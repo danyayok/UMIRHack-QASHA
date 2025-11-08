@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Onest:wght@100..900&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000; 
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    min-height: 100vh;
+}
+
+#travoman{
+    padding: 0%;
+    margin: 0%;
+    background-color: #EAEAE9;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center; 
+    align-items: end; 
+}
+
+#main-panel{
+    width: 62.5vw;
+    height: 85.185185185185185185185185185185vh;
+    background-color: var(--def-background-div);
+    border-radius: 2dvh 2dvh 0dvh 0dvh;
+    display: grid;
+    grid-template-columns: 5.7291666666666666666666666666667vw 25.520833333333333333333333333333vw 25.520833333333333333333333333333vw 5.7291666666666666666666666666667vw;
+    grid-template-rows: 2.7777777777777777777777777777778vh 2.7777777777777777777777777777778vh 27.777777777777777777777777777778vh 3.7037037037037037037037037037037vh 11.111111111111111111111111111111vh 33.333333333333333333333333333333vh 3.7037037037037037037037037037037vh;
+    box-shadow: 0px 0px 40px 0px rgb(0, 0, 0, 0.25);
+    margin-top: auto;
+}
+
+#start-button{
+    width: 13.541666666666666666666666666667vw;
+    height: 3.7037037037037037037037037037037vh;
+    border: none;
+    border-radius: 4dvh;
+    background-color: #0268FB;
+    font-family: "Inter";
+    color: white;
+    grid-row-start: 4;
+    grid-column-start: 2;
+    box-shadow: 0px 0px 6px 0px rgb(0, 0, 0, 0.4);
+    transition: 0.3s ease;
+}
+
+#start-button:hover{
+    box-shadow: 0px 2px 4px 0px rgb(0, 0, 0, 0.25) inset;
+    cursor: pointer;
+}
+
+#links{
+    width: 11.458333333333333333333333333333vw;
+    height: 2.7777777777777777777777777777778vh;
+    grid-row-start: 2;
+    grid-column-start: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 2.0833333333333333333333333333333vw;
+}
+
+
+
+#login{
+    width: 5.2083333333333333333333333333333vw;
+    height: 2.7777777777777777777777777777778vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#registration{
+    width: 6.25vw;
+    height: 2.7777777777777777777777777777778vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+#pipelinesimg{
+    width: 25.520833333333333333333333333333vw;
+    height: 29.777777777777777777777777777778vh;
+    grid-column-start: 3;
+    grid-row-start: 3;
+    background-image: url('../static/assets/pipelinesart.png');
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#text-div{
+    grid-column-start: 2;
+    grid-row-start: 3;
+    height: 25dvh;
+    margin-bottom: 0.27777777777777777777777777777778dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: left;
+}
+
+#qasha{
+    font-weight: 500;
+    font-size: 5.9259259259259259259259259259259vh;
+}
+
+#shiza{
+    font-weight: 500;
+    font-size: 2.2222222222222222222222222222222vh;
+    margin-left: 0.3vw;
+}
+
+#invisible{
+    font-weight: 200;
+    font-size: 1.4814814814814814814814814814815vh;
+    margin-left: 0.3vw;
+}
+
+.cards{
+    width: 13.541666666666666666666666666667vw;
+    height: 33.333333333333333333333333333333vh;
+    border-radius: 1dvh;
+    background-color: white;
+    box-shadow: var(--light-shadow);
+}
+
+#cardsdiv{
+    grid-column-start: 2;
+    grid-row-start: 6;
+    width: 51.041666666666666666666666666667vw;
+    height: 33.333333333333333333333333333333vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+

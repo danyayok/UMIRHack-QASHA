@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Onest:wght@100..900&display=swap');
+
+button:hover{
+    cursor: pointer;
+    box-shadow: 0px 0px 8px 0px rgb(0, 0, 0, 0.25) inset;
+}
+
+:root{
+    --def-background: #EAEAE9;
+    --def-background-div: #FFFFFF;
+    --def-button: #F8FAFD; 
+    --button: #0268FB;
+    --shadow-div: 0px 0px 40px 0px rgb(0, 0, 0, 0.25);
+    --light-shadow: 0px 0px 8px 0px rgb(0, 0, 0, 0.4);
+}
+
+h1,p, .links{
+    padding: 0%;
+    margin: 0%;
+    font-family: "Inter";
+}
+
+.links{
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.4814814814814814814814814814815vh;
+}
+
+#logobutt{
+    width: 2.6041666666666666666666666666667vw;
+    height: 4.6296296296296296296296296296296vh;
+    background-image: url('../static/assets/istlogo.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+
+}

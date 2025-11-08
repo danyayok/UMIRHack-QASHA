@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Onest:wght@100..900&display=swap');
+
+
+input{
+    border: solid 2px #EAEAE9;
+    width: 21.875vw;
+    height: 3.7037037037037037037037037037037vh;
+    border-radius: 1dvh;
+    box-shadow: 0px 2px 4px 0px rgb(0, 0, 0, 0.25) inset;
+}
+
+#travoman{
+    padding: 0%;
+    margin: 0%;
+    background-color: #EAEAE9;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+#logpan{
+    width: 31.25vw;
+    height: 64.814814814814814814814814814815vh;
+    border-radius: 2dvh;
+    background-color: white;
+    box-shadow: var(--shadow-div);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#form{
+    margin-top: 6.9444444444444444444444444444444vh;
+    height: 42.12962962962962962962962962963vh;
+    width: 21.875vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3.7037037037037037037037037037037vh;
+}
+
+
+
+#enter-button{
+    height: 3.7037037037037037037037037037037vh;
+    width: 10.9375vw;
+    border-radius: 2dvh;
+    background-color: #0268FB;
+    border: none;
+    color: white;
+    font-family: "Inter";
+    font-weight: 400;
+    transition: 0.3s ease;
+}
+
+#loglink{
+    font-family: "Inter";
+    font-weight: 200;
+    font-size: 1.2vh;
+    color: black;
+    text-decoration: none;
+
+}
+
+#loglinkdiv{
+    display: flex;
+    width: 8.7291666666666666666666666666667vw;
+    height: 1.8518518518518518518518518518519vh;
+    justify-content: center;
+    align-items: center;
+}
+
+#head-text{
+    font-weight: 600;
+    font-size: 3.7037037037037037037037037037037vh;
+}
+
+
+#passinput{
+    margin-bottom: 0vh;
+}
+
+#passinputp{
+    margin-bottom: 3.7037037037037037037037037037037vh;
+}
+
+.homelink{
+    width: 5.2083333333333333333333333333333vw;
+    height: 2.7777777777777777777777777777778vh;
+    margin-left: 0;
+    margin-top: 0;
+    position: absolute;
+    top: 1.518518518518518518518518518519vh;
+    left: 1.0416666666666666666666666666667vw;
+}
+
+.home{
+    font-family: "Inter";
+    font-weight: 500;
+    font-size: 1.4814814814814814814814814814815vh;
+    color: black;
+    text-decoration: none;
+}
