@@ -24,30 +24,14 @@
     grid-template-rows: 3.7037037037037037037037037037037vh 5.5555555555555555555555555555556vh 8.3333333333333333333333333333333vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh;
 }
 
-#start-test-button{
-    width: 9.375vw;
-    height: 5.5555555555555555555555555555556vh;
-    border: none;
-    border-radius: 2dvh;
-    background-color: var(--button);
-    font-family: "Inter";
-    font-size: 1.8518518518518518518518518518519vh;
-    color: white;
-
-}
-
-#startdiv{
-    grid-row-start: 2;
-    grid-column-start: 3;
-    display: flex;
-    justify-content: end;
-}
-
 #accountpanel{
     width: 12.5vw;
     height: 83.333333333333333333333333333333vh;
     border-radius: 4dvh 0dvh 0dvh 4dvh;
     background-color: white;
+    display: grid;
+    grid-template-rows: repeat(3, 2.7777777777777777777777777777778vh) 3.7037037037037037037037037037037vh 10.185185185185185185185185185185vh 58.333333333333333333333333333333vh;
+    grid-template-columns: 1.0416666666666666666666666666667vw 10.416666666666666666666666666667vw 1.0416666666666666666666666666667vw;
 }
 
 .cardsdiv{
@@ -92,4 +76,143 @@
     font-size: 1.4814814814814814814814814814815vh;
     color: black;
     text-decoration: none;
+}
+
+
+
+#user{
+    background-color: #D9D9D9;
+    border-radius: 4dvh;
+    width: 10.416666666666666666666666666667vw;
+    height: 3.7037037037037037037037037037037vh;
+    grid-row-start: 4;
+    grid-column-start: 2;
+    box-shadow: var(--light-shadow);
+}
+
+#ava{
+    background-color: white;
+    width: 2.0833333333333333333333333333333vw;
+    height: 3.7037037037037037037037037037037vh;
+    border-radius: 4dvh;
+}
+
+#projects{
+    grid-row-start: 6;
+    grid-column-start: 2;
+}
+
+#buttproj{
+    width: 10.416666666666666666666666666667vw;
+    height: 3.7037037037037037037037037037037vh;
+    border-radius: 1dvh;
+    background-color: #0268FB;
+    border: none;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+#butt-sign{
+    font-weight: 600;
+    font-size: 1.4814814814814814814814814814815vh;
+}
+
+#list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: white;
+    border-radius: 1dvh;
+    box-shadow: var(--light-shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+}
+
+#list.visible {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 1vh;
+}
+
+#list.hidden {
+    max-height: 0;
+    opacity: 0;
+}
+
+#list li {
+    padding: 1.5vh 1vw;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    font-family: "Inter";
+    font-size: 1.4vh;
+}
+
+#list li:last-child {
+    border-bottom: none;
+}
+
+#list li:hover {
+    background-color: #f5f5f5;
+}
+
+#buttproj {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#buttproj:hover {
+    background-color: #0258d8;
+}
+
+.card{
+    display: grid;
+    grid-template-columns: 0.52083333333333333333333333333333vw 20.833333333333333333333333333333vw 0.52083333333333333333333333333333vw;
+    grid-template-rows: 0.92592592592592592592592592592593vh 2.7777777777777777777777777777778vh 15.740740740740740740740740740741vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh;
+}
+
+#card1{
+    background: linear-gradient(to right,#0258d8 60%, white 100%);
+}
+
+#card-name{
+    font-weight: 200;
+    font-size: 1.8518518518518518518518518518519vh;
+}
+
+#card-name-div{
+    grid-column-start: 2;
+    grid-row-start: 2;
+    width: 20.833333333333333333333333333333vw;
+    height: 2.7777777777777777777777777777778vh;
+}
+
+#indicator{
+    width: 0.92592592592592592592592592592593vh;
+    height: 0.92592592592592592592592592592593vh;
+    grid-column-start: 2;
+    grid-row-start: 4;
+    background-color: red;
+    border-radius: 10dvh;
+    box-shadow: 0px 0px 8px 1px rgba(255, 0, 0);
+}
+
+
+#gear{
+    width: 1.8518518518518518518518518518519vh;
+    height: 1.8518518518518518518518518518519vh;
+    grid-column-start: 2;
+    grid-row-start: 4;
+    background-image: url('../static/assets/gearcard.png');
+    background-size: cover;
+}
+
+#bottom-row{
+    grid-column-start: 2;
+    grid-row-start: 4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
