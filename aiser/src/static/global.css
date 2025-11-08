@@ -35,3 +35,8 @@ h1,p, .links{
     background-size: 100%;
 
 }
+
+.smalltext{
+    font-size: 1.3vh;
+    font-weight: 300;
+}

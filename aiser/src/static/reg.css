@@ -36,7 +36,7 @@ input{
 
 #form{
     margin-top: 6.9444444444444444444444444444444vh;
-    height: 42.12962962962962962962962962963vh;
+    height: 48.12962962962962962962962962963vh;
     width: 21.875vw;
     display: flex;
     flex-direction: column;
@@ -50,7 +50,7 @@ input{
 #enter-button{
     height: 3.7037037037037037037037037037037vh;
     width: 10.9375vw;
-    border-radius: 2dvh;
+    border-radius: 1dvh;
     background-color: #0268FB;
     border: none;
     color: white;

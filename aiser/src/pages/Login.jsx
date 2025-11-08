@@ -17,8 +17,14 @@ export default function Login(){
             <div id='logpan'>
                 <h1 id='head-text'>Вход</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>
-                    <input type="text"/>
-                    <input type="password" id='passinput'/>
+                    <div>
+                        <p className='smalltext'>Email</p>
+                        <input type="text"/>
+                    </div>
+                    <div>
+                        <p className='smalltext'>Пароль</p>
+                        <input type="password" id='passinput'/>
+                    </div>
                     <button id='enter-button' type='submit'>Войти</button>
                 </form>
                 <div id='reglinkdiv'><Link to='/Registration' id='reglink'>У меня нет аккаунта</Link></div>

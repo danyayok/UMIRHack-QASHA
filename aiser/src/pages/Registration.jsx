@@ -16,10 +16,23 @@ export default function Registration(){
             <div id='logpan'>
                 <h1 id='head-text'>Регистрация</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>
-                    <input type="text"/>
-                    <input type="text"/>
-                    <input type="password" id='passinput'/>
-                    <input type="password" id='passinputp'/>
+                    <div>
+                        <p className='smalltext'>Логин</p>
+                        <input type="text"/>
+                    </div>
+                    <div>
+                        <p className='smalltext'>Email</p>
+                        <input type="text"/>    
+                    </div>
+                    <div>
+                        <p className='smalltext'>Пароль</p>
+                        <input type="password" id='passinput'/>    
+                    </div>
+                    <div>
+                        <p className='smalltext'>Потвердить пароль</p>
+                        <input type="password" id='passinputp'/>    
+                    </div>
+                    
                     <button id='enter-button' type='submit'>Зарегистрироваться</button>
                 </form>
                 <div id='loglinkdiv'><Link to='/Login' id='loglink'>У меня уже есть аккаунт</Link></div>
