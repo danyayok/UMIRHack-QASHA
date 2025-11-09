@@ -121,6 +121,7 @@
 
 #list {
     list-style: none;
+    width: 10.416666666666666666666666666667vw;
     padding: 0;
     margin: 0;
     background-color: white;
@@ -144,7 +145,7 @@
 }
 
 #list li {
-    padding: 1.5vh 1vw;
+    padding: 1vh 1vw;
     cursor: pointer;
     border-bottom: 1px solid #f0f0f0;
     font-family: "Inter";
@@ -264,4 +265,139 @@
 
     border-radius: 1dvh;
     box-shadow: var(--light-shadow);
+}
+
+.project-item {
+    position: relative;
+}
+
+.project-name {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 1vh 1vw;
+    margin: -1vh -1vw;
+}
+
+.project-menu {
+    position: absolute;
+    top: 100%;
+    left: 0%;
+    width: 10.416666666666666666666666666667vw;
+    height: 5.5555555555555555555555555555556vh;
+    background-color: #0268FB;
+    border-radius: 1dvh;
+    box-shadow: var(--light-shadow);
+    margin-top: 0.5vh;
+    display: grid;
+    grid-template-columns: 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw 2.0833333333333333333333333333333vw 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw;
+    grid-template-rows: 0.46296296296296296296296296296296vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh 1.8518518518518518518518518518519vh 0.46296296296296296296296296296296vh;
+    z-index: 1000;
+}
+
+#list {
+    position: relative;
+    overflow: visible;
+}
+
+#list .project-item:hover {
+    background-color: transparent;
+}
+
+#list .project-item .project-name:hover {
+    background-color: #f5f5f5;
+    border-radius: 1dvh; 
+}
+
+.stbutt{
+    padding: 0%;
+    margin: 0%;
+    width: 3.6458333333333333333333333333333vw;
+    height: 1.8518518518518518518518518518519vh;
+    border: white 0.09259259259259259259259259259259vh solid;
+    background-color: #0268FB;
+    border-radius: 2dvh;
+    font-size: 1.2962962962962962962962962962963vh;
+    font-family: "Inter";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+}
+
+.ndbutt{
+    padding: 0%;
+    margin: 0%;
+    height: 1.8518518518518518518518518518519vh;
+    border: white 0.09259259259259259259259259259259vh solid;
+    background-color: #0268FB;
+    border-radius: 2dvh;
+    font-size: 1.1111111111111111111111111111111vh;
+    font-family: "Inter";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+}
+
+#Front{
+    grid-column-start: 2;
+    grid-row-start: 2;
+}
+
+#Back{
+    grid-column-start: 2;
+    grid-row-start: 4;
+}
+
+#overview{
+    grid-column-start: 4;
+    grid-row-start: 2;
+}
+
+#results{
+    grid-column-start: 6;
+    grid-row-start: 2;
+}
+
+#gen{
+    grid-column-start: 4;
+    grid-row-start: 4;
+    grid-column-end: 7;
+}
+
+.stbutt, .ndbutt {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+
+.stbutt:hover:not(.active),
+.ndbutt:hover:not(.active) {
+    background-color: #0258d8;
+    transform: scale(1.1);
+}
+
+
+.stbutt.active {
+    background-color: white;
+    color: #0268FB;
+    border-color: white;
+}
+
+
+.ndbutt.active {
+    background-color: white;
+    color: #0268FB;
+    border-color: white;
+}
+
+
+.stbutt.active:hover,
+.ndbutt.active:hover {
+    background-color: white;
+    color: #0268FB;
+    transform: none;
+    cursor: default;
 }

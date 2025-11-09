@@ -13,7 +13,7 @@ export default function Login(){
     }
     return(
         <div id="travoman">
-            <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
+            <div className='homelink'><Link to='/' className='home links'>Главная</Link></div>
             <div id='logpan'>
                 <h1 id='head-text'>Вход</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>

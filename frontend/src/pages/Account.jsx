@@ -15,20 +15,52 @@ export default function Account(){
         { id: 5, type: 'empty' },
         { id: 6, type: 'empty' }
     ])
+    const [activeProjectMenu, setActiveProjectMenu] = useState(null)
+    const [activeButtons, setActiveButtons] = useState({
+        frontend: false,
+        backend: false,
+        overview: false,
+        results: false,
+        generation: false
+    })
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
     }
 
+    const toggleProjectMenu = (projectId) => {
+        setActiveProjectMenu(activeProjectMenu === projectId ? null : projectId)
+    }
+
+    const handleButtonClick = (buttonType) => {
+        setActiveButtons(prev => {
+            const newState = {...prev};
+            
+            if (buttonType === 'frontend' || buttonType === 'backend') {
+                newState.frontend = false;
+                newState.backend = false;
+            }
+            
+            if (buttonType === 'overview' || buttonType === 'results' || buttonType === 'generation') {
+                newState.overview = false;
+                newState.results = false;
+                newState.generation = false;
+            }
+            
+            newState[buttonType] = true;
+            
+            return newState;
+        });
+    };
+
     const addProject = (cardId) => {
         const projectName = `Проект ${projects.length + 1}`
-        // Случайный прогресс для демонстрации (от 10% до 90%)
         const randomProgress = Math.floor(Math.random() * 80) + 10
         
         const newProject = {
             name: projectName,
             progress: randomProgress,
-            id: Date.now() // уникальный ID
+            id: Date.now() 
         }
         
         setProjects([...projects, newProject])
@@ -55,27 +87,6 @@ export default function Account(){
             setCards(updatedCards)
         }
     }
-
-    // Функция для обновления прогресса (будет вызываться из бэкенда)
-    // const updateProjectProgress = (projectId, newProgress) => {
-    //     // Обновляем прогресс в списке проектов
-    //     setProjects(prevProjects => 
-    //         prevProjects.map(project => 
-    //             project.id === projectId 
-    //                 ? { ...project, progress: newProgress }
-    //                 : project
-    //         )
-    //     )
-        
-    //     // Обновляем прогресс в карточках
-    //     setCards(prevCards =>
-    //         prevCards.map(card =>
-    //             card.name && projects.find(p => p.name === card.name && p.id === projectId)
-    //                 ? { ...card, progress: newProgress }
-    //                 : card
-    //         )
-    //     )
-    // }
 
     const getGradientStyle = (progress) => {
         return {
@@ -135,8 +146,52 @@ export default function Account(){
                         </button>
                         <ul id='list' className={isListVisible ? 'visible' : 'hidden'}>
                             {projects.map((project) => (
-                                <li key={project.id}>
-                                    {project.name} - {project.progress}%
+                                <li key={project.id} className="project-item">
+                                    <span 
+                                        className="project-name"
+                                        onClick={() => toggleProjectMenu(project.id)}
+                                    >
+                                        {project.name} - {project.progress}%
+                                    </span>
+                                    {activeProjectMenu === project.id && (
+                                        <div className="project-menu">
+                                            <button 
+                                                id='Front' 
+                                                className={`stbutt ${activeButtons.frontend ? 'active' : ''}`}
+                                                onClick={() => handleButtonClick('frontend')}
+                                            >
+                                                Frontend
+                                            </button>
+                                            <button 
+                                                id='Back' 
+                                                className={`stbutt ${activeButtons.backend ? 'active' : ''}`}
+                                                onClick={() => handleButtonClick('backend')}
+                                            >
+                                                Backend
+                                            </button>
+                                            <button 
+                                                id='overview' 
+                                                className={`ndbutt ${activeButtons.overview ? 'active' : ''}`}
+                                                onClick={() => handleButtonClick('overview')}
+                                            >
+                                                Обзор
+                                            </button>
+                                            <button 
+                                                id='results' 
+                                                className={`ndbutt ${activeButtons.results ? 'active' : ''}`}
+                                                onClick={() => handleButtonClick('results')}
+                                            >
+                                                Результаты
+                                            </button>
+                                            <button 
+                                                id="gen" 
+                                                className={`ndbutt ${activeButtons.generation ? 'active' : ''}`}
+                                                onClick={() => handleButtonClick('generation')}
+                                            >
+                                                Генерация тестов
+                                            </button>
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                         </ul>

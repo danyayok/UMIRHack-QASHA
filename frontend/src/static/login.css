@@ -59,6 +59,7 @@ input{
     font-family: "Inter";
     font-weight: 400;
     transition: 0.3s ease;
+    box-shadow: var(--button-shadow);
 }
 
 #reglink{
