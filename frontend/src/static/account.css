@@ -58,6 +58,7 @@
     background-color: white;
     border-radius: 1dvh;
     box-shadow: var(--light-shadow);
+    transition: all 0.3s ease;
 }
 
 .homelink{
@@ -167,14 +168,12 @@
     background-color: #0258d8;
 }
 
-.card{
+.card-grid {
     display: grid;
     grid-template-columns: 0.52083333333333333333333333333333vw 20.833333333333333333333333333333vw 0.52083333333333333333333333333333vw;
     grid-template-rows: 0.92592592592592592592592592592593vh 2.7777777777777777777777777777778vh 15.740740740740740740740740740741vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh;
-}
-
-#card1{
-    background: linear-gradient(to right,#0258d8 60%, white 100%);
+    border-radius: 1dvh;
+    transition: all 0.3s ease;
 }
 
 #card-name{
@@ -182,11 +181,21 @@
     font-size: 1.8518518518518518518518518518519vh;
 }
 
-#card-name-div{
+#card-name-div {
     grid-column-start: 2;
     grid-row-start: 2;
     width: 20.833333333333333333333333333333vw;
     height: 2.7777777777777777777777777777778vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#progress-text {
+    font-weight: 400;
+    font-size: 1.4814814814814814814814814814815vh;
+    color: #333;
+    margin: 0;
 }
 
 #indicator{
@@ -197,6 +206,16 @@
     background-color: red;
     border-radius: 10dvh;
     box-shadow: 0px 0px 8px 1px rgba(255, 0, 0);
+}
+
+#indicator.completed {
+    background-color: #00ff00;
+    box-shadow: 0px 0px 8px 1px rgba(0, 255, 0, 0.7);
+}
+
+#indicator.in-progress {
+    background-color: #ffa500;
+    box-shadow: 0px 0px 8px 1px rgba(255, 165, 0, 0.7);
 }
 
 
@@ -215,4 +234,34 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.plus{
+    font-size: 11.111111111111111111111111111111vh;
+}
+
+.add-project {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.add-project:hover {
+    transform: scale(1.1);
+}
+
+.add-project:active {
+    transform: scale(0.95);
+}
+
+.empty-card {
+
+    border-radius: 1dvh;
+    box-shadow: var(--light-shadow);
 }
