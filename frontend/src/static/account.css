@@ -402,3 +402,29 @@
     cursor: default;
 }
 
+#backup-button-div{
+    grid-column-start: 2;
+    grid-row-start: 5;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+
+#backup-button{
+    border: none;
+    border-radius: 2dvh;
+    background-color: #0268FB;
+    width: 10.416666666666666666666666666667vw;
+    height: 2.7777777777777777777777777777778vh;
+    font-size: 1.4814814814814814814814814814815vh;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.92592592592592592592592592592593vh;
+}
+
+#backup-button:hover:not(.active){
+    background-color: #0258d8;
+}

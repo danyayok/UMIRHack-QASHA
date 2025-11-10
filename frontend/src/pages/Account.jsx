@@ -8,6 +8,7 @@ import FrontendResults from './components/FrontendResults'
 import BackendGeneration from './components/BackendGeneration'
 import BackendOverview from './components/BackendOverview'
 import BackendResults from './components/BackendResults'
+import '../static/frontOver.css'
 
 export default function Account(){
     const [isListVisible, setIsListVisible] = useState(false)
@@ -29,8 +30,8 @@ export default function Account(){
         generation: false
     })
     
-    const [activeTab, setActiveTab] = useState(null) // null | 'frontend' | 'backend'
-    const [activeSubTab, setActiveSubTab] = useState('overview') // 'overview' | 'results' | 'generation'
+    const [activeTab, setActiveTab] = useState(null) // null 'frontend' 'backend'
+    const [activeSubTab, setActiveSubTab] = useState('overview') // 'overview' 'results' 'generation'
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
@@ -38,6 +39,21 @@ export default function Account(){
 
     const toggleProjectMenu = (projectId) => {
         setActiveProjectMenu(activeProjectMenu === projectId ? null : projectId)
+    }
+
+    // Функция для кнопки "Назад"
+    const handleBackButton = () => {
+        // Сбрасываем все активные состояния
+        setActiveTab(null)
+        setActiveSubTab('overview')
+        setActiveProjectMenu(null)
+        setActiveButtons({
+            frontend: false,
+            backend: false,
+            overview: false,
+            results: false,
+            generation: false
+        })
     }
 
     const handleButtonClick = (buttonType) => {
@@ -160,12 +176,7 @@ export default function Account(){
                 return <div className='card' key={card.id}></div>
         }
     }
-// ************************************************************************************************************
-// ************************************************************************************************************
-// ************************************************************************************************************
-// ************************************************************************************************************
-// ************************************************************************************************************
-// ************************************************************************************************************
+
     return(
         <div id="travoman">
             <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
@@ -175,6 +186,14 @@ export default function Account(){
                         <div id='ava'></div>
                         <div id='user-name'></div>
                     </div>
+                    {/* Кнопка "Назад" - показываем только когда активна какая-то вкладка */}
+                    {activeTab && (
+                        <div id='backup-button-div'>
+                            <button id='backup-button' onClick={handleBackButton}>
+                                Назад
+                            </button>
+                        </div>
+                    )}
                     <div id='projects'>
                         <button id='buttproj' onClick={toggleList}>
                             <p id='butt-sign'>Проекты</p>
