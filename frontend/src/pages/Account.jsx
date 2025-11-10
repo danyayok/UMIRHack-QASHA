@@ -1,8 +1,13 @@
 import '../static/account.css'
 import '../static/global.css'
 import { Link } from 'react-router-dom'
-import MainButton from './components/MainButton'
 import { useState } from 'react'
+import FrontendGeneration from './components/FrontendGeneration'
+import FrontendOverview from './components/FrontendOverview'
+import FrontendResults from './components/FrontendResults'
+import BackendGeneration from './components/BackendGeneration'
+import BackendOverview from './components/BackendOverview'
+import BackendResults from './components/BackendResults'
 
 export default function Account(){
     const [isListVisible, setIsListVisible] = useState(false)
@@ -23,6 +28,9 @@ export default function Account(){
         results: false,
         generation: false
     })
+    
+    const [activeTab, setActiveTab] = useState(null) // null | 'frontend' | 'backend'
+    const [activeSubTab, setActiveSubTab] = useState('overview') // 'overview' | 'results' | 'generation'
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
@@ -39,12 +47,19 @@ export default function Account(){
             if (buttonType === 'frontend' || buttonType === 'backend') {
                 newState.frontend = false;
                 newState.backend = false;
+                
+                setActiveTab(buttonType);
+                setActiveSubTab('overview');
+                newState.overview = true;
+                newState.results = false;
+                newState.generation = false;
             }
             
             if (buttonType === 'overview' || buttonType === 'results' || buttonType === 'generation') {
                 newState.overview = false;
                 newState.results = false;
                 newState.generation = false;
+                setActiveSubTab(buttonType);
             }
             
             newState[buttonType] = true;
@@ -94,6 +109,21 @@ export default function Account(){
         }
     }
 
+    const renderActiveContent = () => {
+        if (!activeTab) return null;
+
+        switch (activeSubTab) {
+            case 'overview':
+                return activeTab === 'frontend' ? <FrontendOverview /> : <BackendOverview />;
+            case 'results':
+                return activeTab === 'frontend' ? <FrontendResults /> : <BackendResults />;
+            case 'generation':
+                return activeTab === 'frontend' ? <FrontendGeneration /> : <BackendGeneration />;
+            default:
+                return activeTab === 'frontend' ? <FrontendOverview /> : <BackendOverview />;
+        }
+    }
+
     const renderCard = (card) => {
         switch (card.type) {
             case 'grid':
@@ -130,7 +160,12 @@ export default function Account(){
                 return <div className='card' key={card.id}></div>
         }
     }
-
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
     return(
         <div id="travoman">
             <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
@@ -198,12 +233,20 @@ export default function Account(){
                     </div>
                 </aside>
 
-                <div className='cardsdiv' id='firstdiv'>
-                    {cards.slice(0, 3).map(card => renderCard(card))}
-                </div>
-                <div className='cardsdiv' id='secdiv'>
-                    {cards.slice(3, 6).map(card => renderCard(card))}
-                </div>
+                {!activeTab ? (
+                    <>
+                        <div className='cardsdiv' id='firstdiv'>
+                            {cards.slice(0, 3).map(card => renderCard(card))}
+                        </div>
+                        <div className='cardsdiv' id='secdiv'>
+                            {cards.slice(3, 6).map(card => renderCard(card))}
+                        </div>
+                    </>
+                ) : (
+                    <div className="tab-container">
+                        {renderActiveContent()}
+                    </div>
+                )}
             </div>
         </div>
     )

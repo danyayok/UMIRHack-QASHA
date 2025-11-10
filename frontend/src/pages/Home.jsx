@@ -2,7 +2,7 @@ import '../static/home.css'
 import '../static/global.css'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import MainButton from './components/MainButton'
+
 
 export default function Home(){
     const navigate = useNavigate()
@@ -15,7 +15,6 @@ export default function Home(){
         <div id="travoman">
             <div id="main-panel">
                 <div id='links'>
-                    <MainButton />
                     <div id='login'><Link className='links' to='/Login'>Вход</Link></div>
                     <div id='registration'><Link className='links' to='/Registration'>Регистрация</Link></div>
                 </div>

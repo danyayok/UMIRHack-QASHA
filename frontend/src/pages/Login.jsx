@@ -2,7 +2,7 @@ import '../static/login.css'
 import '../static/global.css'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import MainButton from './components/MainButton'
+
 
 export default function Login(){
     const navigate = useNavigate()
