@@ -2,7 +2,6 @@ import '../../static/global.css'
 import '../../static/frontOver.css'
 
 export default function FrontendOverview({ project }) {
-    // Используем данные из props, если они переданы, иначе дефолтные значения
     const testPercentage = project?.testPercentage || 40;
     const projectName = project?.name || 'Проект';
     const indicators = project?.indicators || [
@@ -11,7 +10,6 @@ export default function FrontendOverview({ project }) {
         { name: 'Tickets', status: 'not-started' }
     ];
 
-    // Функция для определения цвета индикатора по статусу
     const getIndicatorColor = (status) => {
         switch (status) {
             case 'completed':
@@ -63,10 +61,9 @@ export default function FrontendOverview({ project }) {
             </div>
 
             <div id='tests-div'>
-                {/* Здесь можно отображать данные тестов из project */}
                 {project?.recentTests && (
                     <div>
-                        {/* Отображение последних тестов */}
+
                     </div>
                 )}
             </div>

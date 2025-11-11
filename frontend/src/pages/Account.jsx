@@ -196,12 +196,24 @@ export default function Account(){
                 return <div className='card' key={card.id}></div>
         }
     }
+// **********************************************************************************
 
+
+
+
+
+
+
+// **********************************************************************************
     return(
         <div id="travoman">
             <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
             <div id="account">
                 <aside id="accountpanel">
+                    <div id="account-div">
+                        <div id='accountt'></div>
+                        <h2 id='account-text'>Личный кабинет</h2>
+                    </div>
                     <div id="user">
                         <div id='ava'></div>
                         <div id='user-name'></div>
