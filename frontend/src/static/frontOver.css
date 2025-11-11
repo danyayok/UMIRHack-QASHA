@@ -55,6 +55,7 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+    margin-top: 1.8518518518518518518518518518519vh;
 }
 
 .indicator-div{
@@ -62,4 +63,77 @@
     height: 7.4074074074074074074074074074074vh;
     border: 0.09259259259259259259259259259259vh solid #0268FB;
     border-radius: 1dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
+
+#percentage-div{
+    width: 27.777777777777777777777777777778vh;
+    height: 27.777777777777777777777777777778vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100dvh;
+    margin: 0;
+    padding: 0.92592592592592592592592592592593vh;
+    background: linear-gradient(#0268FB 0% var(--percentage, 40%), white var(--percentage, 40%) 100%);
+    position: relative;
+}
+
+#percentage-div::before {
+    content: '';
+    position: absolute;
+    width: calc(100% - 1.8518518518518518518518518518519vh);
+    height: calc(100% - 1.8518518518518518518518518518519vh);
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+#percent{
+    margin: 0;
+    padding: 0;
+    font-family: "Inter";
+    font-size: 11.851851851851851851851851851852vh;
+    font-weight: 200;
+    position: relative;
+    z-index: 2;
+}
+
+.ind-text{
+    margin: 0;
+    padding: 0;
+    font-family: "Inter";
+    font-size: 1.8518518518518518518518518518519vh;
+    font-weight: 200;
+}
+
+.tests-indicator{
+    width: 1.8518518518518518518518518518519vh;
+    height: 1.8518518518518518518518518518519vh;
+    border-radius: 100dvh;
+}
+
+#auth-ind{
+    background-color: #00FF00;
+    box-shadow: 0px 0px 4px 0px rgb(0, 255, 0);
+}
+
+#market-ind{
+    background-color: #FF0000;
+    box-shadow: 0px 0px 4px 0px rgb(255, 0, 0);
+}
+
+#tickets-ind{
+    background-color: #FF0000;
+    box-shadow: 0px 0px 4px 0px rgb(255, 0, 0);
+}
+
+/* 
+background-color: #00FF00;                          Зеленый
+box-shadow: 0px 0px 4px 0px rgb(0, 255, 0);
+background-color: #FF0000;                          Красный
+box-shadow: 0px 0px 4px 0px rgb(255, 0, 0);
+*/

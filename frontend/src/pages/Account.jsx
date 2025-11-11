@@ -30,8 +30,9 @@ export default function Account(){
         generation: false
     })
     
-    const [activeTab, setActiveTab] = useState(null) // null 'frontend' 'backend'
-    const [activeSubTab, setActiveSubTab] = useState('overview') // 'overview' 'results' 'generation'
+    const [activeTab, setActiveTab] = useState(null)
+    const [activeSubTab, setActiveSubTab] = useState('overview')
+    const [selectedProject, setSelectedProject] = useState(null) // Добавляем состояние для выбранного проекта
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
@@ -41,12 +42,11 @@ export default function Account(){
         setActiveProjectMenu(activeProjectMenu === projectId ? null : projectId)
     }
 
-    // Функция для кнопки "Назад"
     const handleBackButton = () => {
-        // Сбрасываем все активные состояния
         setActiveTab(null)
         setActiveSubTab('overview')
         setActiveProjectMenu(null)
+        setSelectedProject(null) // Сбрасываем выбранный проект
         setActiveButtons({
             frontend: false,
             backend: false,
@@ -56,7 +56,7 @@ export default function Account(){
         })
     }
 
-    const handleButtonClick = (buttonType) => {
+    const handleButtonClick = (buttonType, project) => {
         setActiveButtons(prev => {
             const newState = {...prev};
             
@@ -66,6 +66,7 @@ export default function Account(){
                 
                 setActiveTab(buttonType);
                 setActiveSubTab('overview');
+                setSelectedProject(project); // Сохраняем выбранный проект
                 newState.overview = true;
                 newState.results = false;
                 newState.generation = false;
@@ -91,7 +92,14 @@ export default function Account(){
         const newProject = {
             name: projectName,
             progress: randomProgress,
-            id: Date.now() 
+            id: Date.now(),
+            // Добавляем дополнительные данные для тестов
+            testPercentage: randomProgress,
+            indicators: [
+                { name: 'Auth', status: 'completed' },
+                { name: 'Market', status: 'in-progress' },
+                { name: 'Tickets', status: 'not-started' }
+            ]
         }
         
         setProjects([...projects, newProject])
@@ -102,7 +110,8 @@ export default function Account(){
                     ...card, 
                     type: 'grid', 
                     name: projectName,
-                    progress: randomProgress
+                    progress: randomProgress,
+                    projectData: newProject // Сохраняем данные проекта в карточке
                 }
             }
             return card
@@ -126,17 +135,28 @@ export default function Account(){
     }
 
     const renderActiveContent = () => {
-        if (!activeTab) return null;
+        if (!activeTab || !selectedProject) return null;
+
+        // Находим актуальные данные проекта
+        const currentProject = projects.find(p => p.id === selectedProject.id) || selectedProject;
 
         switch (activeSubTab) {
             case 'overview':
-                return activeTab === 'frontend' ? <FrontendOverview /> : <BackendOverview />;
+                return activeTab === 'frontend' ? 
+                    <FrontendOverview project={currentProject} /> : 
+                    <BackendOverview project={currentProject} />;
             case 'results':
-                return activeTab === 'frontend' ? <FrontendResults /> : <BackendResults />;
+                return activeTab === 'frontend' ? 
+                    <FrontendResults project={currentProject} /> : 
+                    <BackendResults project={currentProject} />;
             case 'generation':
-                return activeTab === 'frontend' ? <FrontendGeneration /> : <BackendGeneration />;
+                return activeTab === 'frontend' ? 
+                    <FrontendGeneration project={currentProject} /> : 
+                    <BackendGeneration project={currentProject} />;
             default:
-                return activeTab === 'frontend' ? <FrontendOverview /> : <BackendOverview />;
+                return activeTab === 'frontend' ? 
+                    <FrontendOverview project={currentProject} /> : 
+                    <BackendOverview project={currentProject} />;
         }
     }
 
@@ -186,7 +206,6 @@ export default function Account(){
                         <div id='ava'></div>
                         <div id='user-name'></div>
                     </div>
-                    {/* Кнопка "Назад" - показываем только когда активна какая-то вкладка */}
                     {activeTab && (
                         <div id='backup-button-div'>
                             <button id='backup-button' onClick={handleBackButton}>
@@ -212,35 +231,35 @@ export default function Account(){
                                             <button 
                                                 id='Front' 
                                                 className={`stbutt ${activeButtons.frontend ? 'active' : ''}`}
-                                                onClick={() => handleButtonClick('frontend')}
+                                                onClick={() => handleButtonClick('frontend', project)}
                                             >
                                                 Frontend
                                             </button>
                                             <button 
                                                 id='Back' 
                                                 className={`stbutt ${activeButtons.backend ? 'active' : ''}`}
-                                                onClick={() => handleButtonClick('backend')}
+                                                onClick={() => handleButtonClick('backend', project)}
                                             >
                                                 Backend
                                             </button>
                                             <button 
                                                 id='overview' 
                                                 className={`ndbutt ${activeButtons.overview ? 'active' : ''}`}
-                                                onClick={() => handleButtonClick('overview')}
+                                                onClick={() => handleButtonClick('overview', project)}
                                             >
                                                 Обзор
                                             </button>
                                             <button 
                                                 id='results' 
                                                 className={`ndbutt ${activeButtons.results ? 'active' : ''}`}
-                                                onClick={() => handleButtonClick('results')}
+                                                onClick={() => handleButtonClick('results', project)}
                                             >
                                                 Результаты
                                             </button>
                                             <button 
                                                 id="gen" 
                                                 className={`ndbutt ${activeButtons.generation ? 'active' : ''}`}
-                                                onClick={() => handleButtonClick('generation')}
+                                                onClick={() => handleButtonClick('generation', project)}
                                             >
                                                 Генерация тестов
                                             </button>
