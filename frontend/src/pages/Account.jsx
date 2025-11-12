@@ -186,7 +186,7 @@ export default function Account(){
                     type: 'grid', 
                     name: projectName,
                     progress: randomProgress,
-                    projectData: newProject 
+                    projectData: newProject
                 }
             }
             return card
@@ -204,8 +204,25 @@ export default function Account(){
     }
 
     const getGradientStyle = (progress) => {
-        return {
-            background: `linear-gradient(to right, #0258d8 ${progress}%, white 100%)`
+        if (progress < 25) {
+
+            return {
+                backgroundColor: '#ff6b6b'
+            }
+        } else if (progress < 75) {
+
+            return {
+                backgroundColor: '#ffd93d'
+            }
+        } else if (progress < 100) {
+
+            return {
+                backgroundColor: '#6bcf7f'
+            }
+        } else {
+            return {
+                backgroundColor: '#4caf50'
+            }
         }
     }
 
@@ -282,7 +299,6 @@ export default function Account(){
 // ***************************************************************************
     return(
         <div id="travoman">
-            <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
             <div id="account">
 
                 {isProfileModalOpen && (
@@ -294,36 +310,35 @@ export default function Account(){
                             ></div>
 
                             <div id='inputs-div'>
-                                <div id='login-div' className='account-div'>
-                                    <p id='login-text' className='account-text'>Логин</p>
+                                <div className="account-input-container">
                                     <input 
                                         type="text" 
-                                        id='login-input' 
-                                        className='account-input'
+                                        id='login-input'
                                         value={profileData.login}
                                         onChange={(e) => handleInputChange('login', e.target.value)}
+                                        required
                                     />
+                                    <label for="login-input">Логин</label>
                                 </div>
-                                <div className='account-div' id='email-div'>
-                                    <p className='account-text' id='email-text'>Почта</p>
+                                <div className="account-input-container">
                                     <input 
                                         type="text" 
-                                        className='account-input' 
                                         id='email-input'
                                         value={profileData.email}
                                         onChange={(e) => handleInputChange('email', e.target.value)}
+                                        required
                                     />
+                                    <label for="email-input">Почта</label>
                                 </div>
-                                <div className='account-div' id='pass-div'>
-                                    <p className='account-text' id='pass-text'>Пароль</p>
+                                <div className="account-input-container">
                                     <input 
-                                        type="password" 
-                                        className='account-input' 
+                                        type="text" 
                                         id='pass-input'
                                         value={profileData.password}
                                         onChange={(e) => handleInputChange('password', e.target.value)}
-                                        placeholder="Введите новый пароль"
+                                        required
                                     />
+                                    <label for="pass-input">Пароль</label>
                                 </div>
                             </div>
                             <input
@@ -352,8 +367,10 @@ export default function Account(){
 
                 <aside id="accountpanel">
                     <div id="account-div">
-                        <div id='accountt'></div>
-                        <h2 id='account-text'>Личный кабинет</h2>
+                        <Link to="/" id="account-logo-link">
+                            <div id='accountt'></div>
+                            <span id='account-text'>Qasha</span>
+                        </Link>
                     </div>
                     <div id="user" onClick={openProfileModal}>
                         <div 

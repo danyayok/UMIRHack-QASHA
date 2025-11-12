@@ -16,22 +16,38 @@ export default function Registration(){
             <div id='logpan'>
                 <h1 id='head-text'>Регистрация</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>
-                    <div>
-                        <p className='smalltext'>Логин</p>
-                        <input type="text"/>
-                    </div>
-                    <div>
-                        <p className='smalltext'>Email</p>
-                        <input type="text"/>    
-                    </div>
-                    <div>
-                        <p className='smalltext'>Пароль</p>
-                        <input type="password" id='passinput'/>    
-                    </div>
-                    <div>
-                        <p className='smalltext'>Потвердить пароль</p>
-                        <input type="password" id='passinputp'/>    
-                    </div>
+                                <div className="reg-input-container">
+                                    <input 
+                                        type="text" 
+                                        id='login-input'
+                                        required
+                                    />
+                                    <label for="login-input">Логин</label>
+                                </div>
+                                <div className="reg-input-container">
+                                    <input 
+                                        type="text" 
+                                        id='email-input'
+                                        required
+                                    />
+                                    <label for="email-input">Почта</label>
+                                </div>
+                                <div className="reg-input-container">
+                                    <input 
+                                        type="password" 
+                                        id='pass-input'
+                                        required
+                                    />
+                                    <label for="pass-input">Пароль</label>
+                                </div>
+                                <div className="reg-input-container">
+                                    <input 
+                                        type="password" 
+                                        id='sec-pass-input'
+                                        required
+                                    />
+                                    <label for="sec-pass-input">Потвердите пароль</label>
+                                </div>
                     
                     <button id='enter-button' type='submit'>Зарегистрироваться</button>
                 </form>

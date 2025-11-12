@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Onest:wght@100..900&display=swap');
 
-
 #travoman{
     padding: 0%;
     margin: 0%;
@@ -10,23 +9,22 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
 }
 
 #account{
-    width: 83.333333333333333333333333333333vw;
-    height: 83.333333333333333333333333333333vh;
+    width: 97.916666666666666666666666666667vw;
+    height: 96.296296296296296296296296296296vh;
     background-color: #F1F1F1;
     border-radius: 4dvh;
     box-shadow: var(--shadow-div);
     display: grid;
-    grid-template-columns: 12.5vw 1.5625vw 67.708333333333333333333333333333vw 1.5625vw;
-    grid-template-rows: 3.7037037037037037037037037037037vh 5.5555555555555555555555555555556vh 8.3333333333333333333333333333333vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh;
+    grid-template-columns: 12.5vw 2vw 1fr 2vw;
+    grid-template-rows: 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh;
 }
 
 #accountpanel{
     width: 12.5vw;
-    height: 83.333333333333333333333333333333vh;
+    height: 96.296296296296296296296296296296vh;
     border-radius: 4dvh 0dvh 0dvh 4dvh;
     background-color: white;
     display: grid;
@@ -35,29 +33,30 @@
 }
 
 .cardsdiv{
-    width: 67.708333333333333333333333333333vw;
-    height: 22.222222222222222222222222222222vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2vw;
 }
 
 #firstdiv{
-    grid-row-start: 4;
+    grid-row-start: 2;
     grid-column-start: 3;
 }
 
 #secdiv{
-    grid-row-start: 6;
+    grid-row-start: 4;
     grid-column-start: 3;
 }
 
 .card{
-    width: 21.875vw;
-    height: 22.222222222222222222222222222222vh;
+    width: 22.5vw;
+    height: 23vh;
     background-color: white;
     border-radius: 1dvh;
-    box-shadow: var(--light-shadow);
+    box-shadow: none;
     transition: all 0.3s ease;
 }
 
@@ -79,8 +78,6 @@
     text-decoration: none;
 }
 
-
-
 #user{
     background-color: #D9D9D9;
     border-radius: 4dvh;
@@ -88,14 +85,12 @@
     height: 3.7037037037037037037037037037037vh;
     grid-row-start: 4;
     grid-column-start: 2;
-    box-shadow: var(--light-shadow);
+    box-shadow: none;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
-
-
 
 #projects{
     grid-row-start: 6;
@@ -125,7 +120,7 @@
     margin: 0;
     background-color: white;
     border-radius: 1dvh;
-    box-shadow: var(--light-shadow);
+    box-shadow: none;
     overflow: hidden;
     transition: all 0.3s ease;
     max-height: 0;
@@ -174,6 +169,7 @@
     grid-template-rows: 0.92592592592592592592592592592593vh 2.7777777777777777777777777777778vh 15.740740740740740740740740740741vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh;
     border-radius: 1dvh;
     transition: all 0.3s ease;
+    background-color: white; 
 }
 
 #card-name{
@@ -217,7 +213,6 @@
     background-color: #ffa500;
     box-shadow: 0px 0px 8px 1px rgba(255, 165, 0, 0.7);
 }
-
 
 #gear{
     width: 1.8518518518518518518518518518519vh;
@@ -264,9 +259,8 @@
 }
 
 .empty-card {
-
     border-radius: 1dvh;
-    box-shadow: var(--light-shadow);
+    box-shadow: none;
 }
 
 .project-item {
@@ -289,7 +283,7 @@
     height: 5.5555555555555555555555555555556vh;
     background-color: #0268FB;
     border-radius: 1dvh;
-    box-shadow: var(--light-shadow);
+    box-shadow: none;
     margin-top: 0.5vh;
     display: grid;
     grid-template-columns: 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw 2.0833333333333333333333333333333vw 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw;
@@ -374,13 +368,11 @@
     color: white;
 }
 
-
 .stbutt:hover:not(.active),
 .ndbutt:hover:not(.active) {
     background-color: #0258d8;
     transform: scale(1.1);
 }
-
 
 .stbutt.active {
     background-color: white;
@@ -388,13 +380,11 @@
     border-color: white;
 }
 
-
 .ndbutt.active {
     background-color: white;
     color: #0268FB;
     border-color: white;
 }
-
 
 .stbutt.active:hover,
 .ndbutt.active:hover {
@@ -436,8 +426,21 @@
     grid-row-start: 2;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: start;
     align-items: center;
+}
+
+#account-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+#account-logo-link:hover {
+    opacity: 0.8;
 }
 
 #account-text{
@@ -446,10 +449,11 @@
     font-size: 1.6666666666666666666666666666667vh;
     font-weight: 600;
     font-family: "Inter";
+    color: black;
 }
 
 #accountt{
-    background-image: url('../static/assets/account-icon.png');
+    background-image: url('../static/assets/istlogo.png');
     background-size: cover;
     background-repeat: no-repeat;
     width: 3.7037037037037037037037037037037vh;
@@ -474,22 +478,6 @@
     grid-template-rows: 0.92592592592592592592592592592593vh 18.518518518518518518518518518519vh 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 0.92592592592592592592592592592593vh;
 }
 
-#avatar-div{
-    background-color: #F1F1F1;
-    grid-column-start: 2;
-    grid-row-start: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#avatar{
-    width: 10.416666666666666666666666666667vw;
-    height: 10.416666666666666666666666666667vw;
-    border-radius: 10dvh;
-    background-color: white;
-}
-
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -512,7 +500,7 @@
     display: grid;
     grid-template-columns: 1.0416666666666666666666666666667vw 10.416666666666666666666666666667vw 1.0416666666666666666666666666667vw 31.25vw 1.0416666666666666666666666666667vw;
     grid-template-rows: 0.92592592592592592592592592592593vh 18.518518518518518518518518518519vh 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 0.92592592592592592592592592592593vh;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: none;
     z-index: 10001;
     overflow: hidden; 
 }
@@ -661,3 +649,130 @@
     align-items: center;
 }
 
+.card-grid #card-name {
+    color: white;
+    font-weight: 500;
+}
+
+.card-grid #progress-text {
+    color: white;
+    font-weight: 500;
+}
+
+.card-grid #gear {
+    filter: brightness(0) invert(1); 
+}
+
+.card-grid #indicator {
+    box-shadow: 0px 0px 8px 1px rgba(255, 255, 255, 0.7);
+}
+
+.card-grid #indicator.completed {
+    background-color: #00ff00;
+    box-shadow: 0px 0px 8px 1px rgba(0, 255, 0, 0.9);
+}
+
+.card-grid #indicator.in-progress {
+    background-color: #ffff00;
+    box-shadow: 0px 0px 8px 1px rgba(255, 255, 0, 0.9);
+}
+
+.card-grid #card-name {
+    color: #333;
+    font-weight: 500;
+}
+
+.card-grid #progress-text {
+    color: #333;
+    font-weight: 600;
+}
+
+.card-grid #gear {
+    filter: brightness(0.7);
+}
+
+.card-grid #indicator {
+    box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.3);
+}
+
+.card-grid #indicator.completed {
+    background-color: #4caf50;
+    box-shadow: 0px 0px 6px 1px rgba(76, 175, 80, 0.7);
+}
+
+.card-grid #indicator.in-progress {
+    background-color: #ffd93d;
+    box-shadow: 0px 0px 6px 1px rgba(255, 217, 61, 0.7);
+}
+
+.card {
+    transition: all 0.5s ease;
+}
+
+.card-grid {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-input-container {
+  position: relative;
+  margin: 0;
+  width: 100%;
+}
+
+.account-input-container input {
+  width: 100%;
+  padding: 0.8em;
+  font-size: 1.4vh;
+  border: 2px solid #c8c8c8;
+  border-radius: 1dvh;
+  background-color: transparent;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  font-family: "Inter";
+}
+
+.account-input-container label {
+  position: absolute;
+  left: 0.8em;
+  top: 0.7em;
+  font-size: 1.4vh;
+  color: #646464;
+  background-color: transparent;
+  padding: 0 0.4em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  font-family: "Inter";
+  font-weight: 300;
+}
+
+.account-input-container input:focus ~ label,
+.account-input-container input:valid ~ label {
+  transform: translateY(-1.2em) scale(0.85);
+  background-color: white;
+  color: #0268FB;
+}
+
+.account-input-container input:focus {
+  border-color: #0268FB;
+}
+
+/* Специфические стили для инпутов в модальном окне профиля */
+#profile-settings-div .account-input-container {
+  margin: 0;
+}
+
+#profile-settings-div .account-input-container input {
+  height: auto;
+  padding: 0.6em 0.8em;
+}
+
+#profile-settings-div .account-input-container label {
+  top: 0.6em;
+  left: 0.8em;
+}
+
+#profile-settings-div .account-input-container input:focus ~ label,
+#profile-settings-div .account-input-container input:valid ~ label {
+  transform: translateY(-1.1em) scale(0.85);
+}

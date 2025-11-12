@@ -10,9 +10,9 @@ button:hover{
     --def-background-div: #FFFFFF;
     --def-button: #F8FAFD; 
     --def-color: #0268FB;
-    --shadow-div: 0px 0px 40px 0px rgb(0, 0, 0, 0.25);
-    --light-shadow: 0px 0px 8px 0px rgb(0, 0, 0, 0.4);
-    --button-shadow: 0px 0px 6px 0px rgb(0, 0, 0, 0.4);
+    --shadow-div: 0px 0px 4px 0px rgb(0, 0, 0, 0.25);
+    --light-shadow: 0px 0px 2px 0px rgb(0, 0, 0, 0.4);
+    --button-shadow: 0px 0px 2px 0px rgb(0, 0, 0, 0.3);
 }
 
 h1,p, .links{
@@ -44,4 +44,85 @@ h1,p, .links{
 .smalltext{
     font-size: 1.3vh;
     font-weight: 300;
+}
+
+.inputGroup {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 1em 0 1em 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: transparent;
+  border-radius: 2dvh;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.inputGroup label {
+  position: absolute;
+  left: 1em;
+  top: 0.8em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: rgb(100, 100, 100);
+  background-color: transparent;
+  padding: 0 0.4em;
+}
+
+.inputGroup :is(input:focus, input:valid) ~ label {
+  transform: translateY(-1.4em) scale(.9);
+  background-color: white;
+  color: rgb(255, 255, 255);
+}
+
+.inputGroup :is(input:focus, input:valid) {
+  border-color: rgb(255, 255, 255);
+}
+
+.floating-label-input {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 1em 0;
+}
+
+.floating-label-input input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: transparent;
+  border-radius: 2dvh;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.floating-label-input label {
+  position: absolute;
+  left: 1em;
+  top: 0.8em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: rgb(100, 100, 100);
+  background-color: transparent;
+  padding: 0 0.4em;
+}
+
+.floating-label-input :is(input:focus, input:valid) ~ label {
+  transform: translateY(-1.4em) scale(.9);
+  background-color: white;
+  color: rgb(255, 255, 255);
+}
+
+.floating-label-input :is(input:focus, input:valid) {
+  border-color: rgb(255, 255, 255);
 }

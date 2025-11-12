@@ -3,7 +3,6 @@ import '../static/global.css'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-
 export default function Login(){
     const navigate = useNavigate()
 
@@ -11,24 +10,24 @@ export default function Login(){
         navigate('/Account')
         e.preventDefault();
     }
+    
     return(
         <div id="travoman">
             <div className='homelink'><Link to='/' className='home links'>Главная</Link></div>
             <div id='logpan'>
                 <h1 id='head-text'>Вход</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>
-                    <div>
-                        <p className='smalltext'>Email</p>
-                        <input type="text"/>
+                    <div className='inputGroup'>
+                        <input type="text" id='mail' required/>
+                        <label className='smalltext' for="mail">Email</label>
                     </div>
-                    <div>
-                        <p className='smalltext'>Пароль</p>
-                        <input type="password" id='passinput'/>
+                    <div className='inputGroup floating-label-input'>
+                        <input type="password" id='passinput' required/>
+                        <label className='smalltext' for="password">Пароль</label>
                     </div>
                     <button id='enter-button' type='submit'>Войти</button>
                 </form>
                 <div id='reglinkdiv'><Link to='/Registration' id='reglink'>У меня нет аккаунта</Link></div>
-                
             </div>
         </div>
     )

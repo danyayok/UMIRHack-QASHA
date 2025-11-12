@@ -6,7 +6,7 @@ input{
     width: 21.875vw;
     height: 3.7037037037037037037037037037037vh;
     border-radius: 1dvh;
-    box-shadow: 0px 2px 4px 0px rgb(0, 0, 0, 0.25) inset;
+    box-shadow: none;
 }
 
 #travoman{
@@ -55,7 +55,7 @@ input{
     font-family: "Inter";
     font-weight: 400;
     transition: 0.3s ease;
-    box-shadow: var(--button-shadow);
+    box-shadow: none;
 }
 
 #loglink{
@@ -105,4 +105,48 @@ input{
     font-size: 1.4814814814814814814814814814815vh;
     color: black;
     text-decoration: none;
+}
+
+.reg-input-container {
+  position: relative;
+  margin: 0;
+  width: 100%;
+}
+
+.reg-input-container input {
+  width: 100%;
+  padding: 0;
+  font-size: 1.4vh;
+  border: 2px solid #c8c8c8;
+  border-radius: 1dvh;
+  background-color: transparent;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  font-family: "Inter";
+}
+
+.reg-input-container label {
+  position: absolute;
+  left: 0.8em;
+  top: 0.7em;
+  font-size: 1.4vh;
+  color: #646464;
+  background-color: transparent;
+  padding: 0 0.4em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  font-family: "Inter";
+  font-weight: 300;
+}
+
+.reg-input-container input:focus ~ label,
+.reg-input-container input:valid ~ label {
+  transform: translateY(-1.2em) scale(0.85);
+  background-color: white;
+  color: #0268FB;
+}
+
+.reg-input-container input:focus {
+  border-color: #0268FB;
 }
