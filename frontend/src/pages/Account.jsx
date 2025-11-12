@@ -1,7 +1,7 @@
 import '../static/account.css'
 import '../static/global.css'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import FrontendGeneration from './components/FrontendGeneration'
 import FrontendOverview from './components/FrontendOverview'
 import FrontendResults from './components/FrontendResults'
@@ -32,7 +32,33 @@ export default function Account(){
     
     const [activeTab, setActiveTab] = useState(null)
     const [activeSubTab, setActiveSubTab] = useState('overview')
-    const [selectedProject, setSelectedProject] = useState(null) // Добавляем состояние для выбранного проекта
+    const [selectedProject, setSelectedProject] = useState(null)
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+    
+    // Состояния для данных профиля
+    const [profileData, setProfileData] = useState({
+        login: 'GermanGering1',
+        email: 'german@example.com',
+        password: ''
+    })
+    
+    const [initialProfileData, setInitialProfileData] = useState({
+        login: 'GermanGering1',
+        email: 'german@example.com',
+        password: ''
+    })
+    
+    const [hasChanges, setHasChanges] = useState(false)
+    const [avatar, setAvatar] = useState(null) // Состояние для аватара
+
+    useEffect(() => {
+        const changesExist = 
+            profileData.login !== initialProfileData.login ||
+            profileData.email !== initialProfileData.email ||
+            profileData.password !== initialProfileData.password;
+        
+        setHasChanges(changesExist);
+    }, [profileData, initialProfileData]);
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
@@ -46,7 +72,7 @@ export default function Account(){
         setActiveTab(null)
         setActiveSubTab('overview')
         setActiveProjectMenu(null)
-        setSelectedProject(null) // Сбрасываем выбранный проект
+        setSelectedProject(null)
         setActiveButtons({
             frontend: false,
             backend: false,
@@ -54,6 +80,55 @@ export default function Account(){
             results: false,
             generation: false
         })
+    }
+
+    const openProfileModal = () => {
+        setInitialProfileData(profileData);
+        setHasChanges(false);
+        setIsProfileModalOpen(true);
+    }
+
+    const closeProfileModal = () => {
+        if (hasChanges) {
+            const confirmClose = window.confirm('У вас есть несохраненные изменения. Вы уверены, что хотите закрыть?');
+            if (!confirmClose) return;
+        }
+
+        if (hasChanges) {
+            setProfileData(initialProfileData);
+        }
+        setHasChanges(false);
+        setIsProfileModalOpen(false);
+    }
+
+    const handleInputChange = (field, value) => {
+        setProfileData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
+
+    const handleSaveChanges = () => {
+        if (hasChanges) {
+            console.log('Сохранение данных:', profileData);
+            
+            setInitialProfileData(profileData);
+            setHasChanges(false);
+            setIsProfileModalOpen(false);
+        } else {
+            closeProfileModal();
+        }
+    }
+
+    const handleAvatarChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setAvatar(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     const handleButtonClick = (buttonType, project) => {
@@ -66,7 +141,7 @@ export default function Account(){
                 
                 setActiveTab(buttonType);
                 setActiveSubTab('overview');
-                setSelectedProject(project); // Сохраняем выбранный проект
+                setSelectedProject(project);
                 newState.overview = true;
                 newState.results = false;
                 newState.generation = false;
@@ -93,7 +168,7 @@ export default function Account(){
             name: projectName,
             progress: randomProgress,
             id: Date.now(),
-            // Добавляем дополнительные данные для тестов
+
             testPercentage: randomProgress,
             indicators: [
                 { name: 'Auth', status: 'completed' },
@@ -111,7 +186,7 @@ export default function Account(){
                     type: 'grid', 
                     name: projectName,
                     progress: randomProgress,
-                    projectData: newProject // Сохраняем данные проекта в карточке
+                    projectData: newProject 
                 }
             }
             return card
@@ -137,7 +212,6 @@ export default function Account(){
     const renderActiveContent = () => {
         if (!activeTab || !selectedProject) return null;
 
-        // Находим актуальные данные проекта
         const currentProject = projects.find(p => p.id === selectedProject.id) || selectedProject;
 
         switch (activeSubTab) {
@@ -174,7 +248,7 @@ export default function Account(){
                             <p id='progress-text'>{card.progress}%</p>
                         </div>
                         <div id='bottom-row'>
-                            <Link to='/' id='gear'/>
+                            <button id='gear'></button>
                             <div 
                                 id='indicator' 
                                 className={card.progress === 100 ? 'completed' : 'in-progress'}
@@ -196,27 +270,99 @@ export default function Account(){
                 return <div className='card' key={card.id}></div>
         }
     }
-// **********************************************************************************
-
-
-
-
-
-
-
-// **********************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
+// ***************************************************************************
     return(
         <div id="travoman">
             <div className='homelink'><Link to='/' className='home'>Главная</Link></div>
             <div id="account">
+
+                {isProfileModalOpen && (
+                    <div className="modal-overlay" onClick={closeProfileModal}>
+                        <div id='profile-settings-div' onClick={(e) => e.stopPropagation()}>
+                            <div 
+                                id='avatar' 
+                                style={avatar ? { backgroundImage: `url(${avatar})`, backgroundSize: 'cover' } : {}}
+                            ></div>
+
+                            <div id='inputs-div'>
+                                <div id='login-div' className='account-div'>
+                                    <p id='login-text' className='account-text'>Логин</p>
+                                    <input 
+                                        type="text" 
+                                        id='login-input' 
+                                        className='account-input'
+                                        value={profileData.login}
+                                        onChange={(e) => handleInputChange('login', e.target.value)}
+                                    />
+                                </div>
+                                <div className='account-div' id='email-div'>
+                                    <p className='account-text' id='email-text'>Почта</p>
+                                    <input 
+                                        type="text" 
+                                        className='account-input' 
+                                        id='email-input'
+                                        value={profileData.email}
+                                        onChange={(e) => handleInputChange('email', e.target.value)}
+                                    />
+                                </div>
+                                <div className='account-div' id='pass-div'>
+                                    <p className='account-text' id='pass-text'>Пароль</p>
+                                    <input 
+                                        type="password" 
+                                        className='account-input' 
+                                        id='pass-input'
+                                        value={profileData.password}
+                                        onChange={(e) => handleInputChange('password', e.target.value)}
+                                        placeholder="Введите новый пароль"
+                                    />
+                                </div>
+                            </div>
+                            <input
+                                type="file"
+                                id="avatar-input"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={handleAvatarChange}
+                            />
+                            <button 
+                                id='change-avatar-button' 
+                                onClick={() => document.getElementById('avatar-input').click()}
+                            >
+                                Сменить фото
+                            </button>
+                            <button 
+                                id='save-changes-button' 
+                                onClick={handleSaveChanges}
+                                className={hasChanges ? 'has-changes' : ''}
+                            >
+                                {hasChanges ? 'Сохранить изменения' : 'Назад'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <aside id="accountpanel">
                     <div id="account-div">
                         <div id='accountt'></div>
                         <h2 id='account-text'>Личный кабинет</h2>
                     </div>
-                    <div id="user">
-                        <div id='ava'></div>
-                        <div id='user-name'></div>
+                    <div id="user" onClick={openProfileModal}>
+                        <div 
+                            id='ava' 
+                            style={avatar ? { backgroundImage: `url(${avatar})`, backgroundSize: 'cover' } : {}}
+                        ></div>
+                        <div id='user-name-div'>
+                            <p id='user-name'>{profileData.login}</p>
+                        </div>
                     </div>
                     {activeTab && (
                         <div id='backup-button-div'>

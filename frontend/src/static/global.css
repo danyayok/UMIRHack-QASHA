@@ -9,7 +9,7 @@ button:hover{
     --def-background: #EAEAE9;
     --def-background-div: #FFFFFF;
     --def-button: #F8FAFD; 
-    --button: #0268FB;
+    --def-color: #0268FB;
     --shadow-div: 0px 0px 40px 0px rgb(0, 0, 0, 0.25);
     --light-shadow: 0px 0px 8px 0px rgb(0, 0, 0, 0.4);
     --button-shadow: 0px 0px 6px 0px rgb(0, 0, 0, 0.4);

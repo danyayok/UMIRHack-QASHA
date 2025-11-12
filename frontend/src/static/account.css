@@ -89,6 +89,10 @@
     grid-row-start: 4;
     grid-column-start: 2;
     box-shadow: var(--light-shadow);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
 
@@ -220,8 +224,11 @@
     height: 1.8518518518518518518518518518519vh;
     grid-column-start: 2;
     grid-row-start: 4;
+    background: none;
     background-image: url('../static/assets/gearcard.png');
     background-size: cover;
+    border: none;
+    
 }
 
 #bottom-row{
@@ -455,3 +462,202 @@
     background-color: white;
     border-radius: 10dvh;
 }
+
+#profile-settings-div{
+    width: 44.791666666666666666666666666667vw;
+    height: 25.925925925925925925925925925926vh;
+    border: none;
+    border-radius: 1dvh;
+    background-color: #F1F1F1;
+    display: grid;
+    grid-template-columns: 1.0416666666666666666666666666667vw 10.416666666666666666666666666667vw 1.0416666666666666666666666666667vw 31.25vw 1.0416666666666666666666666666667vw;
+    grid-template-rows: 0.92592592592592592592592592592593vh 18.518518518518518518518518518519vh 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 0.92592592592592592592592592592593vh;
+}
+
+#avatar-div{
+    background-color: #F1F1F1;
+    grid-column-start: 2;
+    grid-row-start: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#avatar{
+    width: 10.416666666666666666666666666667vw;
+    height: 10.416666666666666666666666666667vw;
+    border-radius: 10dvh;
+    background-color: white;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+#profile-settings-div {
+    width: 44.791666666666666666666666666667vw;
+    height: 25.925925925925925925925925925926vh;
+    border: none;
+    border-radius: 1dvh;
+    background-color: white;
+    display: grid;
+    grid-template-columns: 1.0416666666666666666666666666667vw 10.416666666666666666666666666667vw 1.0416666666666666666666666666667vw 31.25vw 1.0416666666666666666666666666667vw;
+    grid-template-rows: 0.92592592592592592592592592592593vh 18.518518518518518518518518518519vh 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 0.92592592592592592592592592592593vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 10001;
+    overflow: hidden; 
+}
+
+#inputs-div {
+    grid-column-start: 4;
+    grid-row-start: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.account-div {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.account-text {
+    font-family: "Inter";
+    font-size: 1.4vh;
+    margin-bottom: 0;
+    color: #333;
+}
+
+.account-input {
+    padding: 0;
+    border: none;
+    font-family: "Inter";
+    font-size: 1.3vh;
+    width: 31.25vw;
+}
+
+#buttons-div {
+    grid-column-start: 2;
+    grid-column-end: 5;
+    grid-row-start: 4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#change-avatar-button,
+#save-changes-button,
+#close-modal-button {
+    padding: 0.7vh 1vw;
+    border: none;
+    border-radius: 0.5dvh;
+    background-color: #0268FB;
+    color: white;
+    font-family: "Inter";
+    font-size: 1.2vh;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#change-avatar-button:hover,
+#save-changes-button:hover,
+#close-modal-button:hover {
+    background-color: #0258d8;
+}
+
+#avatar {
+    grid-column-start: 2;
+    grid-row-start: 2;
+    width: 8.716666666666666666666666666667vw;
+    height: 8.716666666666666666666666666667vw;
+    max-width: 10.416666666666666666666666666667vw;
+    max-height: 10.416666666666666666666666666667vw;
+    border-radius: 100dvh;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
+    justify-self: center;
+    align-self: center;
+}
+
+#user {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#user:hover {
+    background-color: #d0d0d0;
+}
+
+#change-avatar-button{
+    grid-column-start: 2;
+    grid-row-start: 4;
+    font-family: "Inter";
+    font-size: 1.4814814814814814814814814814815vh;
+    font-weight: 600;
+}
+
+#save-changes-button{
+    grid-column-start: 4;
+    grid-row-start: 4;
+    grid-row-end: 5;
+    width: 13.541666666666666666666666666667vw;
+    font-family: "Inter";
+    font-size: 1.4814814814814814814814814814815vh;
+    font-weight: 600;
+}
+
+#user-name{
+    font-size: 1.6518518518518518518518518518519vh;
+    font-weight: 500;
+    font-family: "Inter";
+}
+
+#user-name-div{
+    width: 8.3333333333333333333333333333333vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#save-changes-button.has-changes {
+    background-color: #4392ff;
+}
+
+#save-changes-button.has-changes:hover {
+    background-color: #3187ff;
+}
+
+#avatar, #ava {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+}
+
+.account-input {
+    padding: 0;
+    border: none;
+    font-family: "Inter";
+    font-size: 1.4vh;
+    width: 31.25vw;
+    border: none;
+    padding-bottom: 0;
+    transition: border-color 0.3s ease;
+}
+
+#profile-settings-div > #avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
