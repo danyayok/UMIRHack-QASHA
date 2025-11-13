@@ -118,10 +118,17 @@ export const projectsAPI = {
     return response.json();
   },
 
-  updateProjectRepo: (projectId, repoUrl, branch = 'main') =>
-    fetchWithAuth(`/projects/${projectId}/update-repo?repo_url=${encodeURIComponent(repoUrl)}&branch=${branch}`, {
+  updateProjectRepo: (projectId, repoUrl, branch = null) => {
+    const params = new URLSearchParams();
+    params.append('repo_url', repoUrl);
+    if (branch) {
+      params.append('branch', branch);
+    }
+
+    return fetchWithAuth(`/projects/${projectId}/update-repo?${params.toString()}`, {
       method: 'PUT',
-    }),
+    });
+  },
 
   analyzeProject: (projectId) =>
     fetchWithAuth(`/projects/${projectId}/analyze`, {
@@ -136,11 +143,50 @@ export const projectsAPI = {
 
   getProjectAnalyses: (projectId) =>
     fetchWithAuth(`/projects/${projectId}/analyses`),
+
   deleteProject: (projectId) =>
     fetchWithAuth(`/projects/${projectId}`, {
       method: 'DELETE',
     }),
 };
+
+export const testsAPI = {
+  generateTests: (projectId, config) =>
+    fetchWithAuth(`/projects/${projectId}/generate-tests`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+
+  getTestTemplates: () =>
+    fetchWithAuth('/tests/templates'),
+
+  runTests: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/run-tests`, {
+      method: 'POST',
+    }),
+
+  getTestResults: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/test-results`),
+     runTests: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/run-tests`, {
+      method: 'POST',
+    }),
+
+  runSpecificTest: (projectId, testFile) =>
+    fetchWithAuth(`/projects/${projectId}/run-tests/${encodeURIComponent(testFile)}`, {
+      method: 'POST',
+    }),
+
+  getTestResults: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/test-results`),
+
+  generateTests: (projectId, config) =>
+    fetchWithAuth(`/projects/${projectId}/generate-tests`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+};
+
 
 // Health check
 export const healthAPI = {

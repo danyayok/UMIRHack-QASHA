@@ -146,3 +146,20 @@ class AgentReportOut(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class TestRunBase(BaseModel):
+    project_id: int
+    analysis_id: Optional[int] = None
+    status: str
+    results: Optional[Dict[str, Any]] = None
+    coverage: Optional[float] = None
+    duration: Optional[float] = None
+
+class TestRunCreate(TestRunBase):
+    pass
+
+class TestRunOut(TestRunBase):
+    id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

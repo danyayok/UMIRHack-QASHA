@@ -7,24 +7,44 @@ function AnalysisHistory({ analyses, onRefresh }) {
   const formatResult = (result) => {
     if (!result) return 'Нет данных';
 
+    console.log('📋 Analysis History Raw Data:', result);
+
+    // Новый формат (реальный анализ)
+    if (result.file_structure_summary && result.test_analysis) {
+      const {
+        technologies = [],
+        file_structure_summary = {},
+        test_analysis = {},
+        coverage_estimate = 0
+      } = result;
+
+      return `
+Технологии: ${technologies.join(', ') || 'не обнаружены'}
+Файлов проанализировано: ${file_structure_summary.total_files || 0}
+Файлов кода: ${file_structure_summary.code_files || 0}
+Тестовых файлов: ${file_structure_summary.test_files || 0}
+Тесты найдены: ${test_analysis.has_tests ? '✅ Да' : '❌ Нет'}
+Фреймворки тестирования: ${test_analysis.test_frameworks?.join(', ') || 'не обнаружены'}
+Покрытие: ${coverage_estimate}%
+      `.trim();
+    }
+
+    // Старый формат
+    if (result.technologies && Array.isArray(result.technologies)) {
+      return `
+Технологии: ${result.technologies.join(', ')}
+Файлов проанализировано: ${result.metrics?.total_files || 0}
+Сгенерировано тестов: ${result.generated_tests?.total_generated || 0}
+Фреймворки тестирования: ${result.test_frameworks?.join(', ') || 'не обнаружены'}
+      `.trim();
+    }
+
+    // Любой другой формат
     if (typeof result === 'string') {
       return result;
     }
 
-    // Если результат в формате JSON
-    try {
-      if (result.technologies) {
-        return `
-Технологии: ${result.technologies?.join(', ') || 'не обнаружены'}
-Файлов проанализировано: ${result.metrics?.total_files || 0}
-Сгенерировано тестов: ${result.generated_tests?.total_generated || 0}
-Фреймворки тестирования: ${result.test_frameworks?.join(', ') || 'не обнаружены'}
-        `.trim();
-      }
-      return JSON.stringify(result, null, 2);
-    } catch {
-      return 'Не удалось отобразить результат';
-    }
+    return JSON.stringify(result, null, 2);
   };
 
   return (
@@ -112,37 +132,78 @@ function Overview({ project, analyses, onRefresh, onAnalyze }) {
     return progressMap[analysis?.status] || 0;
   };
 
-  const formatAnalysisResult = (result) => {
-    if (!result) return null;
+    const formatAnalysisResult = (result) => {
+      if (!result) return 'Нет данных анализа';
 
-    if (typeof result === 'string') {
-      return result;
-    }
+      // Проверяем, что это реальные данные анализа (а не ошибка или старый формат)
+      if (result.technologies || result.file_structure_summary) {
+        const {
+          technologies = [],
+          frameworks = [],
+          file_structure_summary = {},
+          test_analysis = {},
+          dependencies = {},
+          coverage_estimate = 0,
+          project_structure = {}
+        } = result;
 
-    if (result.technologies) {
-      return `
-📊 РЕЗУЛЬТАТЫ АНАЛИЗА
+        const {
+          total_files = 0,
+          code_files = 0,
+          test_files = 0,
+          total_lines = 0,
+          total_size_kb = 0
+        } = file_structure_summary;
+
+        const {
+          has_tests = false,
+          test_frameworks = [],
+          test_files_count = 0,
+          test_directories = []
+        } = test_analysis;
+
+        return `
+📊 РЕАЛЬНЫЕ РЕЗУЛЬТАТЫ АНАЛИЗА
 
 🏗️ Обнаруженные технологии:
-${result.technologies?.map(tech => `• ${tech}`).join('\n') || '• Не обнаружено'}
+${technologies.length > 0 ? technologies.map(tech => `• ${tech}`).join('\n') : '• Не обнаружено'}
 
 📁 Статистика проекта:
-• Всего файлов: ${result.metrics?.total_files || 0}
-• Файлов кода: ${result.metrics?.code_files || 0}
-• Тестовых файлов: ${result.metrics?.test_files || 0}
+• Всего файлов: ${total_files}
+• Файлов кода: ${code_files}
+• Тестовых файлов: ${test_files}
+• Всего строк кода: ${total_lines}
+• Размер проекта: ${total_size_kb} KB
 
-🧪 Сгенерированные тесты:
-• Всего тестов: ${result.generated_tests?.total_generated || 0}
-• Файлов с тестами: ${result.generated_tests?.test_files?.length || 0}
-• Фреймворки: ${result.generated_tests?.frameworks_used?.join(', ') || 'Не указаны'}
+🧪 Анализ тестов:
+• Тесты найдены: ${has_tests ? '✅ Да' : '❌ Нет'}
+• Тестовых файлов: ${test_files_count}
+• Фреймворки тестирования: ${test_frameworks.length > 0 ? test_frameworks.join(', ') : 'Не обнаружены'}
+• Тестовые директории: ${test_directories.length > 0 ? test_directories.join(', ') : 'Не обнаружены'}
 
-⚡ Фреймворки тестирования:
-${result.test_frameworks?.map(fw => `• ${fw}`).join('\n') || '• Не обнаружено'}
-      `.trim();
+📈 Покрытие тестами:
+• Оценка покрытия: ${coverage_estimate}%
+
+🏛️ Фреймворки:
+${frameworks.length > 0 ? frameworks.map(fw => `• ${fw}`).join('\n') : '• Не обнаружено'}
+
+📦 Зависимости:
+${Object.keys(dependencies).length > 0 ?
+      Object.entries(dependencies).map(([tech, deps]) =>
+        `• ${tech}: ${Array.isArray(deps) ? deps.slice(0, 5).join(', ') : JSON.stringify(deps)}`
+      ).join('\n') :
+      '• Не обнаружены'
     }
+        `.trim();
+      }
 
-    return JSON.stringify(result, null, 2);
-  };
+      // Если данные в старом формате или строка
+      if (typeof result === 'string') {
+        return result;
+      }
+
+      return JSON.stringify(result, null, 2);
+    };
 
   return (
     <div className="p-4 bg-white rounded shadow space-y-4">
@@ -230,24 +291,24 @@ ${result.test_frameworks?.map(fw => `• ${fw}`).join('\n') || '• Не обн�
 function TestsTab({ analyses }) {
   const latestAnalysis = analyses[0];
 
-  const getTestMetrics = (analysis) => {
-    if (!analysis?.result) return null;
+    const getTestMetrics = (analysis) => {
+      if (!analysis?.result) return null;
 
-    // Получаем данные из РЕАЛЬНОГО анализа
-    const result = analysis.result;
+      const result = analysis.result;
 
-    return {
-      coverage: result.coverage_estimate || 0,
-      totalTests: result.test_analysis?.test_files_count || 0,
-      testFiles: result.test_analysis?.test_files_count || 0,
-      technologies: result.technologies || [],
-      frameworks: result.test_analysis?.test_frameworks || [],
-      // Дополнительные метрики из реального анализа
-      totalFiles: result.file_structure_summary?.total_files || 0,
-      codeFiles: result.file_structure_summary?.code_files || 0,
-      hasTests: result.test_analysis?.has_tests || false
+      // Используем реальные данные из анализа
+      return {
+        coverage: result.coverage_estimate || 0,
+        totalTests: result.test_analysis?.test_files_count || 0,
+        testFiles: result.test_analysis?.test_files_count || 0,
+        technologies: result.technologies || [],
+        frameworks: result.test_analysis?.test_frameworks || [],
+        totalFiles: result.file_structure_summary?.total_files || 0,
+        codeFiles: result.file_structure_summary?.code_files || 0,
+        hasTests: result.test_analysis?.has_tests || false,
+        totalLines: result.file_structure_summary?.total_lines || 0
+      };
     };
-  };
 
   const metrics = getTestMetrics(latestAnalysis);
 
@@ -505,14 +566,15 @@ export default function ProjectPage() {
     }
   }
 
-  async function loadAnalyses() {
-    try {
-      const analysesData = await projectsAPI.getProjectAnalyses(id);
-      setAnalyses(analysesData || []);
-    } catch (err) {
-      console.error('Ошибка загрузки анализов:', err);
+    async function loadAnalyses() {
+      try {
+        const analysesData = await projectsAPI.getProjectAnalyses(id);
+        console.log('📊 ANALYSES DATA:', analysesData); // ДЛЯ ОТЛАДКИ
+        setAnalyses(analysesData || []);
+      } catch (err) {
+        console.error('Ошибка загрузки анализов:', err);
+      }
     }
-  }
 
   async function handleAnalyze() {
     try {

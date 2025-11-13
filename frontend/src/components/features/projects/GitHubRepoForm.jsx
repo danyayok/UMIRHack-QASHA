@@ -6,7 +6,7 @@ import { projectsAPI } from '../../../services/api';
 const GitHubRepoForm = ({ project, onClose, onRepoUpdated }) => {
   const [formData, setFormData] = useState({
     repo_url: project.repo_url || '',
-    branch: project.branch || 'main',
+    branch: project.branch || '', // УБИРАЕМ значение по умолчанию
     start_analysis: true
   });
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const GitHubRepoForm = ({ project, onClose, onRepoUpdated }) => {
       const result = await projectsAPI.updateProjectRepo(
         project.id,
         formData.repo_url,
-        formData.branch
+        formData.branch || 'main' // Используем введенную ветку или 'main'
       );
 
       onRepoUpdated(result);
@@ -75,15 +75,18 @@ const GitHubRepoForm = ({ project, onClose, onRepoUpdated }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Ветка
+            Ветка (оставьте пустым для ветки по умолчанию)
           </label>
           <input
             type="text"
             value={formData.branch}
             onChange={handleChange('branch')}
             className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-            placeholder="main"
+            placeholder="main, develop, master..."
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Если не указать, будет использована ветка по умолчанию из репозитория
+          </p>
         </div>
 
         <div className="flex items-center space-x-3 p-3 border rounded-lg">

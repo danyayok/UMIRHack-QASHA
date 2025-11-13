@@ -16,7 +16,7 @@ const ProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
     // Шаг 2: Источник
     source_type: 'github', // 'github' или 'zip'
     repo_url: '',
-    branch: 'main',
+    branch: '', // УБИРАЕМ значение по умолчанию
     zip_file: null,
 
     // Шаг 3: Настройки
@@ -45,7 +45,8 @@ const ProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
 
       if (formData.source_type === 'github') {
         formDataToSend.append('repo_url', formData.repo_url);
-        formDataToSend.append('branch', formData.branch);
+        // Используем введенную ветку или 'main' если пусто
+        formDataToSend.append('branch', formData.branch || 'main');
       } else if (formData.source_type === 'zip' && formData.zip_file) {
         formDataToSend.append('zip_file', formData.zip_file);
       }
@@ -68,7 +69,7 @@ const ProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
       description: '',
       source_type: 'github',
       repo_url: '',
-      branch: 'main',
+      branch: '',
       zip_file: null,
       auto_analyze: true,
     });
@@ -282,15 +283,18 @@ const ProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Ветка
+                    Ветка (оставьте пустым для ветки по умолчанию)
                   </label>
                   <input
                     type="text"
                     value={formData.branch}
                     onChange={handleChange('branch')}
                     className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="main"
+                    placeholder="main, develop, master..."
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Если не указать, будет использована ветка по умолчанию из репозитория
+                  </p>
                 </div>
               </div>
             )}
@@ -334,7 +338,10 @@ const ProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
                 <p><strong>Название:</strong> {formData.name}</p>
                 <p><strong>Источник:</strong> {formData.source_type === 'github' ? 'GitHub' : 'ZIP архив'}</p>
                 {formData.source_type === 'github' && (
-                  <p><strong>Репозиторий:</strong> {formData.repo_url}</p>
+                  <>
+                    <p><strong>Репозиторий:</strong> {formData.repo_url}</p>
+                    <p><strong>Ветка:</strong> {formData.branch || 'по умолчанию'}</p>
+                  </>
                 )}
                 {formData.source_type === 'zip' && (
                   <p><strong>Файл:</strong> {formData.zip_file?.name || 'Не выбран'}</p>

@@ -1,22 +1,33 @@
+// src/App.jsx
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
-import ProjectPage from './pages/ProjectPage';
+import ProjectAnalysisPage from './pages/ProjectAnalysisPage';
+import ProjectTestsPage from './pages/ProjectTestsPage';
+import { useAuth } from './hooks/useAuth';
+import './index.css';
 
-function requireAuth() {
-  return !!localStorage.getItem('token');
-}
+function App() {
+  const { user, loading } = useAuth();
 
-export default function App() {
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/dashboard" element={requireAuth() ? <Dashboard /> : <Navigate to="/auth" />} />
-      <Route path="/projects/:id/*" element={requireAuth() ? <ProjectPage /> : <Navigate to="/auth" />} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/projects/:id/analysis/*" element={<ProjectAnalysisPage />} />
+        <Route path="/projects/:id/tests/*" element={<ProjectTestsPage />} />
+        <Route path="/projects/:id" element={<Navigate to="analysis" replace />} />
+      </Routes>
+    </Router>
   );
 }
+
+export default App;

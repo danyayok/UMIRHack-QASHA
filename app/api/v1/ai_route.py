@@ -4,7 +4,7 @@ import os
 
 router = APIRouter()
 giga = GigaChat(
-    credentials="MDE5YTY4NmEtZDBjOS03OGY5LTkyNmQtNDJjMzAyN2JlZmVkOmUwOTc4YjYwLTZmZjItNGZhNS05ZDQwLTI3NmM4NjgwNTQ0Mw==",
+    credentials=os.getenv("GIGACHAT_KEY"),
     verify_ssl_certs=False
 )
 
