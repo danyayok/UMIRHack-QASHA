@@ -9,6 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
 }
 
 #account{
@@ -20,6 +21,7 @@
     display: grid;
     grid-template-columns: 12.5vw 2vw 1fr 2vw;
     grid-template-rows: 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh 3.7037037037037037037037037037037vh 22.222222222222222222222222222222vh;
+    overflow: hidden;
 }
 
 #accountpanel{
@@ -44,11 +46,13 @@
 #firstdiv{
     grid-row-start: 2;
     grid-column-start: 3;
+    display: none;
 }
 
 #secdiv{
     grid-row-start: 4;
     grid-column-start: 3;
+    display: none;
 }
 
 .card{
@@ -90,6 +94,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#user:hover {
+    background-color: #d0d0d0;
 }
 
 #projects{
@@ -106,6 +116,12 @@
     display: flex;
     justify-content: start;
     align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#buttproj:hover {
+    background-color: #0258d8;
 }
 
 #butt-sign{
@@ -125,25 +141,61 @@
     transition: all 0.3s ease;
     max-height: 0;
     opacity: 0;
+    overflow-x: hidden;
+    position: relative;
+    z-index: 1000;
 }
 
 #list.visible {
     max-height: 200px;
     opacity: 1;
     margin-top: 1vh;
+    overflow-y: auto;
 }
 
 #list.hidden {
     max-height: 0;
     opacity: 0;
+    overflow-y: hidden;
+}
+
+/* Простой скроллбар - только ползунок */
+#list.visible::-webkit-scrollbar {
+    width: 0.3vw;
+}
+
+#list.visible::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#list.visible::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1dvh;
+}
+
+#list.visible::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Убираем кнопки стрелок */
+#list.visible::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Для Firefox - тонкий скроллбар */
+#list.visible {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
 #list li {
-    padding: 1vh 1vw;
+    padding: 1vh 0.8vw 1vh 1vw;
     cursor: pointer;
     border-bottom: 1px solid #f0f0f0;
     font-family: "Inter";
     font-size: 1.4vh;
+    box-sizing: border-box;
+    position: relative;
 }
 
 #list li:last-child {
@@ -154,22 +206,15 @@
     background-color: #f5f5f5;
 }
 
-#buttproj {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#buttproj:hover {
-    background-color: #0258d8;
-}
-
 .card-grid {
     display: grid;
-    grid-template-columns: 0.52083333333333333333333333333333vw 20.833333333333333333333333333333vw 0.52083333333333333333333333333333vw;
+    grid-template-columns: 0.52083333333333333333333333333333vw 1fr 0.52083333333333333333333333333333vw;
     grid-template-rows: 0.92592592592592592592592592592593vh 2.7777777777777777777777777777778vh 15.740740740740740740740740740741vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh;
     border-radius: 1dvh;
     transition: all 0.3s ease;
-    background-color: white; 
+    background-color: white;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 #card-name{
@@ -180,11 +225,12 @@
 #card-name-div {
     grid-column-start: 2;
     grid-row-start: 2;
-    width: 20.833333333333333333333333333333vw;
+    width: 100%;
     height: 2.7777777777777777777777777777778vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-sizing: border-box;
 }
 
 #progress-text {
@@ -192,26 +238,6 @@
     font-size: 1.4814814814814814814814814814815vh;
     color: #333;
     margin: 0;
-}
-
-#indicator{
-    width: 0.92592592592592592592592592592593vh;
-    height: 0.92592592592592592592592592592593vh;
-    grid-column-start: 2;
-    grid-row-start: 4;
-    background-color: red;
-    border-radius: 10dvh;
-    box-shadow: 0px 0px 8px 1px rgba(255, 0, 0);
-}
-
-#indicator.completed {
-    background-color: #00ff00;
-    box-shadow: 0px 0px 8px 1px rgba(0, 255, 0, 0.7);
-}
-
-#indicator.in-progress {
-    background-color: #ffa500;
-    box-shadow: 0px 0px 8px 1px rgba(255, 165, 0, 0.7);
 }
 
 #gear{
@@ -223,7 +249,6 @@
     background-image: url('../static/assets/gearcard.png');
     background-size: cover;
     border: none;
-    
 }
 
 #bottom-row{
@@ -291,11 +316,6 @@
     z-index: 1000;
 }
 
-#list {
-    position: relative;
-    overflow: visible;
-}
-
 #list .project-item:hover {
     background-color: transparent;
 }
@@ -319,6 +339,9 @@
     justify-content: center;
     align-items: center;
     font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
 }
 
 .ndbutt{
@@ -334,6 +357,9 @@
     justify-content: center;
     align-items: center;
     font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
 }
 
 #Front{
@@ -360,12 +386,6 @@
     grid-column-start: 4;
     grid-row-start: 4;
     grid-column-end: 7;
-}
-
-.stbutt, .ndbutt {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: white;
 }
 
 .stbutt:hover:not(.active),
@@ -415,6 +435,8 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 0.92592592592592592592592592592593vh;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #backup-button:hover:not(.active){
@@ -465,17 +487,10 @@
     height: 3.7037037037037037037037037037037vh;
     background-color: white;
     border-radius: 10dvh;
-}
-
-#profile-settings-div{
-    width: 44.791666666666666666666666666667vw;
-    height: 25.925925925925925925925925925926vh;
-    border: none;
-    border-radius: 1dvh;
-    background-color: #F1F1F1;
-    display: grid;
-    grid-template-columns: 1.0416666666666666666666666666667vw 10.416666666666666666666666666667vw 1.0416666666666666666666666666667vw 31.25vw 1.0416666666666666666666666666667vw;
-    grid-template-rows: 0.92592592592592592592592592592593vh 18.518518518518518518518518518519vh 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 0.92592592592592592592592592592593vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
 }
 
 .modal-overlay {
@@ -575,15 +590,9 @@
     border: 2px solid #ddd;
     justify-self: center;
     align-self: center;
-}
-
-#user {
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#user:hover {
-    background-color: #d0d0d0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 #change-avatar-button{
@@ -623,94 +632,6 @@
 
 #save-changes-button.has-changes:hover {
     background-color: #3187ff;
-}
-
-#avatar, #ava {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-sizing: border-box;
-}
-
-.account-input {
-    padding: 0;
-    border: none;
-    font-family: "Inter";
-    font-size: 1.4vh;
-    width: 31.25vw;
-    border: none;
-    padding-bottom: 0;
-    transition: border-color 0.3s ease;
-}
-
-#profile-settings-div > #avatar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.card-grid #card-name {
-    color: white;
-    font-weight: 500;
-}
-
-.card-grid #progress-text {
-    color: white;
-    font-weight: 500;
-}
-
-.card-grid #gear {
-    filter: brightness(0) invert(1); 
-}
-
-.card-grid #indicator {
-    box-shadow: 0px 0px 8px 1px rgba(255, 255, 255, 0.7);
-}
-
-.card-grid #indicator.completed {
-    background-color: #00ff00;
-    box-shadow: 0px 0px 8px 1px rgba(0, 255, 0, 0.9);
-}
-
-.card-grid #indicator.in-progress {
-    background-color: #ffff00;
-    box-shadow: 0px 0px 8px 1px rgba(255, 255, 0, 0.9);
-}
-
-.card-grid #card-name {
-    color: #333;
-    font-weight: 500;
-}
-
-.card-grid #progress-text {
-    color: #333;
-    font-weight: 600;
-}
-
-.card-grid #gear {
-    filter: brightness(0.7);
-}
-
-.card-grid #indicator {
-    box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.3);
-}
-
-.card-grid #indicator.completed {
-    background-color: #4caf50;
-    box-shadow: 0px 0px 6px 1px rgba(76, 175, 80, 0.7);
-}
-
-.card-grid #indicator.in-progress {
-    background-color: #ffd93d;
-    box-shadow: 0px 0px 6px 1px rgba(255, 217, 61, 0.7);
-}
-
-.card {
-    transition: all 0.5s ease;
-}
-
-.card-grid {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .account-input-container {
@@ -757,7 +678,6 @@
   border-color: #0268FB;
 }
 
-/* Специфические стили для инпутов в модальном окне профиля */
 #profile-settings-div .account-input-container {
   margin: 0;
 }
@@ -776,3 +696,183 @@
 #profile-settings-div .account-input-container input:valid ~ label {
   transform: translateY(-1.1em) scale(0.85);
 }
+
+.cards-container {
+    grid-column-start: 3;
+    grid-row-start: 2;
+    grid-row-end: 7;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 0.5vw;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    box-sizing: border-box;
+    max-width: calc(100vw - 12.5vw - 4vw);
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    width: 100%;
+    margin-bottom: 2vh;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* Простой скроллбар для контейнера карточек */
+.cards-container::-webkit-scrollbar {
+    width: 0.3vw;
+}
+
+.cards-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1dvh;
+}
+
+.cards-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.cards-container::-webkit-scrollbar-button {
+    display: none;
+}
+
+.cards-container {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
+}
+
+.card {
+    width: 100%;
+    height: 23vh;
+    background-color: white;
+    border-radius: 1dvh;
+    box-shadow: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.card:hover {
+    transform: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.empty-card {
+    background-color: transparent;
+    border: 2px dashed #d9d9d9;
+}
+
+.new-card {
+    background-color: #f8f9fa;
+    border: 2px dashed #0268FB;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.new-card:hover {
+    background-color: #e9ecef;
+    border-color: #0258d8;
+}
+
+.plus {
+    font-size: 4vh;
+    color: #0268FB;
+    margin: 0;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.card-grid {
+    animation: cardAppear 0.3s ease-out;
+}
+
+@media (max-width: 1600px) {
+    .cards-grid {
+        gap: 1.5vw;
+    }
+}
+
+.card-grid #card-name {
+    color: #333;
+    font-weight: 500;
+}
+
+.card-grid #progress-text {
+    color: #333;
+    font-weight: 600;
+}
+
+.card-grid #gear {
+    filter: brightness(0.7);
+}
+
+.card {
+    transition: all 0.5s ease;
+}
+
+.card-grid {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Убираем фон и стрелки скроллбара, оставляем только ползунок */
+#list.visible::-webkit-scrollbar {
+    width: 0.3vw;
+}
+
+#list.visible::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#list.visible::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1dvh;
+}
+
+#list.visible::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Убираем кнопки стрелок */
+#list.visible::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Для Firefox - тонкий скроллбар */
+#list.visible {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
+}
+
+/* Увеличиваем z-index для project-menu чтобы он был поверх скроллбара */
+.project-menu {
+    position: absolute;
+    top: 100%;
+    left: 0%;
+    width: 10.416666666666666666666666666667vw;
+    height: 5.5555555555555555555555555555556vh;
+    background-color: #0268FB;
+    border-radius: 1dvh;
+    box-shadow: none;
+    margin-top: 0.5vh;
+    display: grid;
+    grid-template-columns: 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw 2.0833333333333333333333333333333vw 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw;
+    grid-template-rows: 0.46296296296296296296296296296296vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh 1.8518518518518518518518518518519vh 0.46296296296296296296296296296296vh;
+    z-index: 1001; /* Увеличиваем z-index */
+}
+

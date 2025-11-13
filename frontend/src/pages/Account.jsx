@@ -1,7 +1,7 @@
 import '../static/account.css'
 import '../static/global.css'
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import FrontendGeneration from './components/FrontendGeneration'
 import FrontendOverview from './components/FrontendOverview'
 import FrontendResults from './components/FrontendResults'
@@ -14,12 +14,7 @@ export default function Account(){
     const [isListVisible, setIsListVisible] = useState(false)
     const [projects, setProjects] = useState([])
     const [cards, setCards] = useState([
-        { id: 1, type: 'new' },
-        { id: 2, type: 'empty' },
-        { id: 3, type: 'empty' },
-        { id: 4, type: 'empty' },
-        { id: 5, type: 'empty' },
-        { id: 6, type: 'empty' }
+        { id: 1, type: 'new' }
     ])
     const [activeProjectMenu, setActiveProjectMenu] = useState(null)
     const [activeButtons, setActiveButtons] = useState({
@@ -49,7 +44,8 @@ export default function Account(){
     })
     
     const [hasChanges, setHasChanges] = useState(false)
-    const [avatar, setAvatar] = useState(null) // Состояние для аватара
+    const [avatar, setAvatar] = useState(null)
+    const cardsContainerRef = useRef(null)
 
     useEffect(() => {
         const changesExist = 
@@ -161,6 +157,12 @@ export default function Account(){
     };
 
     const addProject = (cardId) => {
+        // Проверяем лимит в 100 проектов
+        if (projects.length >= 100) {
+            alert('Достигнут максимальный лимит проектов (100)');
+            return;
+        }
+
         const projectName = `Проект ${projects.length + 1}`
         const randomProgress = Math.floor(Math.random() * 80) + 10
         
@@ -168,7 +170,6 @@ export default function Account(){
             name: projectName,
             progress: randomProgress,
             id: Date.now(),
-
             testPercentage: randomProgress,
             indicators: [
                 { name: 'Auth', status: 'completed' },
@@ -179,6 +180,7 @@ export default function Account(){
         
         setProjects([...projects, newProject])
         
+        // Обновляем карточки: заменяем новую карточку на проект и добавляем следующую новую
         const updatedCards = cards.map(card => {
             if (card.id === cardId) {
                 return { 
@@ -192,30 +194,34 @@ export default function Account(){
             return card
         })
         
-        const nextEmptyCard = updatedCards.find(card => card.type === 'empty')
-        if (nextEmptyCard) {
-            const finalCards = updatedCards.map(card => 
-                card.id === nextEmptyCard.id ? { ...card, type: 'new' } : card
-            )
-            setCards(finalCards)
-        } else {
-            setCards(updatedCards)
+        // Добавляем новую карточку "добавить проект" в конец, если не достигли лимита
+        if (projects.length < 99) { // 99 потому что мы только что добавили один проект
+            updatedCards.push({ 
+                id: Date.now() + 1, // Уникальный ID
+                type: 'new' 
+            })
         }
+        
+        setCards(updatedCards)
+
+        // Прокручиваем к новой карточке
+        setTimeout(() => {
+            if (cardsContainerRef.current) {
+                cardsContainerRef.current.scrollTop = cardsContainerRef.current.scrollHeight;
+            }
+        }, 100);
     }
 
     const getGradientStyle = (progress) => {
         if (progress < 25) {
-
             return {
                 backgroundColor: '#ff6b6b'
             }
         } else if (progress < 75) {
-
             return {
                 backgroundColor: '#ffd93d'
             }
         } else if (progress < 100) {
-
             return {
                 backgroundColor: '#6bcf7f'
             }
@@ -282,21 +288,23 @@ export default function Account(){
                     </div>
                 )
             case 'empty':
-                return <div className='card' key={card.id}></div>
+                return <div className='card empty-card' key={card.id}></div>
             default:
-                return <div className='card' key={card.id}></div>
+                return <div className='card empty-card' key={card.id}></div>
         }
     }
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
+
+    // Функция для группировки карточек по рядам (по 3 в ряду)
+    const groupCardsIntoRows = (cards) => {
+        const rows = [];
+        for (let i = 0; i < cards.length; i += 3) {
+            rows.push(cards.slice(i, i + 3));
+        }
+        return rows;
+    }
+
+    const cardRows = groupCardsIntoRows(cards);
+
     return(
         <div id="travoman">
             <div id="account">
@@ -318,7 +326,7 @@ export default function Account(){
                                         onChange={(e) => handleInputChange('login', e.target.value)}
                                         required
                                     />
-                                    <label for="login-input">Логин</label>
+                                    <label htmlFor="login-input">Логин</label>
                                 </div>
                                 <div className="account-input-container">
                                     <input 
@@ -328,7 +336,7 @@ export default function Account(){
                                         onChange={(e) => handleInputChange('email', e.target.value)}
                                         required
                                     />
-                                    <label for="email-input">Почта</label>
+                                    <label htmlFor="email-input">Почта</label>
                                 </div>
                                 <div className="account-input-container">
                                     <input 
@@ -338,7 +346,7 @@ export default function Account(){
                                         onChange={(e) => handleInputChange('password', e.target.value)}
                                         required
                                     />
-                                    <label for="pass-input">Пароль</label>
+                                    <label htmlFor="pass-input">Пароль</label>
                                 </div>
                             </div>
                             <input
@@ -447,14 +455,13 @@ export default function Account(){
                 </aside>
 
                 {!activeTab ? (
-                    <>
-                        <div className='cardsdiv' id='firstdiv'>
-                            {cards.slice(0, 3).map(card => renderCard(card))}
-                        </div>
-                        <div className='cardsdiv' id='secdiv'>
-                            {cards.slice(3, 6).map(card => renderCard(card))}
-                        </div>
-                    </>
+                    <div className='cards-container' ref={cardsContainerRef}>
+                        {cardRows.map((row, rowIndex) => (
+                            <div key={rowIndex} className='cards-grid'>
+                                {row.map(card => renderCard(card))}
+                            </div>
+                        ))}
+                    </div>
                 ) : (
                     <div className="tab-container">
                         {renderActiveContent()}

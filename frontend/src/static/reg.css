@@ -89,16 +89,6 @@ input{
     margin-bottom: 3.7037037037037037037037037037037vh;
 }
 
-.homelink{
-    width: 5.2083333333333333333333333333333vw;
-    height: 2.7777777777777777777777777777778vh;
-    margin-left: 0;
-    margin-top: 0;
-    position: absolute;
-    top: 1.518518518518518518518518518519vh;
-    left: 1.0416666666666666666666666666667vw;
-}
-
 .home{
     font-family: "Inter";
     font-weight: 500;
@@ -149,4 +139,16 @@ input{
 
 .reg-input-container input:focus {
   border-color: #0268FB;
+}
+
+#logo-linkk{
+    width: 3.7037037037037037037037037037037vh;
+    height: 3.7037037037037037037037037037037vh;
+    margin-left: 0;
+    margin-top: 0;
+    position: absolute;
+    top: 1.518518518518518518518518518519vh;
+    left: 1.0416666666666666666666666666667vw;
+    background-image: url("../static/assets/istlogo.png");
+    background-size: cover;
 }

@@ -12,7 +12,7 @@ export default function Registration(){
     }
     return(
         <div id="travoman">
-        <div className='homelink'><Link to='/' className='home links'>Главная</Link></div>
+            <Link id='logo-linkk' to='/'></Link>
             <div id='logpan'>
                 <h1 id='head-text'>Регистрация</h1>
                 <form action="" id='form' onSubmit={navigateButtonClick}>

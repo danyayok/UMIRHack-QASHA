@@ -13,7 +13,7 @@ body {
 #travoman{
     padding: 0%;
     margin: 0%;
-    background-color: #EAEAE9;
+    background-color: white;
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -23,123 +23,81 @@ body {
 }
 
 #main-panel{
-    width: 62.5vw;
-    height: 85.185185185185185185185185185185vh;
-    background-color: var(--def-background-div);
+    width: 95.833333333333333333333333333333vw;
+    height: 94.444444444444444444444444444444vh;
+    background-image: url("../static/assets/fon (1).jpg");
+    background-size: cover;
     border-radius: 2dvh 2dvh 0dvh 0dvh;
     display: grid;
-    grid-template-columns: 5.7291666666666666666666666666667vw 25.520833333333333333333333333333vw 25.520833333333333333333333333333vw 5.7291666666666666666666666666667vw;
-    grid-template-rows: 2.7777777777777777777777777777778vh 2.7777777777777777777777777777778vh 27.777777777777777777777777777778vh 3.7037037037037037037037037037037vh 11.111111111111111111111111111111vh 33.333333333333333333333333333333vh 3.7037037037037037037037037037037vh;
+    grid-template-columns: 1.0416666666666666666666666666667vw 2.0833333333333333333333333333333vw 13.541666666666666666666666666667vw 2.0833333333333333333333333333333vw 10.416666666666666666666666666667vw 34.375vw;
+    grid-template-rows: 1.8518518518518518518518518518519vh 3.7037037037037037037037037037037vh 12.962962962962962962962962962963vh 7.4074074074074074074074074074074vh 3.7037037037037037037037037037037vh 2.7777777777777777777777777777778vh 7.4074074074074074074074074074074vh 2.7777777777777777777777777777778vh 3.7037037037037037037037037037037vh 7.4074074074074074074074074074074vh 2.7777777777777777777777777777778vh 0.92592592592592592592592592592593vh 33.333333333333333333333333333333vh 3.7037037037037037037037037037037vh;
     box-shadow: 0px 0px 4px 0px rgb(0, 0, 0, 0.25);
     margin-top: auto;
 }
 
-#start-button{
-    width: 13.541666666666666666666666666667vw;
-    height: 3.7037037037037037037037037037037vh;
-    border: none;
-    border-radius: 4dvh;
-    background-color: #0268FB;
-    font-family: "Inter";
-    color: white;
-    grid-row-start: 4;
-    grid-column-start: 2;
-    box-shadow: none;
-    transition: 0.3s ease;
-}
-
-#start-button:hover{
-    cursor: pointer;
-    transform: scale(1.05);
-}
-
-
 #links{
-    width: 11.458333333333333333333333333333vw;
-    height: 2.7777777777777777777777777777778vh;
+    grid-column-start: 2;
+    grid-column-end: 5;
     grid-row-start: 2;
-    grid-column-start: 1;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-left: 2.0833333333333333333333333333333vw;
-}
-
-
-
-#login{
-    width: 5.2083333333333333333333333333333vw;
-    height: 2.7777777777777777777777777777778vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#registration{
-    width: 6.25vw;
-    height: 2.7777777777777777777777777777778vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-
-#pipelinesimg{
-    width: 25.520833333333333333333333333333vw;
-    height: 29.777777777777777777777777777778vh;
-    grid-column-start: 3;
-    grid-row-start: 3;
-    background-image: url('../static/assets/pipelinesart.png');
-    background-size: cover; 
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-#text-div{
-    grid-column-start: 2;
-    grid-row-start: 3;
-    height: 25dvh;
-    margin-bottom: 0.27777777777777777777777777777778dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: left;
-}
-
-#qasha{
-    font-weight: 500;
-    font-size: 5.9259259259259259259259259259259vh;
-}
-
-#shiza{
-    font-weight: 500;
-    font-size: 2.2222222222222222222222222222222vh;
-    margin-left: 0.3vw;
-}
-
-#invisible{
-    font-weight: 200;
-    font-size: 1.4814814814814814814814814814815vh;
-    margin-left: 0.3vw;
-}
-
-.cards{
-    width: 13.541666666666666666666666666667vw;
-    height: 33.333333333333333333333333333333vh;
-    border-radius: 1dvh;
-    background-color: white;
-    box-shadow: 0px 0px 8px 0px rgb(230, 240, 255, 1.0);
-}
-
-#cardsdiv{
-    grid-column-start: 2;
-    grid-row-start: 6;
-    width: 51.041666666666666666666666666667vw;
-    height: 33.333333333333333333333333333333vh;
+    width: 14.583333333333333333333333333333vw;
+    height: 3.7037037037037037037037037037037vh;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
+#logo-link{
+    width: 3.7037037037037037037037037037037vh;
+    height: 3.7037037037037037037037037037037vh;
+    background-image: url("../static/assets/istlogo.png");
+    background-size: cover;
+}
+
+#qasha{
+    grid-column-start: 3;
+    grid-row-start: 4;
+    font-size: 5.9259259259259259259259259259259vh;
+}
+
+#shiza{
+    grid-column-start: 3;
+    grid-row-start: 5;
+    font-size: 2.2222222222222222222222222222222vh;
+    margin-left: 0.32083333333333333333333333333333vw;
+}
+
+#invisible{
+    grid-column-start: 3;
+    grid-column-end: 6;
+    grid-row-start: 7;
+    margin-left: 0.32083333333333333333333333333333vw;
+}
+
+#start-button{
+    grid-column-start: 3;
+    grid-row-start: 9;
+    border: none;
+    background-color: var(--def-color);
+    border-radius: 2dvh;
+    color: white;
+    font-family: "Inter";
+    font-weight: 600;
+}
+
+#cardsdiv{
+    grid-column-start: 3;
+    grid-column-end: 7;
+    grid-row-start: 13;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.cards{
+    width: 13.541666666666666666666666666667vw;
+    height: 33.333333333333333333333333333333vh;
+    box-shadow: var(--light-shadow);
+    background-color: white;
+    border-radius: 1dvh; 
+}
