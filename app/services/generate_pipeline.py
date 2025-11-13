@@ -22,28 +22,26 @@ class TestGenerationPipeline:
 
     async def generate_tests(self, generation_data: Dict) -> Dict[str, Any]:
         """Основной метод генерации тестов"""
-
         project_info = generation_data["project_info"]
         analysis_data = generation_data["analysis_data"]
         test_config = generation_data["test_config"]
+        repo_path = project_info.get("local_path")
 
         logger.info(f"Starting test generation for project: {project_info['name']}")
 
-        # Анализируем проект с полной структурой
+        # Анализируем проект
         project_analysis = self.analyze_project_structure(analysis_data)
 
         # Определяем фреймворк тестирования
-        framework = self.determine_test_framework(
+        framework = self._get_test_framework(
             project_analysis["technologies"],
             project_analysis.get("existing_test_frameworks", []),
             test_config.get("framework", "auto")
         )
 
-        # Генерируем тесты с использованием ИИ
-        generation_results = await self.generate_test_suite_with_ai(
-            project_analysis,
-            test_config,
-            framework
+        # Генерируем тесты
+        generation_results = await self._generate_test_files(
+            project_analysis, test_config, framework, repo_path
         )
 
         # Формируем финальный ответ
@@ -51,68 +49,340 @@ class TestGenerationPipeline:
             "status": "success",
             "project_name": project_info['name'],
             "generated_tests": generation_results["total_tests"],
-            "tests": generation_results["tests"],
+            "test_files": generation_results["test_files"],
             "coverage_estimate": generation_results["coverage_estimate"],
             "framework_used": framework,
-            "files_created": generation_results["files_created"],
+            "files_created": list(generation_results["test_files"].keys()),
             "warnings": generation_results["warnings"],
             "recommendations": generation_results["recommendations"],
             "generation_time": datetime.utcnow().isoformat(),
             "test_config_used": test_config,
             "ai_provider_used": generation_results["ai_provider"],
-            "project_context": self.prepare_project_context(project_analysis)
+            "project_context": self._prepare_context(project_analysis)
+        }
+
+    async def _generate_test_files(self, project_analysis: Dict, test_config: Dict,
+                                   framework: str, repo_path: str) -> Dict[str, Any]:
+        """Генерирует все типы тестовых файлов"""
+        test_files = {}
+        warnings = []
+        recommendations = []
+        ai_provider = "unknown"
+        total_tests = 0
+
+        # Unit тесты
+        if test_config.get("generate_unit_tests", True):
+            unit_files, unit_count, provider = await self._generate_unit_tests(
+                project_analysis, framework, test_config, repo_path
+            )
+            test_files.update(unit_files)
+            total_tests += unit_count
+            ai_provider = provider
+
+        # Интеграционные тесты
+        if test_config.get("generate_integration_tests", True):
+            integration_files, integration_count, provider = await self._generate_integration_tests(
+                project_analysis, framework, test_config
+            )
+            test_files.update(integration_files)
+            total_tests += integration_count
+            ai_provider = provider or ai_provider
+
+        # E2E тесты
+        if test_config.get("generate_e2e_tests", False):
+            e2e_files, e2e_count, provider = await self._generate_e2e_tests(
+                project_analysis, framework, test_config
+            )
+            test_files.update(e2e_files)
+            total_tests += e2e_count
+            ai_provider = provider or ai_provider
+
+        # Расчет покрытия
+        coverage_estimate = self._calculate_coverage(
+            total_tests, project_analysis["test_files_count"], project_analysis["code_files_count"]
+        )
+
+        # Проверка целевого покрытия
+        target_coverage = test_config.get("coverage_target", 80)
+        if coverage_estimate < target_coverage:
+            recommendations.append(
+                f"Для достижения покрытия {target_coverage}% добавьте дополнительные тесты"
+            )
+
+        return {
+            "total_tests": total_tests,
+            "test_files": test_files,
+            "coverage_estimate": coverage_estimate,
+            "warnings": warnings,
+            "recommendations": recommendations,
+            "ai_provider": ai_provider
+        }
+
+    async def _generate_unit_tests(self, project_analysis: Dict, framework: str,
+                                   config: Dict, repo_path: str) -> tuple[Dict[str, str], int, str]:
+        """Генерирует unit тесты"""
+        test_files = {}
+        code_files = project_analysis["code_files"]
+        ai_provider = "unknown"
+
+        files_to_test = code_files[:config.get("max_unit_tests", 5)]
+
+        for file_info in files_to_test:
+            # Получаем реальное содержимое файла
+            real_content = self._get_file_content(file_info["path"], repo_path)
+            if real_content:
+                file_info["real_content"] = real_content
+
+            test_content = await ai_service.generate_test_content(
+                file_info=file_info,
+                project_context=self._prepare_context(project_analysis),
+                test_type="unit",
+                framework=framework,
+                config=config
+            )
+
+            if test_content:
+                filename = self._generate_filename(file_info, "unit", framework)
+                test_files[filename] = test_content
+                ai_provider = "ai_generated"
+            else:
+                filename, content = await self._create_fallback_test(file_info, framework, project_analysis)
+                test_files[filename] = content
+                ai_provider = "fallback"
+
+        return test_files, len(test_files), ai_provider
+
+    async def _generate_integration_tests(self, project_analysis: Dict, framework: str,
+                                          config: Dict) -> tuple[Dict[str, str], int, str]:
+        """Генерирует интеграционные тесты"""
+        test_files = {}
+        ai_provider = "unknown"
+
+        modules = self._find_integration_modules(project_analysis)
+
+        for module in modules[:config.get("max_integration_tests", 3)]:
+            mock_file_info = {
+                "path": f"integration/{module}",
+                "name": module,
+                "type": "integration_module"
+            }
+
+            test_content = await ai_service.generate_test_content(
+                file_info=mock_file_info,
+                project_context=self._prepare_context(project_analysis),
+                test_type="integration",
+                framework=framework,
+                config=config
+            )
+
+            if test_content:
+                filename = f"test_integration_{module}.{self._get_file_ext(framework)}"
+                test_files[filename] = test_content
+                ai_provider = "ai_generated"
+
+        return test_files, len(test_files), ai_provider
+
+    async def _generate_e2e_tests(self, project_analysis: Dict, framework: str,
+                                  config: Dict) -> tuple[Dict[str, str], int, str]:
+        """Генерирует E2E тесты"""
+        test_files = {}
+        ai_provider = "unknown"
+
+        scenarios = self._find_e2e_scenarios(project_analysis)
+
+        for scenario in scenarios[:config.get("max_e2e_tests", 2)]:
+            mock_file_info = {
+                "path": f"e2e/{scenario}",
+                "name": scenario,
+                "type": "e2e_scenario"
+            }
+
+            test_content = await ai_service.generate_test_content(
+                file_info=mock_file_info,
+                project_context=self._prepare_context(project_analysis),
+                test_type="e2e",
+                framework=framework,
+                config=config
+            )
+
+            if test_content:
+                filename = f"test_e2e_{scenario}.{self._get_file_ext(framework)}"
+                test_files[filename] = test_content
+                ai_provider = "ai_generated"
+
+        return test_files, len(test_files), ai_provider
+
+    def _get_test_framework(self, technologies: List[str], existing_frameworks: List[str],
+                            user_choice: str) -> str:
+        """Определяет фреймворк тестирования"""
+        if user_choice != "auto":
+            return user_choice
+
+        if existing_frameworks:
+            return existing_frameworks[0]
+
+        primary_tech = technologies[0].lower() if technologies else "python"
+
+        framework_map = {
+            "python": "pytest",
+            "javascript": "jest",
+            "typescript": "jest",
+            "java": "junit",
+            "html": "cypress"
+        }
+
+        return framework_map.get(primary_tech, "pytest")
+
+    def _calculate_coverage(self, generated_tests: int, existing_tests: int, total_files: int) -> float:
+        """Рассчитывает оценку покрытия"""
+        if total_files == 0:
+            return 0.0
+
+        total_tests = generated_tests + existing_tests
+        base_coverage = min(95.0, (total_tests / max(1, total_files)) * 100)
+        return round(base_coverage, 1)
+
+    def _generate_filename(self, file_info: Dict, test_type: str, framework: str) -> str:
+        """Генерирует имя тестового файла"""
+        base_name = file_info["name"].replace(file_info["extension"], "")
+        return f"test_{test_type}_{base_name}.{self._get_file_ext(framework)}"
+
+    def _get_file_ext(self, framework: str) -> str:
+        """Возвращает расширение файла для фреймворка"""
+        extensions = {
+            "pytest": "py", "unittest": "py",
+            "jest": "js", "mocha": "js", "jasmine": "js",
+            "junit": "java", "testng": "java",
+            "cypress": "js", "playwright": "js", "selenium": "py"
+        }
+        return extensions.get(framework, "txt")
+
+    def _get_file_content(self, file_path: str, repo_path: str) -> str:
+        """Безопасное получение содержимого файла"""
+        full_path = os.path.join(repo_path, file_path)
+
+        if not os.path.exists(full_path):
+            logger.warning(f"File not found: {full_path}")
+            return ""
+
+        try:
+            with open(full_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except UnicodeDecodeError:
+            try:
+                with open(full_path, 'r', encoding='latin-1') as f:
+                    return f.read()
+            except Exception as e:
+                logger.warning(f"Could not read file {full_path} with any encoding: {e}")
+                return ""
+        except Exception as e:
+            logger.warning(f"Error reading file {full_path}: {e}")
+            return ""
+
+    async def _create_fallback_test(self, file_info: Dict, framework: str,
+                                    project_analysis: Dict) -> tuple[str, str]:
+        """Создает fallback тест при ошибке AI"""
+        content = f"""
+# Fallback test for {file_info['path']}
+
+import pytest
+
+class Test{file_info['name'].replace('.', '').title()}:
+    def test_basic_functionality(self):
+        assert True
+
+    def test_edge_cases(self):
+        assert 1 == 1
+"""
+        filename = self._generate_filename(file_info, "unit", framework)
+        return filename, content
+
+    def _find_integration_modules(self, project_analysis: Dict) -> List[str]:
+        """Находит модули для интеграционного тестирования"""
+        modules = []
+        for file_info in project_analysis["code_files"]:
+            if any(keyword in file_info["path"].lower() for keyword in ["api", "service", "controller"]):
+                modules.append(file_info["name"])
+        return modules[:10]
+
+    def _find_e2e_scenarios(self, project_analysis: Dict) -> List[str]:
+        """Находит сценарии для E2E тестирования"""
+        scenarios = ["user_authentication", "main_workflow"]
+        if "react" in project_analysis["technologies"]:
+            scenarios.append("component_rendering")
+        if any("api" in file_info["path"] for file_info in project_analysis["code_files"]):
+            scenarios.append("api_endpoints")
+        return scenarios
+
+    def _prepare_context(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Подготавливает контекст проекта для AI"""
+        return {
+            "project_metadata": {
+                "name": project_analysis.get("project_name", "Unknown"),
+                "technologies": project_analysis["technologies"],
+                "architecture": project_analysis["architecture_patterns"],
+            },
+            "project_structure": {
+                "total_files": project_analysis["total_files"],
+                "code_files_count": project_analysis["code_files_count"],
+                "file_structure": project_analysis.get("file_structure", {}),
+            },
+            "testing_context": {
+                "has_tests": project_analysis["has_existing_tests"],
+                "frameworks": project_analysis["existing_test_frameworks"],
+            }
         }
 
     def _create_test_generation_prompt(self, test_type: str, framework: str, config: Dict, file_info: Dict,
                                        project_context: Dict) -> str:
-        """Создание максимально эффективного промпта для генерации тестов"""
+        """Создание промпта для генерации тестов с использованием существующих примеров"""
 
         language = self._get_language_from_framework(framework)
 
+        # Получаем примеры тестов из существующих методов
+        test_examples = self._get_test_examples(language, framework, test_type)
+
         prompt = f"""
-# ROLE: Senior Test Automation Engineer
-Ты эксперт по написанию качественных тестов. Сгенерируй профессиональные тесты на основе предоставленного кода и контекста проекта.
+    # ROLE: Senior Test Automation Engineer
+    Ты эксперт по написанию качественных тестов. Сгенерируй профессиональные тесты на основе предоставленного кода.
 
-## ТЕХНИЧЕСКИЕ ТРЕБОВАНИЯ:
-- Язык: {language}
-- Фреймворк: {framework}
-- Тип теста: {test_type}
-- Целевое покрытие: {config.get('coverage_target', 80)}%
-- Включить комментарии: {config.get('include_comments', True)}
+    ## ТЕХНИЧЕСКИЕ ТРЕБОВАНИЯ:
+    - Язык: {language}
+    - Фреймворк: {framework}
+    - Тип теста: {test_type}
+    - Включить комментарии: {config.get('include_comments', True)}
 
-## КОНТЕКСТ ПРОЕКТА:
-- Технологии: {', '.join(project_context.get('project_metadata', {}).get('technologies', []))}
-- Архитектура: {project_context.get('project_metadata', {}).get('architecture', [])}
-- Тип проекта: {project_context.get('project_metadata', {}).get('type', 'unknown')}
-- Сложность: {project_context.get('project_metadata', {}).get('complexity', 'unknown')}
+    ## КОНТЕКСТ ПРОЕКТА:
+    - Технологии: {', '.join(project_context.get('project_metadata', {}).get('technologies', []))}
+    - Архитектура: {project_context.get('project_metadata', {}).get('architecture', [])}
 
-## АНАЛИЗИРУЕМЫЙ ФАЙЛ:
-- Путь: {file_info.get('path', 'N/A')}
-- Тип: {file_info.get('type', 'N/A')}
-- Функции: {file_info.get('functions', 0)}
-- Классы: {file_info.get('classes', 0)}
+    ## ПРИМЕР ТЕСТА ДЛЯ ОРИЕНТИРА:
+    {test_examples}
 
-## СТРУКТУРА ПРОЕКТА:
-{self._format_project_structure(project_context.get('project_structure', {}))}
+    ## КРИТЕРИИ КАЧЕСТВА:
+    1. **Полное покрытие** - тестируй все публичные методы
+    2. **Читаемость** - понятные имена, структура AAA
+    3. **Изоляция** - моки для внешних зависимостей
+    4. **Edge cases** - граничные значения и ошибки
 
-## СПЕЦИФИЧЕСКИЕ ТРЕБОВАНИЯ ДЛЯ {test_type.upper()} ТЕСТОВ:
+    ## ФОРМАТ ОТВЕТА:
+    Верни ТОЛЬКО код теста без дополнительных объяснений.
 
-{self._get_test_type_specific_instructions(test_type, framework, language)}
-
-## КРИТЕРИИ КАЧЕСТВА ТЕСТОВ:
-1. **Полное покрытие** - тестируй все публичные методы и основные сценарии
-2. **Читаемость** - понятные имена тестов, структура AAA (Arrange-Act-Assert)
-3. **Изоляция** - моки для внешних зависимостей
-4. **Edge cases** - граничные значения, ошибки, исключения
-5. **Производительность** - быстрые, независимые тесты
-6. **Поддержка** - легко изменять и расширять
-
-## ФОРМАТ ОТВЕТА:
-Верни ТОЛЬКО код теста без дополнительных объяснений, комментариев вне кода или markdown разметки.
-
-Начинай сразу с импортов/зависимостей.
-"""
+    Начинай сразу с импортов/зависимостей.
+    """
         return prompt
+
+    def _get_test_examples(self, language: str, framework: str, test_type: str) -> str:
+        """Получает примеры тестов из существующих методов"""
+
+        if test_type == "unit":
+            return self._get_unit_test_example(language, framework)
+        elif test_type == "integration":
+            return self._get_integration_test_example(language, framework)
+        elif test_type == "e2e":
+            return self._get_e2e_test_example(language, framework)
+        else:
+            return self._get_unit_test_example(language, framework)
 
     def _get_test_type_specific_instructions(self, test_type: str, framework: str, language: str) -> str:
         """Специфичные инструкции для разных типов тестов"""
@@ -306,7 +576,7 @@ describe('Calculator', () => {
                 with open(file_path, 'r', encoding='utf-8') as f:
                     return f.read()
         except Exception as e:
-            logger.warning(f"Could not read file {file_path}: {e}")
+            print(f"Could not read file {file_path}: {e}")
 
         return ""
 
@@ -1216,25 +1486,12 @@ test('complete user registration flow', async ({ page }) => {
         tests = []
         code_files = project_analysis["code_files"]
         ai_provider = "unknown"
-
+        print(f"Starting AI test generation for {len(code_files)} code files")
         # Ограничиваем количество для демо
         files_to_test = code_files[:config.get("max_unit_tests", 5)]
-
-        for file_info in files_to_test:
-            # Подготавливаем улучшенный промпт
-            prompt = self._create_test_generation_prompt(
-                "unit", framework, config, file_info,
-                self.prepare_project_context(project_analysis)
-            )
-
-            # Подготавливаем данные для запроса
-            request_data = self._prepare_test_request_data(
-                file_info,
-                self.prepare_project_context(project_analysis),
-                "unit",
-                framework,
-                config
-            )
+        print(f"Will generate tests for {len(files_to_test)} files")
+        for i, file_info in enumerate(files_to_test):
+            print(f"Generating test {i + 1}/{len(files_to_test)} for file: {file_info['path']}")
 
             test_content = await ai_service.generate_test_content(
                 file_info=file_info,
@@ -1245,6 +1502,7 @@ test('complete user registration flow', async ({ page }) => {
             )
 
             if test_content:
+                print(f"✅ AI successfully generated test for {file_info['path']}")
                 tests.append({
                     "name": f"test_{file_info['name'].replace('.', '_')}",
                     "file": self.generate_test_filename(file_info, "unit", framework),
@@ -1256,11 +1514,13 @@ test('complete user registration flow', async ({ page }) => {
                 })
                 ai_provider = "ai_generated"
             else:
+                print(f"❌ AI failed to generate test for {file_info['path']}, using fallback")
                 # Fallback на шаблонные тесты если ИИ не сработал
                 fallback_test = await self.create_fallback_unit_test(file_info, framework, config, project_analysis)
                 tests.append(fallback_test)
                 ai_provider = "fallback"
 
+        print(f"Generated {len(tests)} unit tests total")
         return tests, ai_provider
 
     async def generate_integration_tests_with_ai(self, project_analysis: Dict, framework: str, config: Dict) -> tuple[

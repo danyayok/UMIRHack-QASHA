@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  # 🔥 ПАРАЛЛЕЛЬНЫЕ ВОРКЕРЫ
+  worker-analysis:
+    build: .
+    command: celery -A app.celery_app worker --queues=analysis,batch_analysis --concurrency=4 --hostname=analysis_worker@%h --loglevel=info
+    deploy:
+      replicas: 2  # Дублируем для надежности
+    depends_on: [redis, db]
+
+  worker-generation:
+    build: .
+    command: celery -A app.celery_app worker --queues=generation,batch_generation --concurrency=3 --hostname=generation_worker@%h --loglevel=info
+    depends_on: [redis, db]
+
+  worker-monitoring:
+    build: .
+    command: celery -A app.celery_app worker --queues=monitoring,maintenance,celery --concurrency=2 --hostname=monitoring_worker@%h --loglevel=info
+    depends_on: [redis, db]
+
+  flower:
+    build: .
+    command: celery -A app.celery_app flower --port=5555 --broker=redis://redis:6379/0
+    ports: ["5555:5555"]
+    depends_on: [redis]

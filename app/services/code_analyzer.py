@@ -1,4 +1,3 @@
-# app/services/code_analyzer.py
 import os
 import asyncio
 import re

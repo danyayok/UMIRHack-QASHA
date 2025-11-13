@@ -12,9 +12,10 @@ passlib[bcrypt]==1.7.4
 PyJWT==2.9.0
 python-multipart==0.0.9
 celery==5.4.0
+aiohttp
+g4f
+gigachat
 redis==5.1.1
 aiofiles==23.2.1
 gitpython==3.1.40
 pathlib2==2.3.7.post1
-celery==5.3.4
-gevent

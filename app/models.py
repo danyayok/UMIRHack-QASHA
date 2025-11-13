@@ -31,7 +31,7 @@ class Project(Base):
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    generated_tests: Mapped[list["GeneratedTest"]] = relationship(back_populates="project")
     owner: Mapped["User"] = relationship(back_populates="projects")
     analyses: Mapped[list["Analysis"]] = relationship(back_populates="project")
     test_runs: Mapped[list["TestRun"]] = relationship(back_populates="project")
@@ -102,3 +102,22 @@ class AgentReport(Base):
 
     agent: Mapped["Agent"] = relationship(back_populates="reports")
     project: Mapped["Project"] = relationship(back_populates="agent_reports")
+
+
+class GeneratedTest(Base):
+    __tablename__ = "generated_tests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    project: Mapped["Project"] = relationship(back_populates="generated_tests")
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    name: Mapped[str] = mapped_column(String)
+    file_path: Mapped[str] = mapped_column(String)
+    test_type: Mapped[str] = mapped_column(String)  # unit, integration, e2e
+    framework: Mapped[str] = mapped_column(String)
+    content: Mapped[str] = mapped_column(Text)
+    target_file: Mapped[str | None] = mapped_column(String)
+    priority: Mapped[str] = mapped_column(String, default="medium")
+    generated_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    ai_provider: Mapped[str | None] = mapped_column(String)
+    coverage_estimate: Mapped[float | None] = mapped_column(Float)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

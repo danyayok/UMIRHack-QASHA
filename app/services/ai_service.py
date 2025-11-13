@@ -5,7 +5,8 @@ from gigachat import GigaChat
 import json
 import os
 import time
-from typing import Optional
+from app.core.config import settings
+from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class HybridAIService:
     def _init_gigachat(self):
         """Инициализация GigaChat если доступен API ключ"""
         try:
-            giga_key = os.getenv("GIGACHAT_KEY")
+            giga_key = settings.GIGACHAT_KEY
             if giga_key:
                 self.giga = GigaChat(
                     credentials=giga_key,
@@ -27,11 +28,11 @@ class HybridAIService:
                     model="GigaChat"
                 )
                 self.giga_available = True
-                logger.info("GigaChat initialized successfully")
+                print("GigaChat initialized successfully")
             else:
-                logger.warning("GIGACHAT_KEY not found, GigaChat will not be available")
+                print("GIGACHAT_KEY not found, GigaChat will not be available")
         except Exception as e:
-            logger.error(f"Failed to initialize GigaChat: {e}")
+            print(f"Failed to initialize GigaChat: {e}")
             self.giga_available = False
 
     async def answer_with_g4f(self, text: str, prompt: str, model: str = 'gpt-4', timeout: int = 120) -> Optional[str]:
@@ -44,14 +45,14 @@ class HybridAIService:
             if response and "Извините, я не могу" not in response and len(response) > 30:
                 return response
             else:
-                logger.warning(f"g4f response too short or contains refusal: {response}")
+                print(f"g4f response too short or contains refusal: {response}")
                 return None
 
         except asyncio.TimeoutError:
-            logger.warning(f"g4f request timed out after {timeout} seconds")
+            print(f"g4f request timed out after {timeout} seconds")
             return None
         except Exception as e:
-            logger.error(f"g4f error: {e}")
+            print(f"g4f error: {e}")
             return None
 
     async def _g4f_request(self, text: str, prompt: str, model: str) -> Optional[str]:
@@ -66,13 +67,13 @@ class HybridAIService:
             )
             return response
         except Exception as e:
-            logger.error(f"g4f request failed: {e}")
+            print(f"g4f request failed: {e}")
             return None
 
     async def answer_with_gigachat(self, text: str, prompt: str) -> Optional[str]:
         """Запрос к GigaChat"""
         if not self.giga_available or not self.giga:
-            logger.error("GigaChat not available")
+            print("GigaChat not available")
             return None
 
         try:
@@ -80,43 +81,48 @@ class HybridAIService:
             response = self.giga.chat(full_prompt)
             return response.choices[0].message.content
         except Exception as e:
-            logger.error(f"GigaChat error: {e}")
+            print(f"GigaChat error: {e}")
             return None
 
-    async def generate_test_content(self, file_info: Dict, project_context: Dict, test_type: str, framework: str,
-                                    config: Dict) -> Optional[str]:
-        """Генерация контента теста с использованием гибридного подхода"""
+    async def generate_test_content(self, file_info: Dict, project_context: Dict,
+                                  test_type: str, framework: str, config: Dict) -> Optional[str]:
+        """Генерация контента теста с улучшенной обработкой ошибок"""
+        try:
+            logger.info(f"Generating {test_type} test for {file_info.get('path', 'unknown')}")
 
-        # Подготавливаем промпт для генерации тестов
-        prompt = self._create_test_generation_prompt(test_type, framework, config)
+            prompt = self._create_test_generation_prompt(test_type, framework, config)
+            request_data = self._prepare_test_request_data(file_info, project_context, test_type, framework, config)
 
-        # Подготавливаем данные для запроса
-        request_data = self._prepare_test_request_data(file_info, project_context, test_type, framework, config)
+            # Пытаемся использовать g4f с таймаутом
+            g4f_response = await self.answer_with_g4f(request_data, prompt, timeout=120)
+            if g4f_response:
+                return g4f_response
 
-        # Пытаемся сначала использовать g4f с таймаутом 2 минуты
-        start_time = time.time()
-        g4f_response = await self.answer_with_g4f(request_data, prompt, timeout=120)
-        g4f_time = time.time() - start_time
+            # Fallback на GigaChat
+            if self.giga_available:
+                giga_response = await self.answer_with_gigachat(request_data, prompt)
+                if giga_response:
+                    return giga_response
 
-        if g4f_response:
-            logger.info(f"g4f successfully generated test in {g4f_time:.2f}s")
-            return g4f_response
+            # Final fallback - базовый шаблон
+            return self._create_fallback_test(file_info, framework, test_type)
 
-        # Если g4f не ответил за 2 минуты или вернул ошибку, используем GigaChat
-        logger.warning(f"g4f failed or timed out after {g4f_time:.2f}s, falling back to GigaChat")
+        except Exception as e:
+            logger.error(f"AI test generation failed: {e}")
+            return self._create_fallback_test(file_info, framework, test_type)
 
-        if self.giga_available:
-            giga_start = time.time()
-            giga_response = await self.answer_with_gigachat(request_data, prompt)
-            giga_time = time.time() - giga_start
+    def _create_fallback_test(self, file_info: Dict, framework: str, test_type: str) -> str:
+            """Создание базового теста при ошибке AI"""
+            return f"""
+    # Auto-generated {test_type} test for {file_info.get('path', 'unknown')}
+    # Generated as fallback (AI service unavailable)
 
-            if giga_response:
-                logger.info(f"GigaChat successfully generated test in {giga_time:.2f}s")
-                return giga_response
+    import pytest
 
-        logger.error("Both g4f and GigaChat failed to generate test")
-        return None
-
+    def test_basic_functionality():
+        \"\"\"Basic test - replace with actual test logic\"\"\"
+        assert True
+    """
     def _create_test_generation_prompt(self, test_type: str, framework: str, config: Dict) -> str:
         """Создание промпта для генерации тестов"""
 

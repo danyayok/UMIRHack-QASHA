@@ -6,27 +6,37 @@ export function useProjects() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadProjects = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchProjects = async () => {
     try {
-      const data = await projectsAPI.getProjects();
+      setLoading(true);
+      setError(null);
+      const data = await apiService.getProjects();
       setProjects(data);
     } catch (err) {
       setError(err.message);
+      console.error('Failed to fetch projects:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const createProject = async (projectData) => {
+const createProject = async (projectData) => {
     try {
-      const newProject = await projectsAPI.createProject(projectData);
-      setProjects(prev => [newProject, ...prev]);
+      const formData = new FormData();
+      Object.keys(projectData).forEach(key => {
+        if (key !== 'zip_file') {
+          formData.append(key, projectData[key]);
+        }
+      });
+      if (projectData.source_type === 'zip' && projectData.zip_file) {
+        formData.append('zip_file', projectData.zip_file);
+      }
+      const newProject = await apiService.createProject(formData);
+      await fetchProjects();
       return newProject;
-    } catch (err) {
-      setError(err.message);
-      throw err;
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      throw error;
     }
   };
 

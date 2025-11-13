@@ -1,4 +1,4 @@
-from random import random
+import random
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
@@ -6,7 +6,7 @@ from app.db.session import get_db
 from typing import List, Optional
 from datetime import datetime
 from app.schemas import ProjectCreate, ProjectOut, AnalysisOut, AnalysisStatus, TestRunOut
-from app.models import Project, Analysis, AgentReport, TestRun
+from app.models import Project, Analysis, AgentReport, TestRun, GeneratedTest
 from app.deps.auth import get_current_user
 from app.tasks import analyze_repository_task, analyze_zip_task
 from app.services.git_service import GitService
@@ -29,21 +29,17 @@ async def get_projects(
         db: AsyncSession = Depends(get_db),
         current_user=Depends(get_current_user)
 ):
-    """Получить список проектов пользователя"""
     try:
         logger.info(f"Getting projects for user {current_user.id}")
 
-        # Получаем проекты
         result = await db.execute(
             select(Project).where(Project.owner_id == current_user.id)
         )
         projects = result.scalars().all()
 
-        logger.info(f"Found {len(projects)} projects")
-
         projects_with_coverage = []
         for project in projects:
-            # Получаем последний завершенный анализ для каждого проекта
+            # Получаем последний завершенный анализ
             analysis_result = await db.execute(
                 select(Analysis)
                 .where(
@@ -55,15 +51,11 @@ async def get_projects(
             )
             latest_analysis = analysis_result.scalar_one_or_none()
 
-            # Вычисляем coverage из РЕАЛЬНОГО анализа
-            coverage = 0
+            coverage = 0.0
             if latest_analysis and latest_analysis.result:
-                logger.info(f"Project {project.id} has analysis result: {latest_analysis.result.keys()}")
-                coverage = latest_analysis.result.get('coverage_estimate', 0)
-            else:
-                logger.info(f"Project {project.id} has no completed analysis or result")
+                # Безопасное получение coverage
+                coverage = float(latest_analysis.result.get('coverage_estimate', 0))
 
-            # Создаем ProjectOut с coverage
             project_out = ProjectOut(
                 id=project.id,
                 name=project.name,
@@ -77,14 +69,13 @@ async def get_projects(
                 updated_at=project.updated_at,
                 coverage=coverage
             )
-
             projects_with_coverage.append(project_out)
 
         return projects_with_coverage
 
     except Exception as e:
-        logger.error(f"Error getting projects: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error getting projects: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/{project_id}", response_model=ProjectOut)
@@ -373,59 +364,130 @@ async def generate_tests(
         current_user=Depends(get_current_user)
 ):
     """Генерация тестов на основе анализа проекта и конфигурации"""
-
-    # Получаем проект
-    project_result = await db.execute(
-        select(Project).where(
-            Project.id == project_id,
-            Project.owner_id == current_user.id
-        )
-    )
-    project = project_result.scalar_one_or_none()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-
-    # Получаем последний завершенный анализ
-    analysis_result = await db.execute(
-        select(Analysis)
-        .where(
-            Analysis.project_id == project_id,
-            Analysis.status == "completed"
-        )
-        .order_by(Analysis.created_at.desc())
-        .limit(1)
-    )
-    analysis = analysis_result.scalar_one_or_none()
-
-    if not analysis:
-        raise HTTPException(status_code=400, detail="No completed analysis found for project")
-
-    # Формируем данные для пайплайна
-    generation_data = {
-        "project_info": {
-            "id": project.id,
-            "name": project.name,
-            "description": project.description,
-            "repo_url": project.repo_url,
-            "branch": project.branch,
-            "technology_stack": project.technology_stack
-        },
-        "analysis_data": analysis.result,
-        "test_config": test_config,
-        "generation_context": {
-            "timestamp": datetime.utcnow().isoformat(),
-            "user_id": current_user.id
-        }
-    }
+    repo_path = None  # Для гарантированной очистки
 
     try:
-        # Используем пайплайн для генерации тестов
-        result = await test_generation_pipeline.generate_tests(generation_data)
-        return result
+        # Получаем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        if not project.repo_url:
+            raise HTTPException(status_code=400, detail="Project must have a repository URL for test generation")
+
+        # Получаем последний завершенный анализ
+        analysis_result = await db.execute(
+            select(Analysis)
+            .where(
+                Analysis.project_id == project_id,
+                Analysis.status == "completed"
+            )
+            .order_by(Analysis.created_at.desc())
+            .limit(1)
+        )
+        analysis = analysis_result.scalar_one_or_none()
+
+        if not analysis:
+            raise HTTPException(status_code=400, detail="No completed analysis found for project")
+
+        logger.info(f"Analysis found: {analysis.id}, status: {analysis.status}")
+        logger.info(f"Analysis result keys: {analysis.result.keys() if analysis.result else 'No result'}")
+        logger.info(f"Technologies: {analysis.result.get('technologies', []) if analysis.result else []}")
+
+        # 📥 СКАЧИВАЕМ АКТУАЛЬНЫЙ РЕПОЗИТОРИЙ
+        logger.info(f"📥 Downloading repository for test generation: {project.repo_url}")
+        git_service = GitService()
+        repo_path = await git_service.clone_repository(project.repo_url, project.branch)
+        logger.info(f"✅ Repository downloaded to: {repo_path}")
+
+        # Формируем данные для пайплайна с путем к репозиторию
+        generation_data = {
+            "project_info": {
+                "id": project.id,
+                "name": project.name,
+                "description": project.description,
+                "repo_url": project.repo_url,
+                "branch": project.branch,
+                "technology_stack": project.technology_stack,
+                "local_path": repo_path  # Добавляем путь к локальной копии
+            },
+            "analysis_data": analysis.result,
+            "test_config": test_config,
+            "generation_context": {
+                "timestamp": datetime.utcnow().isoformat(),
+                "user_id": current_user.id
+            }
+        }
+
+        try:
+            # Используем пайплайн для генерации тестов
+            result = await test_generation_pipeline.generate_tests(generation_data)
+
+            # 💾 СОХРАНЯЕМ СГЕНЕРИРОВАННЫЕ ТЕСТЫ В БАЗУ ДАННЫХ
+            await save_generated_tests(project_id, result, current_user.id, db)
+
+            logger.info(f"✅ Tests generated and saved successfully for project {project_id}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Test generation error for project {project_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
 
     except Exception as e:
-        logger.error(f"Test generation error for project {project_id}: {e}")
+        logger.error(f"Error in generate_tests for project {project_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
+
+    finally:
+        # 🧹 ГАРАНТИРОВАННАЯ ОЧИСТКА ВРЕМЕННЫХ ФАЙЛОВ
+        if repo_path and os.path.exists(repo_path):
+            logger.info(f"🧹 Cleaning up temporary repository: {repo_path}")
+            git_service = GitService()
+            git_service.cleanup(repo_path)
+            logger.info(f"✅ Temporary repository cleaned up")
+
+
+async def save_generated_tests(project_id: int, generation_result: dict, user_id: int, db: AsyncSession):
+    """Сохраняет сгенерированные тесты в базу данных"""
+    try:
+        # Проверяем, есть ли модель GeneratedTest
+        if 'GeneratedTest' not in globals():
+            logger.info("📝 GeneratedTest model not found, skipping test saving")
+            return
+
+        # Сохраняем каждый сгенерированный тест
+        if generation_result.get("status") == "success":
+            tests = generation_result.get("tests", [])
+
+            for test_data in tests:
+                generated_test = GeneratedTest(
+                    project_id=project_id,
+                    name=test_data.get("name", "Unnamed Test"),
+                    file_path=test_data.get("file", "unknown"),
+                    test_type=test_data.get("type", "unit"),
+                    framework=test_data.get("framework", "unknown"),
+                    content=test_data.get("content", ""),
+                    target_file=test_data.get("target_file", ""),
+                    priority=test_data.get("priority", "medium"),
+                    generated_by=user_id,
+                    ai_provider=generation_result.get("ai_provider_used", "unknown"),
+                    coverage_estimate=generation_result.get("coverage_estimate", 0)
+                )
+                db.add(generated_test)
+
+            await db.commit()
+            logger.info(f"💾 Saved {len(tests)} generated tests for project {project_id}")
+
+    except Exception as e:
+        logger.error(f"❌ Failed to save generated tests: {e}")
+        # Не прерываем основной процесс из-за ошибки сохранения
+        await db.rollback()
+
 
 @router.post("/{project_id}/run-tests")
 async def run_tests(
@@ -450,8 +512,7 @@ async def run_tests(
     analysis = await db.execute(
         select(Analysis)
         .where(Analysis.project_id == project_id)
-        .order_by(Analysis.created_at.desc())
-        .first()
+        .order_by(Analysis.created_at.desc()).limit(1)
     )
     analysis = analysis.scalar_one_or_none()
 
@@ -534,7 +595,6 @@ async def get_last_test(
         select(TestRun)
         .where(TestRun.project_id == project_id)
         .order_by(TestRun.created_at.desc())
-        .first()
     )
     test_run = test_run.scalar_one_or_none()
 
@@ -542,6 +602,363 @@ async def get_last_test(
         raise HTTPException(404, "No test runs found")
 
     return TestRunOut.model_validate(test_run)
+
+
+# =============================================================================
+# ПАРАЛЛЕЛЬНЫЕ ОПЕРАЦИИ - НОВЫЕ ЭНДПОЙНТЫ
+# =============================================================================
+
+@router.post("/batch/analyze", response_model=dict)
+async def batch_analyze_projects(
+        project_ids: List[int],
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Параллельный анализ нескольких проектов"""
+    try:
+        logger.info(f"🚀 Starting batch analysis for {len(project_ids)} projects")
+
+        # Создаем анализы для всех проектов
+        analysis_ids = []
+        for project_id in project_ids:
+            # Проверяем что проект принадлежит пользователю
+            project_result = await db.execute(
+                select(Project).where(
+                    Project.id == project_id,
+                    Project.owner_id == current_user.id
+                )
+            )
+            project = project_result.scalar_one_or_none()
+            if not project:
+                raise HTTPException(404, f"Project {project_id} not found")
+
+            # Создаем запись анализа
+            analysis = Analysis(
+                project_id=project_id,
+                status="pending"
+            )
+            db.add(analysis)
+            await db.commit()
+            await db.refresh(analysis)
+            analysis_ids.append(analysis.id)
+
+        # Запускаем параллельный анализ
+        from app.tasks.tasks import batch_analyze_repositories_task
+        task = batch_analyze_repositories_task.delay(analysis_ids)
+
+        logger.info(f"✅ Batch analysis started with {len(analysis_ids)} tasks")
+
+        return {
+            "message": f"Batch analysis started for {len(project_ids)} projects",
+            "task_id": task.id,
+            "analysis_ids": analysis_ids,
+            "total_projects": len(project_ids)
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Batch analysis failed: {e}")
+        raise HTTPException(500, f"Batch analysis failed: {str(e)}")
+
+
+@router.post("/batch/generate-tests", response_model=dict)
+async def batch_generate_tests(
+        projects_config: List[dict],
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Параллельная генерация тестов для нескольких проектов"""
+    try:
+        logger.info(f"🚀 Starting batch test generation for {len(projects_config)} projects")
+
+        # Валидируем проекты
+        validated_configs = []
+        for config in projects_config:
+            project_id = config.get('project_id')
+            test_config = config.get('test_config', {})
+
+            # Проверяем доступ к проекту
+            project_result = await db.execute(
+                select(Project).where(
+                    Project.id == project_id,
+                    Project.owner_id == current_user.id
+                )
+            )
+            project = project_result.scalar_one_or_none()
+            if not project:
+                raise HTTPException(404, f"Project {project_id} not found")
+
+            # Проверяем что есть завершенный анализ
+            analysis_result = await db.execute(
+                select(Analysis).where(
+                    Analysis.project_id == project_id,
+                    Analysis.status == "completed"
+                ).order_by(Analysis.created_at.desc()).limit(1)
+            )
+            analysis = analysis_result.scalar_one_or_none()
+
+            if not analysis:
+                raise HTTPException(400, f"No completed analysis for project {project_id}")
+
+            validated_configs.append({
+                'project_id': project_id,
+                'test_config': test_config
+            })
+
+        # Запускаем параллельную генерацию
+        from app.tasks.tasks import batch_generate_tests_task
+        task = batch_generate_tests_task.delay(validated_configs)
+
+        logger.info(f"✅ Batch test generation started with {len(validated_configs)} projects")
+
+        return {
+            "message": f"Batch test generation started for {len(validated_configs)} projects",
+            "task_id": task.id,
+            "projects_count": len(validated_configs)
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Batch test generation failed: {e}")
+        raise HTTPException(500, f"Batch test generation failed: {str(e)}")
+
+
+@router.post("/{project_id}/generate-tests-parallel", response_model=dict)
+async def generate_tests_parallel(
+        project_id: int,
+        test_config: dict,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Параллельная генерация разных типов тестов для одного проекта"""
+    try:
+        logger.info(f"🚀 Starting parallel test generation for project {project_id}")
+
+        # Проверяем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(404, "Project not found")
+
+        # Проверяем анализ
+        analysis_result = await db.execute(
+            select(Analysis).where(
+                Analysis.project_id == project_id,
+                Analysis.status == "completed"
+            ).order_by(Analysis.created_at.desc()).limit(1)
+        )
+        analysis = analysis_result.scalar_one_or_none()
+
+        if not analysis:
+            raise HTTPException(400, "No completed analysis found")
+
+        # Определяем какие типы тестов генерировать
+        test_types = []
+        if test_config.get("generate_unit_tests", True):
+            test_types.append("unit")
+        if test_config.get("generate_integration_tests", True):
+            test_types.append("integration")
+        if test_config.get("generate_e2e_tests", False):
+            test_types.append("e2e")
+
+        # Запускаем параллельную генерацию
+        from app.tasks.tasks import parallel_test_generation_task
+        task = parallel_test_generation_task.delay(project_id, test_config)
+
+        logger.info(f"✅ Parallel test generation started for project {project_id}, types: {test_types}")
+
+        return {
+            "message": "Parallel test generation started",
+            "task_id": task.id,
+            "project_id": project_id,
+            "test_types": test_types
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Parallel test generation failed: {e}")
+        raise HTTPException(500, f"Test generation failed: {str(e)}")
+
+
+@router.get("/task/{task_id}/status", response_model=dict)
+async def get_task_status(
+        task_id: str,
+        current_user=Depends(get_current_user)
+):
+    """Получение статуса задачи Celery"""
+    try:
+        from app.celery_app import celery_app
+        from celery.result import AsyncResult, GroupResult
+
+        result = AsyncResult(task_id, app=celery_app)
+
+        response = {
+            "task_id": task_id,
+            "status": result.status,
+            "ready": result.ready(),
+            "successful": result.successful() if result.ready() else None,
+        }
+
+        if result.ready():
+            if result.successful():
+                response["result"] = result.result
+            else:
+                response["error"] = str(result.result)
+        else:
+            # Прогресс для групповых задач
+            if hasattr(result, 'result') and isinstance(result.result, GroupResult):
+                group_result = result.result
+                response["progress"] = {
+                    "total": len(group_result),
+                    "completed": group_result.completed_count(),
+                    "failed": group_result.failed_count(),
+                    "progress_percentage": int((group_result.completed_count() / len(group_result)) * 100) if len(
+                        group_result) > 0 else 0
+                }
+            # Прогресс для обычных задач
+            elif result.state == 'PROGRESS':
+                response["progress"] = result.info
+
+        return response
+
+    except Exception as e:
+        logger.error(f"❌ Error getting task status: {e}")
+        raise HTTPException(500, f"Error getting task status: {str(e)}")
+
+
+@router.get("/batch/{group_id}/status", response_model=dict)
+async def get_batch_status(
+        group_id: str,
+        current_user=Depends(get_current_user)
+):
+    """Получение статуса группы задач"""
+    try:
+        from app.tasks.tasks import get_task_group_status_task
+        result = get_task_group_status_task.delay(group_id)
+
+        # Ждем результат синхронно
+        group_status = result.get(timeout=10)
+
+        return group_status
+
+    except Exception as e:
+        logger.error(f"❌ Error getting batch status: {e}")
+        raise HTTPException(500, f"Error getting batch status: {str(e)}")
+
+
+@router.post("/batch/monitor-progress", response_model=dict)
+async def monitor_analysis_progress(
+        analysis_ids: List[int],
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Мониторинг прогресса нескольких анализов"""
+    try:
+        # Проверяем доступ к анализам
+        for analysis_id in analysis_ids:
+            analysis_result = await db.execute(
+                select(Analysis)
+                .join(Project)
+                .where(
+                    Analysis.id == analysis_id,
+                    Project.owner_id == current_user.id
+                )
+            )
+            analysis = analysis_result.scalar_one_or_none()
+            if not analysis:
+                raise HTTPException(404, f"Analysis {analysis_id} not found")
+
+        # Запускаем мониторинг
+        from app.tasks.tasks import monitor_analysis_progress_task
+        task = monitor_analysis_progress_task.delay(analysis_ids)
+
+        return {
+            "message": f"Progress monitoring started for {len(analysis_ids)} analyses",
+            "task_id": task.id,
+            "analysis_ids": analysis_ids
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Progress monitoring failed: {e}")
+        raise HTTPException(500, f"Progress monitoring failed: {str(e)}")
+
+
+@router.post("/maintenance/cleanup", response_model=dict)
+async def cleanup_old_analyses(
+        days_old: int = 30,
+        current_user=Depends(get_current_user)
+):
+    """Очистка старых анализов (только для админов или владельцев)"""
+    try:
+        # Здесь можно добавить проверку прав доступа
+        from app.tasks.tasks import cleanup_old_analyses_task
+        task = cleanup_old_analyses_task.delay(days_old)
+
+        return {
+            "message": f"Cleanup started for analyses older than {days_old} days",
+            "task_id": task.id,
+            "days_old": days_old
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Cleanup failed: {e}")
+        raise HTTPException(500, f"Cleanup failed: {str(e)}")
+
+
+@router.get("/batch/queue/stats", response_model=dict)
+async def get_queue_stats(
+        current_user=Depends(get_current_user)
+):
+    """Получение статистики очередей"""
+    try:
+        from app.celery_app import celery_app
+
+        # Получаем инспектор для мониторинга
+        inspector = celery_app.control.inspect()
+
+        # Активные задачи
+        active = inspector.active()
+        # Задачи в очередях
+        scheduled = inspector.scheduled()
+        # Зарезервированные задачи
+        reserved = inspector.reserved()
+
+        stats = {
+            "queues": {
+                "analysis": 0,
+                "generation": 0,
+                "monitoring": 0,
+                "maintenance": 0
+            },
+            "workers": len(inspector.stats() or {}),
+            "total_tasks": 0
+        }
+
+        # Считаем задачи по очередям (упрощенная логика)
+        if active:
+            for worker, tasks in active.items():
+                stats["total_tasks"] += len(tasks)
+
+        if scheduled:
+            for worker, tasks in scheduled.items():
+                stats["total_tasks"] += len(tasks)
+
+        if reserved:
+            for worker, tasks in reserved.items():
+                stats["total_tasks"] += len(tasks)
+
+        return stats
+
+    except Exception as e:
+        logger.error(f"❌ Error getting queue stats: {e}")
+        return {
+            "error": "Could not retrieve queue stats",
+            "queues": {},
+            "workers": 0,
+            "total_tasks": 0
+        }
 
 
 def generate_test_results(analysis_data, project):
@@ -626,4 +1043,3 @@ def get_file_ext(techs):
     if 'javascript' in techs: return 'js'
     if 'java' in techs: return 'java'
     return 'txt'
-

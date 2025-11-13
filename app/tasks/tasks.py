@@ -3,8 +3,12 @@ import os
 import tempfile
 import zipfile
 from datetime import datetime
-from pathlib import Path
-from celery import current_task
+import time
+from typing import List
+from sqlalchemy import select
+# from pathlib import Path
+# from celery import current_task
+from celery import group, chord
 from app.celery_app import celery_app
 from app.db.session import AsyncSessionLocal
 from app.models import Analysis, Project
@@ -146,6 +150,7 @@ def _filter_dependencies_from_results(analysis_result: dict) -> dict:
 
 async def perform_repository_analysis(analysis_id: int):
     """Асинхронная функция для анализа репозитория"""
+    repo_path = None
     try:
         logger.info(f"🔍 Starting REAL repository analysis for ID: {analysis_id}")
 
@@ -161,7 +166,7 @@ async def perform_repository_analysis(analysis_id: int):
 
         logger.info(f"📦 Cloning repository: {repo_url}, branch: {branch}")
 
-        # Клонируем репозиторий
+        # Клонируем репозиторий (всегда новая копия)
         git_service = GitService()
         repo_path = await git_service.clone_repository(repo_url, branch)
 
@@ -177,13 +182,12 @@ async def perform_repository_analysis(analysis_id: int):
             # 🔥 ПРИНУДИТЕЛЬНАЯ ФИЛЬТРАЦИЯ ВСЕХ ЗАВИСИМОСТЕЙ
             analysis_result = _filter_dependencies_from_results(analysis_result)
 
-            logger.info(f"📊 REAL analysis completed (after dependency filtering):")
+            logger.info(f"📊 REAL analysis completed:")
             logger.info(f"  - Technologies: {analysis_result.get('technologies', [])}")
             logger.info(f"  - Frameworks: {analysis_result.get('frameworks', [])}")
             logger.info(f"  - Project files: {analysis_result['metrics']['total_files']}")
             logger.info(f"  - Code files: {analysis_result['metrics']['code_files']}")
             logger.info(f"  - Test files: {analysis_result['metrics']['test_files']}")
-            logger.info(f"  - Ignored dependency files: {analysis_result['metrics']['ignored_files']}")
 
             await update_analysis_status(analysis_id, "generating")
 
@@ -239,14 +243,18 @@ async def perform_repository_analysis(analysis_id: int):
             logger.error(f"❌ Analysis failed: {e}")
             await update_analysis_status(analysis_id, "failed", str(e))
             raise
-        finally:
-            # Очищаем временные файлы
-            git_service.cleanup(repo_path)
 
     except Exception as e:
         logger.error(f"❌ Repository analysis {analysis_id} failed: {str(e)}")
         await update_analysis_status(analysis_id, "failed", str(e))
         raise
+    finally:
+        if repo_path and os.path.exists(repo_path):
+            logger.info(f"🧹 Cleaning up temporary repository: {repo_path}")
+            git_service = GitService()
+            git_service.cleanup(repo_path)
+        else:
+            logger.info(f"⚠️  No temporary repository to clean up for analysis {analysis_id}")
 
 
 async def perform_zip_analysis(analysis_id: int, zip_path: str):
@@ -340,21 +348,45 @@ async def perform_zip_analysis(analysis_id: int, zip_path: str):
         raise
 
 
+# =============================================================================
+# ОСНОВНЫЕ ЗАДАЧИ АНАЛИЗА
+# =============================================================================
+
 @celery_app.task(bind=True, name="app.tasks.analyze_repository_task")
 @robust_async_to_sync
 async def analyze_repository_task(self, analysis_id: int):
     """Анализ репозитория из GitHub"""
+    start_time = time.time()
     logger.info(f"🎯 Starting analyze_repository_task for analysis_id: {analysis_id}")
+
     try:
+        # Обновляем прогресс
+        self.update_state(
+            state='PROGRESS',
+            meta={'current': 0, 'total': 100, 'status': 'starting'}
+        )
+
         result = await perform_repository_analysis(analysis_id)
-        logger.info(f"✅ analyze_repository_task completed for analysis_id: {analysis_id}")
+        execution_time = time.time() - start_time
+
+        logger.info(f"✅ Analysis {analysis_id} completed in {execution_time:.2f}s")
         return result
+
     except Exception as e:
-        logger.error(f"❌ analyze_repository_task failed for analysis_id {analysis_id}: {str(e)}")
+        execution_time = time.time() - start_time
+        logger.error(f"❌ Analysis {analysis_id} failed after {execution_time:.2f}s: {e}")
+
+        # Обновляем статус в БД при ошибке
+        try:
+            await update_analysis_status(analysis_id, "failed", str(e))
+        except Exception as db_error:
+            logger.error(f"Failed to update analysis status: {db_error}")
+
         return {
             "status": "error",
             "analysis_id": analysis_id,
-            "error": str(e)
+            "error": str(e),
+            "execution_time": execution_time
         }
 
 
@@ -362,24 +394,356 @@ async def analyze_repository_task(self, analysis_id: int):
 @robust_async_to_sync
 async def analyze_zip_task(self, analysis_id: int, zip_path: str):
     """Анализ ZIP архива"""
+    start_time = time.time()
     logger.info(f"🎯 Starting analyze_zip_task for analysis_id: {analysis_id}")
+
     try:
+        self.update_state(
+            state='PROGRESS',
+            meta={'current': 0, 'total': 100, 'status': 'starting'}
+        )
+
         result = await perform_zip_analysis(analysis_id, zip_path)
-        logger.info(f"✅ analyze_zip_task completed for analysis_id: {analysis_id}")
+        execution_time = time.time() - start_time
+
+        logger.info(f"✅ ZIP analysis {analysis_id} completed in {execution_time:.2f}s")
         return result
+
     except Exception as e:
-        logger.error(f"❌ analyze_zip_task failed for analysis_id {analysis_id}: {str(e)}")
+        execution_time = time.time() - start_time
+        logger.error(f"❌ ZIP analysis {analysis_id} failed after {execution_time:.2f}s: {str(e)}")
+
+        try:
+            await update_analysis_status(analysis_id, "failed", str(e))
+        except Exception as db_error:
+            logger.error(f"Failed to update analysis status: {db_error}")
+
         return {
             "status": "error",
             "analysis_id": analysis_id,
-            "error": str(e)
+            "error": str(e),
+            "execution_time": execution_time
         }
 
+
+# =============================================================================
+# ПАРАЛЛЕЛЬНЫЕ ЗАДАЧИ ДЛЯ ГРУППОВОЙ ОБРАБОТКИ
+# =============================================================================
+
+@celery_app.task(bind=True, name="app.tasks.batch_analyze_repositories_task")
+def batch_analyze_repositories_task(self, analysis_ids: List[int]):
+    """Параллельный анализ нескольких репозиториев"""
+    logger.info(f"🚀 Starting batch analysis for {len(analysis_ids)} repositories")
+
+    # Создаем группу задач для параллельного выполнения
+    job = group(
+        analyze_repository_task.s(analysis_id)
+        for analysis_id in analysis_ids
+    )
+
+    result = job.apply_async()
+
+    return {
+        "status": "started",
+        "total_tasks": len(analysis_ids),
+        "task_group_id": result.id,
+        "analysis_ids": analysis_ids
+    }
+
+
+@celery_app.task(bind=True, name="app.tasks.batch_analyze_zips_task")
+def batch_analyze_zips_task(self, analysis_data: List[dict]):
+    """Параллельный анализ нескольких ZIP архивов"""
+    logger.info(f"🚀 Starting batch ZIP analysis for {len(analysis_data)} archives")
+
+    tasks = []
+    for data in analysis_data:
+        task = analyze_zip_task.s(data['analysis_id'], data['zip_path'])
+        tasks.append(task)
+
+    job = group(tasks)
+    result = job.apply_async()
+
+    return {
+        "status": "started",
+        "total_tasks": len(analysis_data),
+        "task_group_id": result.id,
+        "analysis_data": analysis_data
+    }
+
+
+# =============================================================================
+# ЗАДАЧИ ГЕНЕРАЦИИ ТЕСТОВ
+# =============================================================================
+
+@celery_app.task(bind=True, name="app.tasks.parallel_test_generation_task")
+@robust_async_to_sync
+async def parallel_test_generation_task(self, project_id: int, test_config: dict):
+    """Параллельная генерация разных типов тестов"""
+    try:
+        from app.services.generate_pipeline import test_generation_pipeline
+
+        logger.info(f"🚀 Starting parallel test generation for project {project_id}")
+
+        # Получаем проект и анализ
+        async with AsyncSessionLocal() as db:
+            project = await db.get(Project, project_id)
+            if not project:
+                raise Exception("Project not found")
+
+            # Получаем последний анализ
+            analysis_result = await db.execute(
+                select(Analysis)
+                .where(
+                    Analysis.project_id == project_id,
+                    Analysis.status == "completed"
+                )
+                .order_by(Analysis.created_at.desc())
+                .limit(1)
+            )
+            analysis = analysis_result.scalar_one_or_none()
+
+        if not analysis:
+            raise Exception("No completed analysis found")
+
+        # Создаем задачи для разных типов тестов
+        tasks = []
+
+        if test_config.get("generate_unit_tests", True):
+            unit_task = generate_unit_tests_task.s(project_id, test_config, analysis.result)
+            tasks.append(unit_task)
+
+        if test_config.get("generate_integration_tests", True):
+            integration_task = generate_integration_tests_task.s(project_id, test_config, analysis.result)
+            tasks.append(integration_task)
+
+        if test_config.get("generate_e2e_tests", False):
+            e2e_task = generate_e2e_tests_task.s(project_id, test_config, analysis.result)
+            tasks.append(e2e_task)
+
+        # Запускаем все задачи параллельно
+        if tasks:
+            job = group(tasks)
+            group_result = job.apply_async()
+
+            return {
+                "status": "parallel_generation_started",
+                "project_id": project_id,
+                "task_group_id": group_result.id,
+                "task_count": len(tasks)
+            }
+        else:
+            return {"status": "no_tasks_created", "project_id": project_id}
+
+    except Exception as e:
+        logger.error(f"❌ Parallel test generation failed: {e}")
+        raise
+
+
+@celery_app.task(bind=True, name="app.tasks.generate_unit_tests_task")
+@robust_async_to_sync
+async def generate_unit_tests_task(self, project_id: int, test_config: dict, analysis_data: dict):
+    """Генерация unit тестов - отдельная задача"""
+    start_time = time.time()
+    logger.info(f"🔧 Generating unit tests for project {project_id}")
+
+    try:
+        # Имитация генерации unit тестов (замените на реальную логику)
+        self.update_state(state='PROGRESS', meta={'status': 'generating_unit_tests'})
+        await asyncio.sleep(5)
+
+        execution_time = time.time() - start_time
+
+        return {
+            "status": "success",
+            "test_type": "unit",
+            "project_id": project_id,
+            "generated_tests": 15,
+            "coverage_estimate": 65,
+            "execution_time": execution_time
+        }
+    except Exception as e:
+        logger.error(f"❌ Unit test generation failed: {e}")
+        raise
+
+
+@celery_app.task(bind=True, name="app.tasks.generate_integration_tests_task")
+@robust_async_to_sync
+async def generate_integration_tests_task(self, project_id: int, test_config: dict, analysis_data: dict):
+    """Генерация интеграционных тестов - отдельная задача"""
+    start_time = time.time()
+    logger.info(f"🔧 Generating integration tests for project {project_id}")
+
+    try:
+        # Имитация генерации интеграционных тестов (замените на реальную логику)
+        self.update_state(state='PROGRESS', meta={'status': 'generating_integration_tests'})
+        await asyncio.sleep(3)
+
+        execution_time = time.time() - start_time
+
+        return {
+            "status": "success",
+            "test_type": "integration",
+            "project_id": project_id,
+            "generated_tests": 8,
+            "coverage_estimate": 25,
+            "execution_time": execution_time
+        }
+    except Exception as e:
+        logger.error(f"❌ Integration test generation failed: {e}")
+        raise
+
+
+@celery_app.task(bind=True, name="app.tasks.generate_e2e_tests_task")
+@robust_async_to_sync
+async def generate_e2e_tests_task(self, project_id: int, test_config: dict, analysis_data: dict):
+    """Генерация E2E тестов - отдельная задача"""
+    start_time = time.time()
+    logger.info(f"🔧 Generating E2E tests for project {project_id}")
+
+    try:
+        # Имитация генерации E2E тестов (замените на реальную логику)
+        self.update_state(state='PROGRESS', meta={'status': 'generating_e2e_tests'})
+        await asyncio.sleep(7)
+
+        execution_time = time.time() - start_time
+
+        return {
+            "status": "success",
+            "test_type": "e2e",
+            "project_id": project_id,
+            "generated_tests": 5,
+            "coverage_estimate": 15,
+            "execution_time": execution_time
+        }
+    except Exception as e:
+        logger.error(f"❌ E2E test generation failed: {e}")
+        raise
+
+
+@celery_app.task(bind=True, name="app.tasks.batch_generate_tests_task")
+def batch_generate_tests_task(self, projects_config: List[dict]):
+    """Пакетная генерация тестов для нескольких проектов"""
+    logger.info(f"🚀 Starting batch test generation for {len(projects_config)} projects")
+
+    tasks = []
+    for config in projects_config:
+        task = parallel_test_generation_task.s(
+            config['project_id'],
+            config.get('test_config', {})
+        )
+        tasks.append(task)
+
+    job = group(tasks)
+    result = job.apply_async()
+
+    return {
+        "status": "started",
+        "total_projects": len(projects_config),
+        "task_group_id": result.id
+    }
+
+
+# =============================================================================
+# ЗАДАЧИ МОНИТОРИНГА И УПРАВЛЕНИЯ
+# =============================================================================
+
+@celery_app.task(bind=True, name="app.tasks.monitor_analysis_progress_task")
+def monitor_analysis_progress_task(self, analysis_ids: List[int]):
+    """Мониторинг прогресса анализа нескольких проектов"""
+    logger.info(f"📊 Monitoring progress for {len(analysis_ids)} analyses")
+
+    # Создаем задачи для мониторинга
+    monitoring_tasks = []
+    for analysis_id in analysis_ids:
+        task = check_analysis_status_task.s(analysis_id)
+        monitoring_tasks.append(task)
+
+    # Запускаем мониторинг
+    job = group(monitoring_tasks)
+    result = job.apply_async()
+
+    return {
+        "status": "monitoring_started",
+        "monitoring_group_id": result.id,
+        "analysis_ids": analysis_ids
+    }
+
+
+@celery_app.task(bind=True, name="app.tasks.check_analysis_status_task")
+@robust_async_to_sync
+async def check_analysis_status_task(self, analysis_id: int):
+    """Проверка статуса конкретного анализа"""
+    async with AsyncSessionLocal() as db:
+        analysis = await db.get(Analysis, analysis_id)
+        if analysis:
+            return {
+                "analysis_id": analysis_id,
+                "status": analysis.status,
+                "progress": self._get_progress_from_status(analysis.status),
+                "has_result": analysis.result is not None,
+                "coverage_estimate": analysis.result.get('coverage_estimate', 0) if analysis.result else 0
+            }
+        return {"analysis_id": analysis_id, "status": "not_found"}
+
+
+def _get_progress_from_status(self, status: str) -> int:
+    """Преобразует статус в процент прогресса"""
+    progress_map = {
+        "pending": 0,
+        "cloning": 25,
+        "analyzing": 50,
+        "generating": 75,
+        "completed": 100,
+        "failed": 0
+    }
+    return progress_map.get(status, 0)
+
+
+@celery_app.task(bind=True, name="app.tasks.get_task_group_status_task")
+def get_task_group_status_task(self, group_id: str):
+    """Получение статуса группы задач"""
+    try:
+        from celery.result import GroupResult
+
+        group_result = GroupResult.restore(group_id, app=celery_app)
+
+        if group_result:
+            # Получаем результаты завершенных задач
+            completed = group_result.completed_count()
+            total = len(group_result)
+
+            return {
+                "group_id": group_id,
+                "total_tasks": total,
+                "completed_tasks": completed,
+                "failed_tasks": group_result.failed_count(),
+                "progress_percentage": int((completed / total) * 100) if total > 0 else 0,
+                "ready": group_result.ready(),
+                "successful": group_result.successful(),
+                "results": group_result.results if group_result.ready() else None
+            }
+        else:
+            return {"error": "Group not found", "group_id": group_id}
+
+    except Exception as e:
+        logger.error(f"Error getting group status: {e}")
+        return {"error": str(e), "group_id": group_id}
+
+
+# =============================================================================
+# СЛУЖЕБНЫЕ И ТЕСТОВЫЕ ЗАДАЧИ
+# =============================================================================
 
 @celery_app.task(bind=True, name="app.tasks.test_dependency_filtering_task")
 @robust_async_to_sync
 async def test_dependency_filtering_task(self, repo_url: str, branch: str = "main"):
     """Тестовая задача для проверки фильтрации ВСЕХ зависимостей"""
+    # Проверка на тестовую среду
+    if os.getenv('ENVIRONMENT') not in ['testing', 'development']:
+        logger.warning("Dependency filtering test should run only in test/development environment")
+        return {"status": "skipped", "reason": "not_test_environment"}
+
     logger.info(f"🧪 Testing dependency filtering with: {repo_url}, branch: {branch}")
 
     try:
@@ -487,9 +851,72 @@ async def diagnostic_task(self, test_type: str = "basic"):
             git_service.cleanup(repo_path)
             return {"status": "success", "test": "git"}
 
+        elif test_type == "parallel":
+            logger.info("🔄 Testing parallel execution...")
+            # Создаем несколько задач для параллельного выполнения
+            tasks = []
+            for i in range(3):
+                task = diagnostic_parallel_subtask.s(i)
+                tasks.append(task)
+
+            job = group(tasks)
+            result = job.apply_async()
+
+            return {
+                "status": "parallel_test_started",
+                "task_group_id": result.id,
+                "subtask_count": 3
+            }
+
     except Exception as e:
         logger.error(f"❌ Diagnostic task failed: {e}", exc_info=True)
         return {"status": "error", "test": test_type, "error": str(e)}
+
+
+@celery_app.task(bind=True, name="app.tasks.diagnostic_parallel_subtask")
+@robust_async_to_sync
+async def diagnostic_parallel_subtask(self, task_id: int):
+    """Вспомогательная задача для тестирования параллелизма"""
+    logger.info(f"🔧 Starting parallel subtask {task_id}")
+    await asyncio.sleep(2)  # Имитация работы
+    return {"status": "success", "task_id": task_id, "result": f"subtask_{task_id}_completed"}
+
+
+@celery_app.task(bind=True, name="app.tasks.cleanup_old_analyses_task")
+@robust_async_to_sync
+async def cleanup_old_analyses_task(self, days_old: int = 30):
+    """Очистка старых анализов"""
+    try:
+        from datetime import timedelta
+        from sqlalchemy import delete
+
+        cutoff_date = datetime.utcnow() - timedelta(days=days_old)
+
+        async with AsyncSessionLocal() as db:
+            # Находим анализы для удаления
+            result = await db.execute(
+                select(Analysis).where(Analysis.created_at < cutoff_date)
+            )
+            old_analyses = result.scalars().all()
+
+            # Удаляем их
+            deleted_count = 0
+            for analysis in old_analyses:
+                await db.delete(analysis)
+                deleted_count += 1
+
+            await db.commit()
+
+            logger.info(f"🧹 Cleaned up {deleted_count} analyses older than {days_old} days")
+            return {
+                "status": "success",
+                "deleted_count": deleted_count,
+                "cutoff_date": cutoff_date.isoformat()
+            }
+
+    except Exception as e:
+        logger.error(f"❌ Cleanup task failed: {e}")
+        return {"status": "error", "error": str(e)}
 
 
 def _calculate_real_coverage(analysis_result):
