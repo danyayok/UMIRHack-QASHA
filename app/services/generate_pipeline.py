@@ -4,7 +4,7 @@ import json
 from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
 from pathlib import Path
-
+import re
 logger = logging.getLogger("qa_automata")
 
 
@@ -220,7 +220,7 @@ class TestGenerationPipeline:
 
     async def _generate_unit_tests(self, project_analysis: Dict, framework: str,
                                    config: Dict, repo_path: str) -> Tuple[Dict[str, str], int, str]:
-        """Генерирует unit тесты"""
+        """Генерирует unit тесты с ПОЛНЫМ КОНТЕКСТОМ ФАЙЛА"""
         test_files = {}
         code_files = project_analysis.get("code_files", [])
         ai_provider = "unknown"
@@ -229,28 +229,42 @@ class TestGenerationPipeline:
 
         for file_info in files_to_test:
             try:
-                # 🔥 ИСПРАВЛЕНИЕ: Убедимся что file_info - словарь
                 if not isinstance(file_info, dict):
-                    logger.warning(f"Invalid file_info type: {type(file_info)}, skipping")
                     continue
 
-                # Создаем копию чтобы не модифицировать исходные данные
                 file_info_copy = file_info.copy()
 
-                # Получаем реальное содержимое файла
-                real_content = self._get_file_content(file_info_copy.get("path", ""), repo_path)
-                if real_content:
-                    file_info_copy["real_content"] = real_content
-                    file_info_copy["has_content"] = True
-                else:
-                    file_info_copy["has_content"] = False
+                # ПОЛУЧАЕМ РАСШИРЕННОЕ СОДЕРЖИМОЕ ФАЙЛА
+                enhanced_content = self._get_enhanced_file_content(file_info_copy.get("path", ""), repo_path)
+                file_info_copy["enhanced_content"] = enhanced_content
+                file_info_copy["has_content"] = bool(enhanced_content.get("content"))
 
-                # Подготавливаем контекст
+                # Подготавливаем контекст проекта
                 project_context = self._prepare_context(project_analysis)
 
+                # ДОБАВЛЯЕМ СПЕЦИФИЧЕСКУЮ ИНФОРМАЦИЮ ДЛЯ ТЕСТИРОВАНИЯ
+                file_specific_context = {
+                    "file_criticality": self._assess_criticality(file_info_copy),
+                    "is_core_component": self._is_critical_file(file_info_copy),
+                    "suggested_test_scenarios": self._suggest_test_scenarios(file_info_copy, project_analysis),
+                    "required_imports": self._get_required_test_imports(enhanced_content.get("analysis", {}), framework)
+                }
+
+                enhanced_file_info = {
+                    **file_info_copy,
+                    "context_hints": file_specific_context
+                }
+                enhanced_context = {
+                    **project_context,
+                    "specific_file_analysis": self._get_detailed_file_analysis(file_info_copy, repo_path),
+                    "related_endpoints": self._find_related_endpoints(file_info_copy, project_analysis),
+                    "test_scenarios": self._suggest_test_scenarios(file_info_copy, project_analysis),
+                    "mock_suggestions": self._suggest_mocks(file_info_copy, project_analysis)
+                }
+
                 test_content = await self.ai_service.generate_test_content(
-                    file_info=file_info_copy,  # 🔥 Теперь передаем словарь, а не список
-                    project_context=project_context,
+                    file_info=enhanced_file_info,
+                    project_context=enhanced_context,  # ✅ Полный контекст
                     test_type="unit",
                     framework=framework,
                     config=config
@@ -272,6 +286,23 @@ class TestGenerationPipeline:
                 ai_provider = "fallback"
 
         return test_files, len(test_files), ai_provider
+
+    def _get_required_test_imports(self, file_analysis: Dict, framework: str) -> List[str]:
+        """Определяет необходимые импорты для тестов"""
+        required_imports = []
+
+        # Базовые импорты для фреймворка
+        if framework == 'pytest':
+            required_imports.extend(['pytest', 'unittest.mock'])
+        elif framework == 'unittest':
+            required_imports.extend(['unittest', 'unittest.mock'])
+
+        # Импорты из исходного файла
+        for imp in file_analysis.get('imports', []):
+            if imp['type'] == 'direct_import':
+                required_imports.append(imp['module'])
+
+        return required_imports
 
     async def _generate_api_tests(self, project_analysis: Dict, framework: str,
                                   config: Dict, repo_path: str) -> Tuple[Dict[str, str], int, str]:
@@ -363,20 +394,26 @@ class TestGenerationPipeline:
 
         return test_files, len(test_files), ai_provider
 
-    async def _generate_e2e_tests(self, project_analysis: Dict, framework: str,
-                                  config: Dict) -> Tuple[Dict[str, str], int, str]:
-        """Генерирует E2E тесты"""
+    async def _generate_e2e_tests(self, project_analysis: Dict, framework: str, config: Dict) -> Tuple[
+        Dict[str, str], int, str]:
+        """Генерация E2E тестов с реальным контекстом - ИСПРАВЛЕННАЯ ВЕРСИЯ"""
         test_files = {}
         ai_provider = "unknown"
 
-        scenarios = self._find_e2e_scenarios(project_analysis)
+        # Находим реальные E2E сценарии
+        e2e_scenarios = self._find_real_e2e_scenarios(project_analysis)
 
-        for scenario in scenarios[:config.get("max_e2e_tests", 2)]:
+        for scenario in e2e_scenarios[:config.get("max_e2e_tests", 2)]:
             try:
+                # Используем существующий анализ для создания контекста
                 mock_file_info = {
-                    "path": f"e2e/{scenario}",
-                    "name": scenario,
-                    "type": "e2e_scenario"
+                    "path": f"e2e/{scenario['name']}",
+                    "name": scenario['name'],
+                    "type": "e2e_scenario",
+                    "scenario_data": scenario,
+                    "api_endpoints": self._format_api_routes(project_analysis.get('api_endpoints', [])),
+                    "user_flows": scenario.get('user_flows', []),
+                    "pages": scenario.get('pages', [])
                 }
 
                 test_content = await self.ai_service.generate_test_content(
@@ -388,7 +425,7 @@ class TestGenerationPipeline:
                 )
 
                 if test_content:
-                    filename = f"test_e2e_{scenario}.{self._get_file_ext(framework)}"
+                    filename = f"test_e2e_{scenario['name']}.{self._get_file_ext(framework)}"
                     test_files[filename] = test_content
                     ai_provider = "ai_generated"
 
@@ -458,47 +495,35 @@ class TestGenerationPipeline:
         return extensions.get(framework, "py")
 
     def _get_file_content(self, file_path: str, repo_path: str = "") -> str:
-        """Безопасное получение содержимого файла с улучшенной обработкой путей"""
+        """Безопасное получение содержимого файла - ДОПОЛНЕННАЯ ВЕРСИЯ"""
         if not file_path:
             return ""
-
-        # Нормализуем пути
-        file_path = file_path.strip()
-        if repo_path:
-            repo_path = repo_path.strip()
-
-        # Пробуем разные варианты путей
-        possible_paths = [file_path]
-
-        if repo_path:
-            possible_paths.extend([
-                os.path.join(repo_path, file_path),
-                os.path.join(repo_path, file_path.lstrip('/')),
-                os.path.join(repo_path, file_path.lstrip('./'))
-            ])
-
-        for full_path in possible_paths:
-            if os.path.exists(full_path) and os.path.isfile(full_path):
-                try:
-                    with open(full_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                        logger.info(f"GET_FILE_CONTENT: Successfully read {len(content)} chars from {full_path}")
-                        return content
-                except UnicodeDecodeError:
-                    try:
-                        with open(full_path, 'r', encoding='latin-1') as f:
-                            content = f.read()
-                            logger.info(f"GET_FILE_CONTENT: Successfully read with latin-1: {len(content)} chars")
-                            return content
-                    except Exception as e:
-                        logger.warning(f"Could not read file {full_path} with any encoding: {e}")
-                        continue
-                except Exception as e:
-                    logger.warning(f"Error reading file {full_path}: {e}")
-                    continue
-
-        logger.warning(f"File not found at any path: {file_path}")
-        return ""
+        absolute_path = self._find_absolute_file_path(file_path, repo_path)
+        logger.info(f"Looking for file: {file_path} -> {absolute_path}")
+        if not os.path.exists(absolute_path) or not os.path.isfile(absolute_path):
+            logger.warning(f"File not found: {absolute_path}")
+            return ""
+        try:
+            with open(absolute_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                if len(content) > 100000:
+                    content = content[:100000] + "\n# ... [FILE TRUNCATED FOR ANALYSIS]"
+                logger.info(f"GET_FILE_CONTENT: Successfully read {len(content)} chars from {absolute_path}")
+                return content
+        except UnicodeDecodeError:
+            try:
+                with open(absolute_path, 'r', encoding='latin-1') as f:
+                    content = f.read()
+                    if len(content) > 100000:
+                        content = content[:100000] + "\n# ... [FILE TRUNCATED FOR ANALYSIS]"
+                    logger.info(f"GET_FILE_CONTENT: Successfully read with latin-1: {len(content)} chars")
+                    return content
+            except Exception as e:
+                logger.warning(f"Could not read file {absolute_path} with any encoding: {e}")
+                return ""
+        except Exception as e:
+            logger.warning(f"Error reading file {absolute_path}: {e}")
+            return ""
 
     async def _create_fallback_test(self, file_info: Dict, framework: str,
                                     project_analysis: Dict) -> Tuple[str, str]:
@@ -540,7 +565,7 @@ class Test{file_name}:
         return scenarios
 
     def _prepare_context(self, project_analysis: Dict) -> Dict[str, Any]:
-        """Подготавливает полный контекст проекта для AI со всей структурой файлов"""
+        """Подготавливает РАСШИРЕННЫЙ контекст проекта для AI"""
         if not project_analysis:
             return self._create_empty_context()
 
@@ -549,7 +574,8 @@ class Test{file_name}:
         # Формируем полную структуру файлов проекта
         complete_file_structure = self._prepare_complete_file_structure(file_structure)
 
-        return {
+        # Базовый контекст
+        base_context = {
             "project_metadata": {
                 "name": project_analysis.get('project_name', 'Unknown'),
                 "technologies": project_analysis.get('technologies', []),
@@ -573,6 +599,30 @@ class Test{file_name}:
             "dependencies": project_analysis.get('dependencies', {}),
             "api_endpoints": project_analysis.get('api_endpoints', []),
         }
+
+        # ДОБАВЛЯЕМ РАСШИРЕННЫЙ КОНТЕКСТ
+        enhanced_context = {
+            **base_context,
+            "semantic_analysis": {
+                "key_components": self._identify_key_components(project_analysis, ""),
+                "critical_paths": self._find_critical_paths(project_analysis),
+                "error_handling_patterns": self._analyze_error_handling(project_analysis)
+            },
+            "business_context": {
+                "domains": self._detect_business_domains(project_analysis),
+                "core_functions": self._identify_core_functions(project_analysis),
+                "data_entities": self._identify_data_entities(project_analysis)
+            },
+            "testing_recommendations": {
+                "priority_focus": self._determine_test_priority(project_analysis),
+                "recommended_test_types": self._recommend_test_types(project_analysis),
+                "risk_areas": self._identify_risk_areas(project_analysis)
+            }
+        }
+
+        logger.info(
+            f"Enhanced context prepared with {len(enhanced_context['semantic_analysis']['key_components'])} key components")
+        return enhanced_context
 
     def _create_empty_context(self) -> Dict[str, Any]:
         """Создает пустой контекст при отсутствии данных"""
@@ -658,6 +708,16 @@ class Test{file_name}:
         }
         return type_map.get(extension, 'unknown')
 
+    def _format_api_routes(self, routes: List[Dict]) -> str:
+        """Форматирует API routes"""
+        if not routes:
+            return "   Нет API endpoints"
+
+        result = []
+        for route in routes[:5]:
+            result.append(f"   {route['method']} {route['path']} ({route['type']})")
+
+        return '\n'.join(result)
     def _get_language_from_framework(self, framework: str) -> str:
         """Определение языка по фреймворку"""
         lang_map = {
@@ -972,7 +1032,913 @@ class Test{file_name}:
 
         return patterns
 
+    def _prepare_enhanced_context(self, project_analysis: Dict, repo_path: str) -> Dict[str, Any]:
+        """Расширенный контекст проекта с семантическим анализом"""
 
+        # Используем существующий метод как основу
+        base_context = self._prepare_context(project_analysis)
+
+        # Дополняем расширенной информацией
+        enhanced_context = {
+            **base_context,
+            "semantic_analysis": self._perform_semantic_analysis(project_analysis, repo_path),
+            "code_patterns": self._extract_code_patterns(project_analysis, repo_path),
+            "business_logic": self._infer_business_logic(project_analysis),
+            "testing_strategy": self._derive_testing_strategy(project_analysis)
+        }
+
+        return enhanced_context
+
+    def _perform_semantic_analysis(self, project_analysis: Dict, repo_path: str) -> Dict[str, Any]:
+        """Семантический анализ кода для понимания логики"""
+        semantic_data = {
+            "key_components": self._identify_key_components(project_analysis, repo_path),
+            "data_flow": self._analyze_data_flow(project_analysis),
+            "critical_paths": self._find_critical_paths(project_analysis),
+            "error_handling": self._analyze_error_handling(project_analysis)
+        }
+
+        logger.info(f"Semantic analysis completed: {len(semantic_data['key_components'])} key components found")
+        return semantic_data
+
+    def _identify_key_components(self, project_analysis: Dict, repo_path: str) -> List[Dict]:
+        """Идентификация ключевых компонентов системы"""
+        key_components = []
+
+        # Анализ API endpoints как ключевых компонентов
+        for endpoint in project_analysis.get('api_endpoints', [])[:10]:
+            key_components.append({
+                "type": "api_endpoint",
+                "name": f"{endpoint.get('method', 'GET')} {endpoint.get('path', '')}",
+                "file": endpoint.get('file', ''),
+                "function": endpoint.get('function_name', 'unknown'),
+                "criticality": "high" if endpoint.get('method') in ['POST', 'PUT', 'DELETE'] else "medium"
+            })
+
+        # Анализ основных модулей
+        for file_info in project_analysis.get('code_files', [])[:20]:
+            if self._is_critical_file(file_info):
+                key_components.append({
+                    "type": "core_module",
+                    "name": file_info.get('name', ''),
+                    "path": file_info.get('path', ''),
+                    "technology": file_info.get('technology', ''),
+                    "criticality": self._assess_criticality(file_info)
+                })
+
+        return key_components
+
+    def _is_critical_file(self, file_info: Dict) -> bool:
+        """Определяет критичность файла"""
+        path = file_info.get('path', '').lower()
+        name = file_info.get('name', '').lower()
+
+        critical_indicators = [
+            'controller', 'service', 'model', 'handler',
+            'api', 'endpoint', 'route', 'view',
+            'core', 'main', 'app', 'application',
+            'business', 'logic', 'manager'
+        ]
+
+        return any(indicator in path or indicator in name for indicator in critical_indicators)
+
+    def _assess_criticality(self, file_info: Dict) -> str:
+        """Оценивает критичность файла"""
+        path = file_info.get('path', '').lower()
+
+        if any(term in path for term in ['controller', 'api', 'endpoint']):
+            return "high"
+        elif any(term in path for term in ['service', 'business', 'logic']):
+            return "high"
+        elif any(term in path for term in ['model', 'data', 'database']):
+            return "medium"
+        else:
+            return "low"
+
+    def _analyze_data_flow(self, project_analysis: Dict) -> List[Dict]:
+        """Анализ потоков данных между компонентами"""
+        data_flows = []
+
+        # На основе API endpoints определяем потенциальные потоки данных
+        endpoints = project_analysis.get('api_endpoints', [])
+        for i, endpoint in enumerate(endpoints[:5]):
+            for j, next_endpoint in enumerate(endpoints[i + 1:i + 3]):
+                if self._are_endpoints_related(endpoint, next_endpoint):
+                    data_flows.append({
+                        "source": f"{endpoint.get('method')} {endpoint.get('path')}",
+                        "target": f"{next_endpoint.get('method')} {next_endpoint.get('path')}",
+                        "data_type": "request/response",
+                        "relationship": "sequential"
+                    })
+
+        return data_flows
+
+    def _are_endpoints_related(self, endpoint1: Dict, endpoint2: Dict) -> bool:
+        """Определяет связаны ли эндпоинты"""
+        path1 = endpoint1.get('path', '')
+        path2 = endpoint2.get('path', '')
+
+        # Эндпоинты связаны если они в одном файле или имеют общий префикс пути
+        return (endpoint1.get('file') == endpoint2.get('file') or
+                path1.split('/')[0] == path2.split('/')[0])
+
+    def _find_critical_paths(self, project_analysis: Dict) -> List[List[str]]:
+        """Находит критические пути в приложении"""
+        critical_paths = []
+
+        # Создаем типичные критические пути на основе архитектуры
+        frameworks = project_analysis.get('frameworks', [])
+
+        if 'django' in frameworks:
+            critical_paths.append(['URL → View → Model → Database → Response'])
+        elif 'flask' in frameworks:
+            critical_paths.append(['Route → View Function → Business Logic → Response'])
+        elif 'fastapi' in frameworks:
+            critical_paths.append(['Endpoint → Dependency → Service → Model → Response'])
+
+        # Добавляем общие критические пути
+        critical_paths.extend([
+            ['User Input → Validation → Processing → Storage → Response'],
+            ['API Request → Authentication → Authorization → Business Logic → Response'],
+            ['Data Query → Processing → Transformation → Response']
+        ])
+
+        return critical_paths
+
+    def _analyze_error_handling(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Анализ обработки ошибок в проекте"""
+        error_patterns = {
+            "common_error_scenarios": [
+                "Invalid input validation",
+                "Database connection errors",
+                "Authentication failures",
+                "Authorization violations",
+                "Resource not found",
+                "External API failures"
+            ],
+            "recommended_error_tests": [
+                "Test invalid input formats",
+                "Test boundary conditions",
+                "Test authentication edge cases",
+                "Test database rollback scenarios",
+                "Test concurrent access issues"
+            ]
+        }
+
+        return error_patterns
+
+    def _extract_code_patterns(self, project_analysis: Dict, repo_path: str) -> Dict[str, Any]:
+        """Извлекает паттерны кода из проекта"""
+        patterns = {
+            "architectural_patterns": self._detect_architectural_patterns(project_analysis),
+            "design_patterns": self._detect_design_patterns(project_analysis),
+            "conventions": self._detect_code_conventions(project_analysis)
+        }
+
+        return patterns
+
+    def _detect_architectural_patterns(self, project_analysis: Dict) -> List[str]:
+        """Обнаруживает архитектурные паттерны"""
+        patterns = []
+        frameworks = [f.lower() for f in project_analysis.get('frameworks', [])]
+        file_structure = project_analysis.get('file_structure', {})
+
+        if any(f in ['django', 'flask', 'fastapi'] for f in frameworks):
+            patterns.append("MVC/MVT Pattern")
+
+        if any(f in ['react', 'vue', 'angular'] for f in frameworks):
+            patterns.append("Component-Based Architecture")
+
+        # Анализ структуры файлов для определения паттернов
+        if any('microservice' in path.lower() for path in file_structure.keys()):
+            patterns.append("Microservices Architecture")
+        elif any('monolith' in path.lower() for path in file_structure.keys()):
+            patterns.append("Monolithic Architecture")
+
+        return patterns
+
+    def _detect_design_patterns(self, project_analysis: Dict) -> List[str]:
+        """Обнаруживает паттерны проектирования"""
+        patterns = []
+        file_structure = project_analysis.get('file_structure', {})
+
+        # Простой анализ на основе имен файлов и структуры
+        if any('factory' in path.lower() for path in file_structure.keys()):
+            patterns.append("Factory Pattern")
+        if any('singleton' in path.lower() for path in file_structure.keys()):
+            patterns.append("Singleton Pattern")
+        if any('adapter' in path.lower() for path in file_structure.keys()):
+            patterns.append("Adapter Pattern")
+        if any('observer' in path.lower() for path in file_structure.keys()):
+            patterns.append("Observer Pattern")
+
+        return patterns
+
+    def _detect_code_conventions(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Определяет соглашения по коду"""
+        conventions = {
+            "naming_conventions": self._analyze_naming_conventions(project_analysis),
+            "testing_conventions": self._analyze_testing_conventions(project_analysis),
+            "project_structure": self._analyze_project_structure(project_analysis)
+        }
+
+        return conventions
+
+    def _analyze_naming_conventions(self, project_analysis: Dict) -> Dict[str, str]:
+        """Анализирует соглашения по именованию"""
+        conventions = {}
+        file_structure = project_analysis.get('file_structure', {})
+
+        # Анализ имен файлов
+        filenames = list(file_structure.keys())[:50]  # Берем первые 50 файлов для анализа
+
+        if any('test_' in fname for fname in filenames):
+            conventions["test_files"] = "test_*.py"
+        if any('_test.py' in fname for fname in filenames):
+            conventions["test_files"] = "*_test.py"
+
+        return conventions
+
+    def _analyze_testing_conventions(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Анализирует соглашения по тестированию"""
+        test_analysis = project_analysis.get('test_analysis', {})
+
+        return {
+            "test_frameworks": test_analysis.get('test_frameworks', []),
+            "test_structure": test_analysis.get('test_directories', []),
+            "has_unit_tests": test_analysis.get('has_tests', False),
+            "test_coverage": project_analysis.get('coverage_estimate', 0)
+        }
+
+    def _analyze_project_structure(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Анализирует структуру проекта"""
+        structure = {
+            "architecture_type": "unknown",
+            "has_separate_tests": False,
+            "module_organization": "flat"
+        }
+
+        file_structure = project_analysis.get('file_structure', {})
+        paths = list(file_structure.keys())
+
+        # Определяем тип архитектуры
+        if any('/src/' in path for path in paths):
+            structure["architecture_type"] = "standard_src"
+        if any('/app/' in path for path in paths):
+            structure["architecture_type"] = "application_folders"
+
+        # Проверяем наличие отдельной тестовой директории
+        structure["has_separate_tests"] = any('/test' in path.lower() or '/tests' in path.lower() for path in paths)
+
+        return structure
+
+    def _infer_business_logic(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Выводит бизнес-логику на основе анализа проекта"""
+        business_domains = self._detect_business_domains(project_analysis)
+
+        return {
+            "domains": business_domains,
+            "core_functions": self._identify_core_functions(project_analysis),
+            "data_entities": self._identify_data_entities(project_analysis)
+        }
+
+    def _detect_business_domains(self, project_analysis: Dict) -> List[str]:
+        """Определяет бизнес-домены проекта"""
+        domains = []
+        file_structure = project_analysis.get('file_structure', {})
+
+        # Анализ путей файлов для определения доменов
+        paths = list(file_structure.keys())
+
+        domain_indicators = {
+            'user': ['user', 'auth', 'account', 'profile'],
+            'product': ['product', 'item', 'catalog', 'inventory'],
+            'order': ['order', 'cart', 'checkout', 'payment'],
+            'content': ['content', 'article', 'blog', 'post'],
+            'notification': ['notification', 'message', 'email', 'alert']
+        }
+
+        for domain, indicators in domain_indicators.items():
+            if any(indicator in path.lower() for path in paths for indicator in indicators):
+                domains.append(domain)
+
+        return domains if domains else ["general_application"]
+
+    def _identify_core_functions(self, project_analysis: Dict) -> List[str]:
+        """Определяет основные функции системы"""
+        core_functions = []
+        endpoints = project_analysis.get('api_endpoints', [])
+
+        # На основе API endpoints определяем основные функции
+        for endpoint in endpoints[:10]:
+            method = endpoint.get('method', '').upper()
+            path = endpoint.get('path', '')
+
+            if method == 'GET' and '/{id}' in path:
+                core_functions.append(f"Retrieve {path.split('/')[1]} by ID")
+            elif method == 'POST':
+                core_functions.append(f"Create new {path.split('/')[-1]}")
+            elif method == 'PUT' or method == 'PATCH':
+                core_functions.append(f"Update {path.split('/')[1]}")
+            elif method == 'DELETE':
+                core_functions.append(f"Delete {path.split('/')[1]}")
+
+        return list(set(core_functions))  # Убираем дубликаты
+
+    def _identify_data_entities(self, project_analysis: Dict) -> List[str]:
+        """Определяет основные сущности данных"""
+        entities = []
+        file_structure = project_analysis.get('file_structure', {})
+
+        # Ищем файлы моделей
+        for path in file_structure.keys():
+            if any(indicator in path.lower() for indicator in ['model', 'entity', 'schema']):
+                # Извлекаем имя сущности из пути
+                entity_name = path.split('/')[-1].replace('.py', '').replace('_', ' ').title()
+                if entity_name and entity_name != 'Model':
+                    entities.append(entity_name)
+
+        return entities if entities else ["User", "Data"]
+
+    def _derive_testing_strategy(self, project_analysis: Dict) -> Dict[str, Any]:
+        """Формирует стратегию тестирования на основе анализа проекта"""
+        return {
+            "priority_focus": self._determine_test_priority(project_analysis),
+            "test_types_needed": self._recommend_test_types(project_analysis),
+            "coverage_goals": self._set_coverage_goals(project_analysis),
+            "risk_areas": self._identify_risk_areas(project_analysis)
+        }
+
+    def _determine_test_priority(self, project_analysis: Dict) -> List[str]:
+        """Определяет приоритеты тестирования"""
+        priorities = []
+
+        # Критические API endpoints
+        if project_analysis.get('api_endpoints'):
+            priorities.append("API endpoints (especially POST/PUT/DELETE)")
+
+        # Основные бизнес-функции
+        priorities.append("Core business logic")
+
+        # Обработка ошибок
+        priorities.append("Error handling and edge cases")
+
+        # Интеграционные точки
+        priorities.append("Data validation and integration points")
+
+        return priorities
+
+    def _recommend_test_types(self, project_analysis: Dict) -> Dict[str, bool]:
+        """Рекомендует типы тестов на основе проекта"""
+        frameworks = [f.lower() for f in project_analysis.get('frameworks', [])]
+        has_api = bool(project_analysis.get('api_endpoints'))
+
+        return {
+            "unit_tests": True,  # Всегда рекомендуем unit тесты
+            "integration_tests": has_api or any(f in ['django', 'flask', 'fastapi'] for f in frameworks),
+            "api_tests": has_api,
+            "e2e_tests": any(f in ['react', 'vue', 'angular'] for f in frameworks),
+            "performance_tests": has_api and len(project_analysis.get('api_endpoints', [])) > 5
+        }
+
+    def _set_coverage_goals(self, project_analysis: Dict) -> Dict[str, float]:
+        """Устанавливает цели покрытия"""
+        current_coverage = project_analysis.get('coverage_estimate', 0)
+
+        return {
+            "unit_test_coverage": min(80.0, current_coverage + 20.0),
+            "integration_test_coverage": min(70.0, current_coverage + 15.0),
+            "api_test_coverage": min(90.0, current_coverage + 25.0) if project_analysis.get('api_endpoints') else 0.0
+        }
+
+    def _identify_risk_areas(self, project_analysis: Dict) -> List[str]:
+        """Определяет рискованные области для тестирования"""
+        risk_areas = []
+
+        # API endpoints с модифицирующими операциями
+        endpoints = project_analysis.get('api_endpoints', [])
+        for endpoint in endpoints:
+            if endpoint.get('method') in ['POST', 'PUT', 'DELETE']:
+                risk_areas.append(f"Data modification: {endpoint.get('method')} {endpoint.get('path')}")
+
+        # Сложные бизнес-процессы
+        if len(project_analysis.get('api_endpoints', [])) > 10:
+            risk_areas.append("Complex business workflows")
+
+        # Интеграции с внешними системами
+        if project_analysis.get('dependencies'):
+            risk_areas.append("External dependencies and integrations")
+
+        return risk_areas if risk_areas else ["Core application functionality"]
+
+    def _find_related_endpoints(self, file_info: Dict, project_analysis: Dict) -> List[Dict]:
+        """Находит эндпоинты связанные с файлом"""
+        related = []
+        file_path = file_info.get('path', '')
+
+        for endpoint in project_analysis.get('api_endpoints', []):
+            if endpoint.get('file') == file_path:
+                related.append({
+                    "method": endpoint.get('method'),
+                    "path": endpoint.get('path'),
+                    "function": endpoint.get('function_name')
+                })
+
+        return related
+
+    def _suggest_test_scenarios(self, file_info: Dict, project_analysis: Dict) -> List[str]:
+        """Предлагает сценарии тестирования для файла"""
+        scenarios = []
+        file_path = file_info.get('path', '').lower()
+
+        # Базовые сценарии для всех файлов
+        scenarios.extend([
+            "Test basic functionality with valid inputs",
+            "Test edge cases and boundary conditions",
+            "Test error handling with invalid inputs",
+            "Test performance with typical workloads"
+        ])
+
+        # Специфические сценарии на основе типа файла
+        if 'model' in file_path:
+            scenarios.extend([
+                "Test data validation rules",
+                "Test database operations (CRUD)",
+                "Test relationships with other models"
+            ])
+        elif 'service' in file_path or 'business' in file_path:
+            scenarios.extend([
+                "Test business logic with various inputs",
+                "Test integration with dependencies",
+                "Test transaction rollback scenarios"
+            ])
+        elif 'api' in file_path or 'endpoint' in file_path:
+            scenarios.extend([
+                "Test HTTP status codes for different scenarios",
+                "Test request/response payload validation",
+                "Test authentication and authorization"
+            ])
+
+        return scenarios
+
+    def _get_enhanced_file_content(self, file_path: str, repo_path: str) -> Dict[str, Any]:
+        """Получает расширенное содержимое файла с анализом"""
+        content = self._get_file_content(file_path, repo_path)
+        if not content:
+            return {"content": "", "analysis": {}}
+
+        return {
+            "content": content,
+            "analysis": self._analyze_file_content(content, file_path)
+        }
+
+    def _analyze_file_content(self, content: str, file_path: str) -> Dict[str, Any]:
+        """Анализирует содержимое файла для извлечения ключевой информации - ИСПРАВЛЕННАЯ ВЕРСИЯ"""
+        if not content:
+            return {
+                "imports": [],
+                "classes": [],
+                "functions": [],
+                "dependencies": [],
+                "api_routes": [],
+                "database_operations": [],
+                "error_handling": [],
+                "configurations": []
+            }
+
+        try:
+            lines = content.split('\n')
+
+            return {
+                "imports": self._extract_imports(lines),
+                "classes": self._extract_classes(content),
+                "functions": self._extract_functions(content),
+                "dependencies": self._extract_dependencies(content),
+                "api_routes": self._extract_api_routes(content),
+                "database_operations": self._extract_database_operations(content),
+                "error_handling": self._extract_error_handling(content),
+                "configurations": self._extract_configurations(content)
+            }
+        except Exception as e:
+            logger.error(f"Error analyzing file content for {file_path}: {e}")
+            return {
+                "imports": [],
+                "classes": [],
+                "functions": [],
+                "dependencies": [],
+                "api_routes": [],
+                "database_operations": [],
+                "error_handling": [],
+                "configurations": [],
+                "analysis_error": str(e)
+            }
+
+    def _extract_imports(self, lines: List[str]) -> List[Dict]:
+        """Извлекает все импорты из файла"""
+        imports = []
+        import_patterns = [
+            (r'^import\s+(\w+)', "direct_import"),
+            (r'^from\s+([\w\.]+)\s+import', "from_import"),
+            (r'^from\s+([\w\.]+)\s+import\s+\(([^)]+)\)', "multi_import")
+        ]
+
+        for line in lines:
+            line = line.strip()
+            for pattern, import_type in import_patterns:
+                match = re.search(pattern, line)
+                if match:
+                    imports.append({
+                        "type": import_type,
+                        "line": line,
+                        "module": match.group(1) if match.groups() else None,
+                        "imports": match.group(2).split(',') if len(match.groups()) > 1 else None
+                    })
+
+        return imports
+
+    def _extract_classes(self, content: str) -> List[Dict]:
+        """Извлекает классы из файла"""
+        classes = []
+        class_patterns = [
+            (r'class\s+(\w+)\(([^)]*)\):', "python_class"),
+            (r'class\s+(\w+):', "python_class_simple")
+        ]
+
+        for pattern, class_type in class_patterns:
+            matches = re.finditer(pattern, content)
+            for match in matches:
+                classes.append({
+                    "type": class_type,
+                    "name": match.group(1),
+                    "inheritance": match.group(2) if len(match.groups()) > 1 else None,
+                    "methods": self._extract_class_methods(content, match.group(1))
+                })
+
+        return classes
+
+    def _extract_class_methods(self, content: str, class_name: str) -> List[Dict]:
+        """Извлекает методы класса"""
+        methods = []
+        # Ищем методы после объявления класса
+        class_start = content.find(f"class {class_name}")
+        if class_start == -1:
+            return methods
+
+        # Ищем следующий класс или конец файла
+        next_class = re.search(r'class\s+\w+', content[class_start + 1:])
+        class_content = content[class_start:class_start + next_class.start()] if next_class else content[class_start:]
+
+        method_patterns = [
+            (r'def\s+(\w+)\(self[^)]*\):', "instance_method"),
+            (r'def\s+(\w+)\(cls[^)]*\):', "class_method"),
+            (r'def\s+(\w+)\([^)]*\):', "static_method")
+        ]
+
+        for pattern, method_type in method_patterns:
+            matches = re.finditer(pattern, class_content)
+            for match in matches:
+                methods.append({
+                    "type": method_type,
+                    "name": match.group(1),
+                    "signature": match.group(0)
+                })
+
+        return methods
+
+    def _extract_functions(self, content: str) -> List[Dict]:
+        """Извлекает функции из файла"""
+        functions = []
+        function_pattern = r'def\s+(\w+)\(([^)]*)\):'
+
+        matches = re.finditer(function_pattern, content)
+        for match in matches:
+            functions.append({
+                "name": match.group(1),
+                "parameters": match.group(2),
+                "is_async": 'async' in content[:match.start()].split('\n')[-1]
+            })
+
+        return functions
+
+    def _extract_dependencies(self, content: str) -> List[Dict]:
+        """Извлекает зависимости из файла"""
+        dependencies = []
+
+        # Паттерны для различных зависимостей
+        dependency_patterns = [
+            (r'requests\.(get|post|put|delete)', "http_client"),
+            (r'sqlalchemy', "orm"),
+            (r'django\.', "django_framework"),
+            (r'flask', "flask_framework"),
+            (r'pandas', "data_analysis"),
+            (r'numpy', "numerical_computing"),
+            (r'redis', "cache"),
+            (r'celery', "task_queue"),
+            (r'pytest', "testing"),
+            (r'unittest', "testing")
+        ]
+
+        for pattern, dep_type in dependency_patterns:
+            if re.search(pattern, content):
+                dependencies.append({
+                    "type": dep_type,
+                    "name": pattern.replace(r'\.', '').replace(r'\([^)]*\)', ''),
+                    "usage_count": len(re.findall(pattern, content))
+                })
+
+        return dependencies
+
+
+    def _extract_api_routes(self, content: str) -> List[Dict]:
+        """Извлекает API routes из файла"""
+        routes = []
+
+        route_patterns = [
+            (r'@app\.route\(["\']([^"\']+)["\']', "flask_route"),
+            (r'@router\.(get|post|put|delete)\(["\']([^"\']+)["\']', "fastapi_route"),
+            (r'path\(["\']([^"\']+)["\']', "django_route"),
+            (r'url\(["\']([^"\']+)["\']', "django_route_alt")
+        ]
+
+        for pattern, route_type in route_patterns:
+            matches = re.finditer(pattern, content)
+            for match in matches:
+                routes.append({
+                    "type": route_type,
+                    "path": match.group(1) if route_type == "flask_route" else match.group(2),
+                    "method": match.group(1).upper() if route_type == "fastapi_route" else "GET"
+                })
+
+        return routes
+
+
+    def _extract_database_operations(self, content: str) -> List[Dict]:
+        """Извлекает операции с базой данных"""
+        db_operations = []
+
+        db_patterns = [
+            (r'\.objects\.filter\(', "django_filter"),
+            (r'\.objects\.get\(', "django_get"),
+            (r'\.objects\.create\(', "django_create"),
+            (r'\.save\(\)', "django_save"),
+            (r'\.delete\(\)', "django_delete"),
+            (r'session\.query\(', "sqlalchemy_query"),
+            (r'session\.add\(', "sqlalchemy_add"),
+            (r'session\.commit\(', "sqlalchemy_commit"),
+            (r'SELECT.*FROM', "raw_sql_select"),
+            (r'INSERT INTO', "raw_sql_insert"),
+            (r'UPDATE.*SET', "raw_sql_update"),
+            (r'DELETE FROM', "raw_sql_delete")
+        ]
+
+        for pattern, op_type in db_patterns:
+            if re.search(pattern, content, re.IGNORECASE):
+                db_operations.append({
+                    "type": op_type,
+                    "operation": pattern.replace(r'\([^)]*\)', '').replace(r'\.', ''),
+                    "count": len(re.findall(pattern, content, re.IGNORECASE))
+                })
+
+        return db_operations
+
+
+    def _extract_error_handling(self, content: str) -> List[Dict]:
+        """Извлекает обработку ошибок"""
+        error_handling = []
+
+        error_patterns = [
+            (r'try:', "try_block"),
+            (r'except\s+(\w+)', "except_block"),
+            (r'raise\s+(\w+)', "raise_statement"),
+            (r'assert\s+', "assert_statement"),
+            (r'if\s+.*:\s*raise', "conditional_raise")
+        ]
+
+        for pattern, handler_type in error_patterns:
+            matches = re.finditer(pattern, content)
+            for match in matches:
+                error_info = {
+                    "type": handler_type,
+                    "line": match.group(0)
+                }
+                if handler_type == "except_block" and len(match.groups()) > 0:
+                    error_info["exception_type"] = match.group(1)
+                error_handling.append(error_info)
+
+        return error_handling
+
+
+    def _extract_configurations(self, content: str) -> List[Dict]:
+        """Извлекает конфигурации и настройки"""
+        configurations = []
+
+        config_patterns = [
+            (r'DEBUG\s*=\s*(True|False)', "debug_setting"),
+            (r'SECRET_KEY\s*=', "secret_key"),
+            (r'DATABASE_URL\s*=', "database_url"),
+            (r'ALLOWED_HOSTS\s*=', "allowed_hosts"),
+            (r'INSTALLED_APPS\s*=', "installed_apps"),
+            (r'MIDDLEWARE\s*=', "middleware"),
+            (r'CORS_ORIGIN_WHITELIST\s*=', "cors_settings")
+        ]
+
+        for pattern, config_type in config_patterns:
+            match = re.search(pattern, content)
+            if match:
+                configurations.append({
+                    "type": config_type,
+                    "setting": match.group(0)
+                })
+
+        return configurations
+
+    def _get_detailed_file_analysis(self, file_info: Dict, repo_path: str) -> Dict:
+        """Детальный анализ конкретного файла"""
+        file_path = file_info.get('path', '')
+        content = self._get_file_content(file_path, repo_path)
+
+        return {
+            "content": content,
+            "imports": self._extract_imports(content.split('\n')),
+            "classes": self._extract_classes(content),
+            "functions": self._extract_functions(content),
+            "api_calls": self._extract_api_calls(content),
+            "database_operations": self._extract_database_operations(content),
+            "error_handling": self._extract_error_handling(content),
+            "complexity_metrics": self._calculate_complexity(content)
+        }
+
+    def _find_related_endpoints(self, file_info: Dict, project_analysis: Dict) -> List[Dict]:
+        """Находит эндпоинты связанные с файлом"""
+        related = []
+        file_path = file_info.get('path', '')
+
+        for endpoint in project_analysis.get('api_endpoints', []):
+            if endpoint.get('file') == file_path:
+                related.append({
+                    "method": endpoint.get('method'),
+                    "path": endpoint.get('path'),
+                    "function": endpoint.get('function_name'),
+                    "parameters": endpoint.get('parameters', [])
+                })
+
+        return related
+
+    def _suggest_test_scenarios(self, file_info: Dict, project_analysis: Dict) -> List[str]:
+        """Предлагает сценарии тестирования для файла"""
+        scenarios = []
+        file_path = file_info.get('path', '').lower()
+
+        # Базовые сценарии
+        scenarios.extend([
+            "Test basic functionality with valid inputs",
+            "Test edge cases and boundary conditions",
+            "Test error handling with invalid inputs",
+            "Test performance with typical workloads"
+        ])
+
+        # Специфические сценарии на основе типа файла
+        if 'model' in file_path:
+            scenarios.extend([
+                "Test data validation rules",
+                "Test database operations (CRUD)",
+                "Test relationships with other models"
+            ])
+        elif 'service' in file_path or 'business' in file_path:
+            scenarios.extend([
+                "Test business logic with various inputs",
+                "Test integration with dependencies",
+                "Test transaction rollback scenarios"
+            ])
+        elif 'api' in file_path or 'endpoint' in file_path:
+            scenarios.extend([
+                "Test HTTP status codes for different scenarios",
+                "Test request/response payload validation",
+                "Test authentication and authorization"
+            ])
+
+        return scenarios
+
+    def _suggest_mocks(self, file_info: Dict, project_analysis: Dict) -> List[Dict]:
+        """Предлагает что нужно мокать в тестах"""
+        mocks = []
+        file_path = file_info.get('path', '').lower()
+
+        # Анализ зависимостей для мокинга
+        dependencies = project_analysis.get('dependencies', {})
+
+        if 'requests' in str(dependencies):
+            mocks.append({
+                "target": "requests",
+                "reason": "HTTP calls to external APIs",
+                "examples": ["mock.get()", "mock.post()"]
+            })
+
+        if any(db in str(dependencies) for db in ['sqlalchemy', 'django.db', 'psycopg2']):
+            mocks.append({
+                "target": "database",
+                "reason": "Database operations",
+                "examples": ["mock_session.query()", "mock_connection.execute()"]
+            })
+
+        return mocks
+
+    def _extract_api_calls(self, content: str) -> List[Dict]:
+        """Извлекает API вызовы из файла"""
+        api_calls = []
+
+        patterns = [
+            (r'requests\.(get|post|put|delete|patch)\([^)]*\)', 'requests'),
+            (r'httpx\.(get|post|put|delete|patch)\([^)]*\)', 'httpx'),
+            (r'aiohttp\.(get|post|put|delete|patch)\([^)]*\)', 'aiohttp'),
+            (r'urllib\.request\.(urlopen|Request)\([^)]*\)', 'urllib')
+        ]
+
+        for pattern, lib in patterns:
+            matches = re.finditer(pattern, content)
+            for match in matches:
+                api_calls.append({
+                    "library": lib,
+                    "call": match.group(0),
+                    "method": match.group(1) if match.groups() else 'unknown'
+                })
+
+        return api_calls
+
+    def _calculate_complexity(self, content: str) -> Dict[str, Any]:
+        """Рассчитывает метрики сложности кода"""
+        lines = content.split('\n')
+
+        # Простые метрики сложности
+        total_lines = len(lines)
+        code_lines = len([line for line in lines if line.strip() and not line.strip().startswith('#')])
+        function_count = len(re.findall(r'def\s+\w+\(', content))
+        class_count = len(re.findall(r'class\s+\w+', content))
+
+        # Подсчет условий и циклов для цикломатической сложности
+        conditions = len(re.findall(r'\b(if|elif|for|while|and|or)\b', content))
+
+        return {
+            "total_lines": total_lines,
+            "code_lines": code_lines,
+            "function_count": function_count,
+            "class_count": class_count,
+            "condition_count": conditions,
+            "complexity_score": min(10, (conditions + function_count) / max(1, code_lines / 100))
+        }
+
+    def _find_real_e2e_scenarios(self, project_analysis: Dict) -> List[Dict]:
+        """Находит реальные E2E сценарии на основе анализа проекта"""
+        scenarios = []
+
+        # Сценарии на основе API endpoints
+        endpoints = project_analysis.get('api_endpoints', [])
+        if endpoints:
+            scenarios.append({
+                "name": "api_workflow",
+                "description": "Complete API workflow testing",
+                "user_flows": ["Authentication → Data retrieval → Data modification"],
+                "pages": ["Login", "Dashboard", "Details"]
+            })
+
+        # Сценарии на основе бизнес-логики
+        business_functions = project_analysis.get('business_context', {}).get('core_functions', [])
+        for func in business_functions[:3]:
+            scenarios.append({
+                "name": f"{func.lower().replace(' ', '_')}_flow",
+                "description": f"End-to-end test for {func}",
+                "user_flows": [func],
+                "pages": ["Main workflow pages"]
+            })
+
+        return scenarios
+
+    def _find_absolute_file_path(self, relative_path: str, repo_path: str) -> str:
+        if not relative_path or not repo_path:
+            return relative_path
+
+        # Пробуем разные варианты путей
+        possible_paths = [
+            os.path.join(repo_path, relative_path),
+            os.path.join(repo_path, relative_path.lstrip('/')),
+            os.path.join(repo_path, relative_path.lstrip('./'))
+        ]
+
+        for path in possible_paths:
+            if os.path.exists(path) and os.path.isfile(path):
+                return path
+
+        # Рекурсивный поиск по имени файла
+        filename = os.path.basename(relative_path)
+        if filename:
+            for root, dirs, files in os.walk(repo_path):
+                if filename in files:
+                    found_path = os.path.join(root, filename)
+                    logger.info(f"Found file {filename} at {found_path}")
+                    return found_path
+
+        logger.warning(f"File not found: {relative_path} in {repo_path}")
+        return relative_path  # fallback
 test_generation_pipeline = None
 
 
