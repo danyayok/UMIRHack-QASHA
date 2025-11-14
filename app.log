@@ -14524,3 +14524,1934 @@ const r...
 2025-11-14 22:38:35,842 - qa_automata - INFO - Cleaning up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_2loj6hs1
 2025-11-14 22:38:39,285 - qa_automata - INFO - Successfully cleaned up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_2loj6hs1
 2025-11-14 22:38:39,286 - qa_automata - INFO - Temporary repository cleaned up
+2025-11-15 01:13:58,258 - qa_automata - INFO - 🚀 INIT: Starting app dependencies initialization
+2025-11-15 01:13:58,259 - qa_automata - INFO - INIT: Pipeline initialized successfully
+2025-11-15 01:13:58,260 - qa_automata - INFO - INIT: Pipeline object: <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000195AAF9CD10>
+2025-11-15 01:13:58,260 - qa_automata - INFO - INIT: Pipeline type: <class 'app.services.generate_pipeline.TestGenerationPipeline'>
+2025-11-15 01:13:58,262 - qa_automata - INFO - All app dependencies initialized
+2025-11-15 01:14:15,668 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\python\qa_automata\.venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-11-15 01:14:19,063 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:19,719 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:28,832 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:35,430 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:41,751 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:46,821 - qa_automata - INFO - Starting REAL analysis for project 4, analysis 11
+2025-11-15 01:14:47,181 - qa_automata - INFO - Analysis task started for analysis 11
+2025-11-15 01:14:48,090 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:49,541 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:53,471 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:14:54,093 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:15:19,011 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:15:19,581 - qa_automata - INFO - Getting projects for user 1
+2025-11-15 01:15:24,279 - qa_automata - INFO - START: Генерация тестов для проекта 4
+2025-11-15 01:15:24,280 - qa_automata - INFO - GET_PIPELINE: Checking pipeline status...
+2025-11-15 01:15:24,280 - qa_automata - INFO - GET_PIPELINE: Pipeline retrieved successfully: <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000195AAF9CD10>
+2025-11-15 01:15:24,392 - qa_automata - INFO - Analysis found: 11, status: completed
+2025-11-15 01:15:24,393 - qa_automata - INFO - Analysis result keys: dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp'])
+2025-11-15 01:15:24,394 - qa_automata - INFO - Technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:24,395 - qa_automata - INFO - Downloading repository for test generation: https://github.com/danyayok/Axenix-hackRND2025
+2025-11-15 01:15:24,396 - qa_automata - INFO - Cloning https://github.com/danyayok/Axenix-hackRND2025 (branch: main) to C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:15:34,768 - qa_automata - INFO - Repository cloned successfully to C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:15:34,769 - qa_automata - INFO - Repository downloaded to: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:15:34,770 - qa_automata - INFO - PIPELINE: Запуск пайплайна генерации тестов...
+2025-11-15 01:15:34,771 - qa_automata - INFO - PIPELINE: test_generation_pipeline = <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000195AAF9CD10>
+2025-11-15 01:15:34,772 - qa_automata - INFO - PIPELINE: type = <class 'app.services.generate_pipeline.TestGenerationPipeline'>
+2025-11-15 01:15:34,773 - qa_automata - INFO - PIPELINE: project_info keys = dict_keys(['id', 'name', 'description', 'repo_url', 'branch', 'technology_stack', 'local_path'])
+2025-11-15 01:15:34,773 - qa_automata - INFO - PIPELINE: analysis_data keys = dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp'])
+2025-11-15 01:15:34,774 - qa_automata - INFO - PIPELINE: test_config = {'framework': 'auto', 'coverage_target': 80, 'generate_unit_tests': True, 'generate_integration_tests': True, 'generate_e2e_tests': True, 'include_comments': True, 'generate_documentation': False, 'documentation_format': 'txt', 'test_pattern': 'standard', 'test_directory': '', 'custom_test_path': False}
+2025-11-15 01:15:34,775 - qa_automata - INFO - API Endpoints found: []
+2025-11-15 01:15:34,775 - qa_automata - INFO - API Endpoints by file: {}
+2025-11-15 01:15:34,776 - qa_automata - WARNING - No API endpoints found in analysis data!
+2025-11-15 01:15:34,777 - qa_automata - INFO - Starting test generation for project: Axenix-hackRND2025
+2025-11-15 01:15:34,778 - qa_automata - INFO - 🔍 INITIAL_API_CHECK: API endpoints in analysis: 0
+2025-11-15 01:15:34,779 - qa_automata - WARNING - File structure is empty, analyzing repository directly
+2025-11-15 01:15:34,781 - qa_automata - INFO - [DEBUG] Directory contents: ['.git', '.gitignore', '.idea', '.sourcecraft', 'backend', 'hack', 'node_modules', 'package-lock.json', 'package.json', 'README.md']
+2025-11-15 01:15:34,979 - qa_automata - INFO - [DEBUG] Total files found by rglob: 1260
+2025-11-15 01:15:34,980 - qa_automata - INFO - [DEBUG] File 0: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\.git (is_file: False)
+2025-11-15 01:15:34,981 - qa_automata - INFO - [DEBUG] File 1: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\.gitignore (is_file: True)
+2025-11-15 01:15:34,982 - qa_automata - INFO - [DEBUG] File 2: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\.idea (is_file: False)
+2025-11-15 01:15:34,987 - qa_automata - INFO - [DEBUG] File 3: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\.sourcecraft (is_file: False)
+2025-11-15 01:15:34,989 - qa_automata - INFO - [DEBUG] File 4: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend (is_file: False)
+2025-11-15 01:15:34,991 - qa_automata - INFO - [DEBUG] File 5: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack (is_file: False)
+2025-11-15 01:15:34,992 - qa_automata - INFO - [DEBUG] File 6: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\node_modules (is_file: False)
+2025-11-15 01:15:34,994 - qa_automata - INFO - [DEBUG] File 7: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\package-lock.json (is_file: True)
+2025-11-15 01:15:34,995 - qa_automata - INFO - [DEBUG] File 8: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\package.json (is_file: True)
+2025-11-15 01:15:34,996 - qa_automata - INFO - [DEBUG] File 9: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\README.md (is_file: True)
+2025-11-15 01:15:35,315 - qa_automata - INFO - Total files found: 1093
+2025-11-15 01:15:37,609 - qa_automata - INFO - Detected framework: react (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\eslint.config.js': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\vite.config.js': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\404.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\App.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\Auth.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\Create.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\Home.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\main.jsx': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\404.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Conf.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Create.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Home.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Invite.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Notification.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Plan-Conference.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Profile.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\Settings.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\components\\Chat.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\components\\NavDiv.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\components\\ParticipantsPanel.jsx': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\src\\pages\\components\\RoomControls.jsx': 1})
+2025-11-15 01:15:37,610 - qa_automata - INFO - Detected framework: vue (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\package.json': 1})
+2025-11-15 01:15:37,611 - qa_automata - INFO - Detected framework: angular (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\package.json': 1})
+2025-11-15 01:15:37,611 - qa_automata - INFO - Detected framework: express (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\hack\\package.json': 1})
+2025-11-15 01:15:37,612 - qa_automata - INFO - Detected framework: fastapi (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\main.py': 4, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\auth.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\chat.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\covers.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\crypto.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\metrics.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\moderation.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\notifications.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\participants.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\recordings.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\rooms.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\rtc.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\state.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\sync.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\users.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\api\\ws.py': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\middleware\\metrics_middleware.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_80hy9f8s\\backend\\app\\services\\ws_hub.py': 1})
+2025-11-15 01:15:37,613 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Starting endpoint detection in C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:15:37,708 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Found 66 Python files to analyze
+2025-11-15 01:15:37,709 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\tests.py
+2025-11-15 01:15:37,726 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET detail in backend\tests.py:98
+2025-11-15 01:15:37,727 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET id in backend\tests.py:110
+2025-11-15 01:15:37,728 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET slug in backend\tests.py:137
+2025-11-15 01:15:37,728 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET slug in backend\tests.py:157
+2025-11-15 01:15:37,730 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET requestBody in backend\tests.py:374
+2025-11-15 01:15:37,731 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET properties in backend\tests.py:384
+2025-11-15 01:15:37,731 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET type in backend\tests.py:387
+2025-11-15 01:15:37,732 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET required in backend\tests.py:388
+2025-11-15 01:15:37,738 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\tests.py
+2025-11-15 01:15:37,739 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\main.py
+2025-11-15 01:15:37,740 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:15:37,741 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:15:37,741 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:15:37,743 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:15:37,744 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:15:37,744 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:15:37,747 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:15:37,748 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:15:37,748 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\main.py
+2025-11-15 01:15:37,749 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\auth.py
+2025-11-15 01:15:37,757 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:15:37,758 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:15:37,758 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:15:37,758 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:15:37,759 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:15:37,759 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:15:37,760 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:15:37,760 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:15:37,760 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\auth.py
+2025-11-15 01:15:37,761 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\chat.py
+2025-11-15 01:15:37,762 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:15:37,762 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:15:37,763 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:15:37,763 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:15:37,763 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:15:37,764 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:15:37,764 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:15:37,764 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:15:37,765 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:15:37,766 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:15:37,769 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:15:37,769 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:15:37,770 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:15:37,771 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:15:37,771 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:15:37,772 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:15:37,774 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:15:37,774 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:15:37,775 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:15:37,775 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:15:37,777 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\chat.py
+2025-11-15 01:15:37,777 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\covers.py
+2025-11-15 01:15:37,778 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:15:37,780 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:15:37,780 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:15:37,781 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:15:37,781 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:15:37,782 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:15:37,782 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:15:37,783 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:15:37,786 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:15:37,787 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:15:37,787 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:15:37,787 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:15:37,788 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\covers.py
+2025-11-15 01:15:37,790 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\crypto.py
+2025-11-15 01:15:37,791 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:15:37,792 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:15:37,792 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:15:37,792 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:15:37,793 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:15:37,793 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:15:37,793 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:15:37,794 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:15:37,794 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\crypto.py
+2025-11-15 01:15:37,795 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\deps.py
+2025-11-15 01:15:37,799 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\metrics.py
+2025-11-15 01:15:37,806 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:15:37,807 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:15:37,808 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:15:37,808 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:15:37,809 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:15:37,810 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:15:37,810 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:15:37,811 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:15:37,812 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:15:37,813 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:15:37,814 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:15:37,815 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:15:37,816 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:15:37,818 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:15:37,819 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:15:37,820 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:15:37,822 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:15:37,823 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:15:37,823 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:15:37,824 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:15:37,824 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\metrics.py
+2025-11-15 01:15:37,827 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\moderation.py
+2025-11-15 01:15:37,829 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:15:37,829 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:15:37,830 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:15:37,830 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:15:37,831 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:15:37,831 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:15:37,831 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:15:37,832 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:15:37,848 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:15:37,849 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:15:37,850 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:15:37,853 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:15:37,856 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:15:37,857 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:15:37,859 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:15:37,859 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:15:37,863 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:15:37,864 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:15:37,865 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:15:37,866 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:15:37,866 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:15:37,870 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:15:37,880 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:15:37,881 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:15:37,882 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 24 endpoints in backend\app\api\moderation.py
+2025-11-15 01:15:37,890 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\notifications.py
+2025-11-15 01:15:37,891 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:15:37,892 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:15:37,892 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:15:37,892 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:15:37,893 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:15:37,893 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:15:37,893 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:15:37,893 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:15:37,894 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:15:37,894 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:15:37,894 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:15:37,894 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:15:37,898 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:15:37,908 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:15:37,910 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:15:37,912 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:15:37,913 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\notifications.py
+2025-11-15 01:15:37,914 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\participants.py
+2025-11-15 01:15:37,920 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:15:37,923 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:15:37,924 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:15:37,925 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:15:37,925 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:15:37,926 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:15:37,926 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:15:37,927 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:15:37,928 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:15:37,928 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:15:37,928 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:15:37,928 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:15:37,929 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:15:37,929 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:15:37,930 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:15:37,931 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:15:37,931 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\participants.py
+2025-11-15 01:15:37,932 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\recordings.py
+2025-11-15 01:15:37,936 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:15:37,937 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:15:37,938 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:15:37,938 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:15:37,938 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:15:37,939 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:15:37,939 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:15:37,940 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:15:37,940 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:15:37,941 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:15:37,941 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:15:37,942 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:15:37,942 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\recordings.py
+2025-11-15 01:15:37,942 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\rooms.py
+2025-11-15 01:15:37,944 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:15:37,944 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:15:37,945 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:15:37,945 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:15:37,946 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:15:37,948 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:15:37,956 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:15:37,958 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:15:37,959 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:15:37,960 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:15:37,961 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:15:37,961 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:15:37,961 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\rooms.py
+2025-11-15 01:15:37,962 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\rtc.py
+2025-11-15 01:15:37,964 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:15:37,964 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:15:37,965 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:15:37,966 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:15:37,966 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:15:37,969 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:15:37,971 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:15:37,972 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:15:37,973 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\rtc.py
+2025-11-15 01:15:37,974 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\state.py
+2025-11-15 01:15:37,975 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:15:37,976 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:15:37,976 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:15:37,977 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:15:37,977 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:15:37,977 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:15:37,977 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:15:37,978 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:15:37,988 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:15:37,991 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:15:37,991 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:15:37,992 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:15:37,993 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:15:37,994 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:15:37,996 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:15:37,997 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:15:37,998 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\state.py
+2025-11-15 01:15:37,999 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\sync.py
+2025-11-15 01:15:38,002 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:15:38,003 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:15:38,004 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:15:38,004 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:15:38,005 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 4 endpoints in backend\app\api\sync.py
+2025-11-15 01:15:38,005 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\users.py
+2025-11-15 01:15:38,007 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:15:38,007 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:15:38,007 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:15:38,008 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:15:38,009 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:15:38,010 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:15:38,010 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:15:38,010 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:15:38,012 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:15:38,013 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:15:38,013 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:15:38,014 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:15:38,014 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:15:38,014 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:15:38,015 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:15:38,016 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:15:38,020 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:15:38,021 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:15:38,022 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:15:38,023 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:15:38,024 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\users.py
+2025-11-15 01:15:38,025 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\ws.py
+2025-11-15 01:15:38,031 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET type in backend\app\api\ws.py:145
+2025-11-15 01:15:38,032 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET after_seq in backend\app\api\ws.py:221
+2025-11-15 01:15:38,033 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET limit in backend\app\api\ws.py:222
+2025-11-15 01:15:38,033 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET to in backend\app\api\ws.py:229
+2025-11-15 01:15:38,036 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET text in backend\app\api\ws.py:249
+2025-11-15 01:15:38,038 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET ciphertext_b64 in backend\app\api\ws.py:292
+2025-11-15 01:15:38,038 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET algo in backend\app\api\ws.py:298
+2025-11-15 01:15:38,039 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET is_typing in backend\app\api\ws.py:338
+2025-11-15 01:15:38,040 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET topic in backend\app\api\ws.py:356
+2025-11-15 01:15:38,040 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET is_locked in backend\app\api\ws.py:361
+2025-11-15 01:15:38,041 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET mute_all in backend\app\api\ws.py:366
+2025-11-15 01:15:38,041 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET mic_muted in backend\app\api\ws.py:379
+2025-11-15 01:15:38,041 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET cam_off in backend\app\api\ws.py:380
+2025-11-15 01:15:38,043 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 13 endpoints in backend\app\api\ws.py
+2025-11-15 01:15:38,044 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\core\config.py
+2025-11-15 01:15:38,046 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\core\security.py
+2025-11-15 01:15:38,048 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET uid in backend\app\core\security.py:30
+2025-11-15 01:15:38,048 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 1 endpoints in backend\app\core\security.py
+2025-11-15 01:15:38,049 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\db\base.py
+2025-11-15 01:15:38,053 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\db\session.py
+2025-11-15 01:15:38,055 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\middleware\metrics_middleware.py
+2025-11-15 01:15:38,057 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\crypto.py
+2025-11-15 01:15:38,059 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\event.py
+2025-11-15 01:15:38,061 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\membership.py
+2025-11-15 01:15:38,063 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\message.py
+2025-11-15 01:15:38,065 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\notification.py
+2025-11-15 01:15:38,067 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\recording.py
+2025-11-15 01:15:38,071 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\room.py
+2025-11-15 01:15:38,074 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\user.py
+2025-11-15 01:15:38,076 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\crypto_repo.py
+2025-11-15 01:15:38,078 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\event_repo.py
+2025-11-15 01:15:38,080 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\membership_repo.py
+2025-11-15 01:15:38,082 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\message_repo.py
+2025-11-15 01:15:38,087 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\notification_repo.py
+2025-11-15 01:15:38,090 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\recording_repo.py
+2025-11-15 01:15:38,092 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\room_repo.py
+2025-11-15 01:15:38,095 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\user_repo.py
+2025-11-15 01:15:38,097 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\auth.py
+2025-11-15 01:15:38,099 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\chat.py
+2025-11-15 01:15:38,103 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\membership.py
+2025-11-15 01:15:38,105 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\message.py
+2025-11-15 01:15:38,107 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\metrics.py
+2025-11-15 01:15:38,108 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\moderation.py
+2025-11-15 01:15:38,110 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\notification.py
+2025-11-15 01:15:38,112 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\room.py
+2025-11-15 01:15:38,113 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\rtc.py
+2025-11-15 01:15:38,115 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\signaling.py
+2025-11-15 01:15:38,119 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\state.py
+2025-11-15 01:15:38,123 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\user.py
+2025-11-15 01:15:38,126 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\chat.py
+2025-11-15 01:15:38,128 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\crypto.py
+2025-11-15 01:15:38,130 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\media.py
+2025-11-15 01:15:38,132 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\metrics.py
+2025-11-15 01:15:38,138 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET messages in backend\app\services\metrics.py:138
+2025-11-15 01:15:38,139 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:139
+2025-11-15 01:15:38,139 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:140
+2025-11-15 01:15:38,139 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET media_streams in backend\app\services\metrics.py:141
+2025-11-15 01:15:38,140 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:142
+2025-11-15 01:15:38,140 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:156
+2025-11-15 01:15:38,140 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET messages in backend\app\services\metrics.py:159
+2025-11-15 01:15:38,140 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:160
+2025-11-15 01:15:38,141 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET media_streams in backend\app\services\metrics.py:161
+2025-11-15 01:15:38,141 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:162
+2025-11-15 01:15:38,142 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET message_count in backend\app\services\metrics.py:165
+2025-11-15 01:15:38,142 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET ws_connections in backend\app\services\metrics.py:187
+2025-11-15 01:15:38,142 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET system_memory_percent in backend\app\services\metrics.py:188
+2025-11-15 01:15:38,143 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET process_cpu_percent in backend\app\services\metrics.py:189
+2025-11-15 01:15:38,143 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET system_memory_percent in backend\app\services\metrics.py:193
+2025-11-15 01:15:38,143 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET process_cpu_percent in backend\app\services\metrics.py:194
+2025-11-15 01:15:38,144 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\services\metrics.py
+2025-11-15 01:15:38,144 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\moderation.py
+2025-11-15 01:15:38,146 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\participants.py
+2025-11-15 01:15:38,149 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\recording.py
+2025-11-15 01:15:38,154 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\rooms.py
+2025-11-15 01:15:38,157 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\state.py
+2025-11-15 01:15:38,160 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\sync.py
+2025-11-15 01:15:38,162 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\users.py
+2025-11-15 01:15:38,163 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\ws_hub.py
+2025-11-15 01:15:38,166 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\utils\ids.py
+2025-11-15 01:15:38,171 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\utils\text.py
+2025-11-15 01:15:38,173 - qa_automata - INFO - 📊 API_ENDPOINT_SUMMARY: Found 242 total endpoints in 19 files
+2025-11-15 01:15:38,173 - qa_automata - INFO - FINAL ANALYSIS: 109 project files, 984 ignored files (931 from dependencies)
+2025-11-15 01:15:38,174 - qa_automata - INFO - FILE STRUCTURE: Contains 109 files
+2025-11-15 01:15:38,174 - qa_automata - INFO - FILE SUMMARY: {'total_files': 109, 'code_files': 107, 'test_files': 0, 'total_lines': 11336, 'total_size_kb': 386.76}
+2025-11-15 01:15:38,174 - qa_automata - INFO - SAMPLE FILES: ['package.json', 'README.md', 'backend\\Dockerfile', 'backend\\requirements.txt', 'backend\\tests.py']
+2025-11-15 01:15:38,175 - qa_automata - INFO - ANALYSIS_RESULT_KEYS: dict_keys(['technologies', 'frameworks', 'file_structure', 'file_structure_summary', 'test_analysis', 'dependencies', 'metrics', 'project_structure', 'complexity_metrics', 'coverage_estimate', 'source', 'branch', 'analysis_timestamp', 'api_endpoints', 'api_endpoints_by_file'])
+2025-11-15 01:15:38,175 - qa_automata - INFO - ANALYSIS_TECHNOLOGIES: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:38,175 - qa_automata - INFO - ANALYSIS_METRICS: {'total_files': 109, 'code_files': 107, 'test_files': 0, 'total_lines': 11336, 'total_size_kb': 0, 'ignored_files': 984, 'ignored_directories': [], 'dependency_files_count': 931}
+2025-11-15 01:15:38,177 - qa_automata - INFO - 🔍 AFTER_ANALYSIS_API_CHECK: API endpoints: 242
+2025-11-15 01:15:38,178 - qa_automata - INFO - ANALYSIS_DATA_KEYS: dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp', 'file_structure', 'metrics', 'api_endpoints', 'api_endpoints_by_file'])
+2025-11-15 01:15:38,178 - qa_automata - INFO - EXTRACT_START: Extracting code files
+2025-11-15 01:15:38,179 - qa_automata - INFO - EXTENSIONS_RESULT: Final extensions: ['.pyw', '.jsx', '.html', '.htm', '.py', '.css', '.scss', '.js', '.less']
+2025-11-15 01:15:38,179 - qa_automata - INFO - EXTRACT_ADDED: backend\tests.py
+2025-11-15 01:15:38,179 - qa_automata - INFO - EXTRACT_ADDED: hack\eslint.config.js
+2025-11-15 01:15:38,179 - qa_automata - INFO - EXTRACT_ADDED: hack\index.html
+2025-11-15 01:15:38,180 - qa_automata - INFO - EXTRACT_ADDED: hack\vite.config.js
+2025-11-15 01:15:38,180 - qa_automata - INFO - EXTRACT_ADDED: backend\app\main.py
+2025-11-15 01:15:38,180 - qa_automata - INFO - EXTRACT_ADDED: backend\app\test_metrics.py
+2025-11-15 01:15:38,180 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\auth.py
+2025-11-15 01:15:38,180 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\chat.py
+2025-11-15 01:15:38,181 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\covers.py
+2025-11-15 01:15:38,182 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\crypto.py
+2025-11-15 01:15:38,182 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\metrics.py
+2025-11-15 01:15:38,183 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\moderation.py
+2025-11-15 01:15:38,186 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\notifications.py
+2025-11-15 01:15:38,187 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\participants.py
+2025-11-15 01:15:38,188 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\recordings.py
+2025-11-15 01:15:38,189 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\rooms.py
+2025-11-15 01:15:38,190 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\rtc.py
+2025-11-15 01:15:38,191 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\state.py
+2025-11-15 01:15:38,191 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\sync.py
+2025-11-15 01:15:38,192 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\users.py
+2025-11-15 01:15:38,192 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\ws.py
+2025-11-15 01:15:38,193 - qa_automata - INFO - EXTRACT_ADDED: backend\app\core\config.py
+2025-11-15 01:15:38,194 - qa_automata - INFO - EXTRACT_ADDED: backend\app\core\security.py
+2025-11-15 01:15:38,194 - qa_automata - INFO - EXTRACT_ADDED: backend\app\db\base.py
+2025-11-15 01:15:38,194 - qa_automata - INFO - EXTRACT_ADDED: backend\app\db\session.py
+2025-11-15 01:15:38,194 - qa_automata - INFO - EXTRACT_ADDED: backend\app\middleware\metrics_middleware.py
+2025-11-15 01:15:38,195 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\crypto.py
+2025-11-15 01:15:38,195 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\event.py
+2025-11-15 01:15:38,195 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\membership.py
+2025-11-15 01:15:38,195 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\message.py
+2025-11-15 01:15:38,195 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\notification.py
+2025-11-15 01:15:38,196 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\recording.py
+2025-11-15 01:15:38,196 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\room.py
+2025-11-15 01:15:38,197 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\user.py
+2025-11-15 01:15:38,198 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\crypto_repo.py
+2025-11-15 01:15:38,198 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\event_repo.py
+2025-11-15 01:15:38,200 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\membership_repo.py
+2025-11-15 01:15:38,201 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\message_repo.py
+2025-11-15 01:15:38,203 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\notification_repo.py
+2025-11-15 01:15:38,203 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\recording_repo.py
+2025-11-15 01:15:38,204 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\room_repo.py
+2025-11-15 01:15:38,204 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\user_repo.py
+2025-11-15 01:15:38,205 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\auth.py
+2025-11-15 01:15:38,205 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\chat.py
+2025-11-15 01:15:38,206 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\membership.py
+2025-11-15 01:15:38,206 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\message.py
+2025-11-15 01:15:38,206 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\metrics.py
+2025-11-15 01:15:38,207 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\moderation.py
+2025-11-15 01:15:38,207 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\notification.py
+2025-11-15 01:15:38,207 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\room.py
+2025-11-15 01:15:38,207 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\rtc.py
+2025-11-15 01:15:38,207 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\signaling.py
+2025-11-15 01:15:38,208 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\state.py
+2025-11-15 01:15:38,208 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\user.py
+2025-11-15 01:15:38,208 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\chat.py
+2025-11-15 01:15:38,208 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\crypto.py
+2025-11-15 01:15:38,208 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\media.py
+2025-11-15 01:15:38,209 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\metrics.py
+2025-11-15 01:15:38,209 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\moderation.py
+2025-11-15 01:15:38,209 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\participants.py
+2025-11-15 01:15:38,210 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\recording.py
+2025-11-15 01:15:38,210 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\rooms.py
+2025-11-15 01:15:38,211 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\state.py
+2025-11-15 01:15:38,211 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\sync.py
+2025-11-15 01:15:38,212 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\users.py
+2025-11-15 01:15:38,213 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\ws_hub.py
+2025-11-15 01:15:38,213 - qa_automata - INFO - EXTRACT_ADDED: backend\app\utils\ids.py
+2025-11-15 01:15:38,214 - qa_automata - INFO - EXTRACT_ADDED: backend\app\utils\text.py
+2025-11-15 01:15:38,215 - qa_automata - INFO - EXTRACT_ADDED: hack\src\404.css
+2025-11-15 01:15:38,215 - qa_automata - INFO - EXTRACT_ADDED: hack\src\404.jsx
+2025-11-15 01:15:38,216 - qa_automata - INFO - EXTRACT_ADDED: hack\src\App.css
+2025-11-15 01:15:38,219 - qa_automata - INFO - EXTRACT_ADDED: hack\src\App.jsx
+2025-11-15 01:15:38,219 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Auth.css
+2025-11-15 01:15:38,220 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Auth.jsx
+2025-11-15 01:15:38,221 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Create.css
+2025-11-15 01:15:38,221 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Create.jsx
+2025-11-15 01:15:38,222 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Home.css
+2025-11-15 01:15:38,223 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Home.jsx
+2025-11-15 01:15:38,223 - qa_automata - INFO - EXTRACT_ADDED: hack\src\index.css
+2025-11-15 01:15:38,224 - qa_automata - INFO - EXTRACT_ADDED: hack\src\main.jsx
+2025-11-15 01:15:38,225 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\404.jsx
+2025-11-15 01:15:38,225 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Conf.jsx
+2025-11-15 01:15:38,226 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Create.jsx
+2025-11-15 01:15:38,227 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Home.jsx
+2025-11-15 01:15:38,228 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Invite.jsx
+2025-11-15 01:15:38,228 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Notification.jsx
+2025-11-15 01:15:38,229 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Plan-Conference.jsx
+2025-11-15 01:15:38,230 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Profile.jsx
+2025-11-15 01:15:38,231 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Settings.jsx
+2025-11-15 01:15:38,242 - qa_automata - INFO - EXTRACT_ADDED: hack\src\сonfig\livekit.js
+2025-11-15 01:15:38,243 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\Chat.jsx
+2025-11-15 01:15:38,244 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\NavDiv.jsx
+2025-11-15 01:15:38,245 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\ParticipantsPanel.jsx
+2025-11-15 01:15:38,245 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\RoomControls.jsx
+2025-11-15 01:15:38,246 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\404.css
+2025-11-15 01:15:38,246 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Conf.css
+2025-11-15 01:15:38,246 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Create.css
+2025-11-15 01:15:38,246 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Global.css
+2025-11-15 01:15:38,247 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Home.css
+2025-11-15 01:15:38,247 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Invite.css
+2025-11-15 01:15:38,247 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\notification.css
+2025-11-15 01:15:38,247 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Profile.css
+2025-11-15 01:15:38,247 - qa_automata - INFO - EXTRACT_COMPLETE: Found 102 code files
+2025-11-15 01:15:38,248 - qa_automata - INFO - 🔍 FINAL_API_CHECK: 242 endpoints for generation
+2025-11-15 01:15:38,248 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:15:38,249 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:15:38,293 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:15:38,294 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:15:38,295 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:15:38,307 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:15:38,308 - qa_automata - INFO -   - File: backend\tests.py
+2025-11-15 01:15:38,308 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:15:38,309 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:15:38,309 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:38,310 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:15:38,310 - qa_automata - INFO - AI_START: Generating unit test for backend\tests.py
+2025-11-15 01:15:38,310 - qa_automata - INFO - AI_INFO: Framework: jest, File type: python_module
+2025-11-15 01:15:38,311 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:15:38,311 - qa_automata - INFO - AI_DATA: Request data length: 805 chars
+2025-11-15 01:15:38,312 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: backend\tests.py
+    - Тип: python_module
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Ф...
+2025-11-15 01:15:38,312 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:15:45,245 - qa_automata - INFO - ✅ Ollama response received, length: 184
+2025-11-15 01:15:45,246 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 184
+2025-11-15 01:15:45,247 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// backend/tests.py - UNIT TESTS (Jest Framework)
+
+describe('Backend Tests', () => {
+  test('should pass a basic test', () => {
+    expect(true).toBe(true);
+  });
+});
+```...
+2025-11-15 01:15:45,248 - qa_automata - INFO - Looking for file: hack\eslint.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\eslint.config.js
+2025-11-15 01:15:45,249 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 763 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\eslint.config.js
+2025-11-15 01:15:45,258 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:15:45,259 - qa_automata - INFO - Looking for file: hack\eslint.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\eslint.config.js
+2025-11-15 01:15:45,261 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 763 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\eslint.config.js
+2025-11-15 01:15:45,262 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:15:45,262 - qa_automata - INFO -   - File: hack\eslint.config.js
+2025-11-15 01:15:45,262 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:15:45,263 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:15:45,263 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:45,263 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:15:45,263 - qa_automata - INFO - AI_START: Generating unit test for hack\eslint.config.js
+2025-11-15 01:15:45,263 - qa_automata - INFO - AI_INFO: Framework: jest, File type: javascript_module
+2025-11-15 01:15:45,264 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:15:45,264 - qa_automata - INFO - AI_DATA: Request data length: 818 chars
+2025-11-15 01:15:45,264 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\eslint.config.js
+    - Тип: javascript_module
+    - Технология: javascript
+
+    ### 🏗️ СТРУКТУРА Ф...
+2025-11-15 01:15:45,265 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:15:52,964 - qa_automata - INFO - ✅ Ollama response received, length: 710
+2025-11-15 01:15:52,964 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 710
+2025-11-15 01:15:52,965 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Тест для файла hack\eslint.config.js
+// Поскольку файл не содержит классов/функций, тестируем экспорт конфигурации
+
+const eslintConfig = require('../hack/eslint.config.js');
+
+describe...
+2025-11-15 01:15:52,966 - qa_automata - INFO - Looking for file: hack\index.html -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\index.html
+2025-11-15 01:15:52,967 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 353 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\index.html
+2025-11-15 01:15:52,971 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:15:52,972 - qa_automata - INFO - Looking for file: hack\index.html -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\index.html
+2025-11-15 01:15:52,973 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 353 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\index.html
+2025-11-15 01:15:52,974 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:15:52,975 - qa_automata - INFO -   - File: hack\index.html
+2025-11-15 01:15:52,975 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:15:52,976 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:15:52,976 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:52,976 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:15:52,977 - qa_automata - INFO - AI_START: Generating unit test for hack\index.html
+2025-11-15 01:15:52,977 - qa_automata - INFO - AI_INFO: Framework: jest, File type: html_template
+2025-11-15 01:15:52,977 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:15:52,978 - qa_automata - INFO - AI_DATA: Request data length: 802 chars
+2025-11-15 01:15:52,979 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\index.html
+    - Тип: html_template
+    - Технология: html
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл...
+2025-11-15 01:15:52,980 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:15:57,034 - qa_automata - INFO - ✅ Ollama response received, length: 325
+2025-11-15 01:15:57,036 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 325
+2025-11-15 01:15:57,036 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Пустой файл теста, так как index.html не содержит логики для unit тестирования
+describe('hack/index.html', () => {
+  test('should exist as a template file', () => {
+    // Этот тест я...
+2025-11-15 01:15:57,037 - qa_automata - INFO - Looking for file: hack\vite.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\vite.config.js
+2025-11-15 01:15:57,038 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 161 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\vite.config.js
+2025-11-15 01:15:57,041 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:15:57,042 - qa_automata - INFO - Looking for file: hack\vite.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\vite.config.js
+2025-11-15 01:15:57,042 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 161 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\hack\vite.config.js
+2025-11-15 01:15:57,043 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:15:57,044 - qa_automata - INFO -   - File: hack\vite.config.js
+2025-11-15 01:15:57,044 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:15:57,044 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:15:57,045 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:15:57,045 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:15:57,046 - qa_automata - INFO - AI_START: Generating unit test for hack\vite.config.js
+2025-11-15 01:15:57,047 - qa_automata - INFO - AI_INFO: Framework: jest, File type: javascript_module
+2025-11-15 01:15:57,047 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:15:57,048 - qa_automata - INFO - AI_DATA: Request data length: 816 chars
+2025-11-15 01:15:57,048 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\vite.config.js
+    - Тип: javascript_module
+    - Технология: javascript
+
+    ### 🏗️ СТРУКТУРА ФАЙ...
+2025-11-15 01:15:57,049 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:10,624 - qa_automata - INFO - ✅ Ollama response received, length: 224
+2025-11-15 01:16:10,630 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 224
+2025-11-15 01:16:10,630 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Тесты не могут быть сгенерированы, так как файл vite.config.js не содержит тестируемой логики (функций, классов и т.д.)
+// Требуется ручная проверка конфигурации или интеграционные те...
+2025-11-15 01:16:10,632 - qa_automata - INFO - Looking for file: backend\app\main.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\app\main.py
+2025-11-15 01:16:10,643 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 4875 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\app\main.py
+2025-11-15 01:16:10,648 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:10,654 - qa_automata - INFO - Looking for file: backend\app\main.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\app\main.py
+2025-11-15 01:16:10,659 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 4875 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\app\main.py
+2025-11-15 01:16:10,663 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:10,664 - qa_automata - INFO -   - File: backend\app\main.py
+2025-11-15 01:16:10,664 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:10,666 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:16:10,668 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:10,670 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:10,671 - qa_automata - INFO - AI_START: Generating unit test for backend\app\main.py
+2025-11-15 01:16:10,671 - qa_automata - INFO - AI_INFO: Framework: jest, File type: python_module
+2025-11-15 01:16:10,672 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:16:10,673 - qa_automata - INFO - AI_DATA: Request data length: 808 chars
+2025-11-15 01:16:10,674 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: backend\app\main.py
+    - Тип: python_module
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+    ...
+2025-11-15 01:16:10,674 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:16,565 - qa_automata - INFO - ✅ Ollama response received, length: 384
+2025-11-15 01:16:16,566 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 384
+2025-11-15 01:16:16,567 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Невозможно создать unit тест, так как файл main.py не содержит функций или классов для тестирования
+describe('main.py module tests', () => {
+  test('should verify module exists', () =...
+2025-11-15 01:16:16,570 - qa_automata - INFO - GENERATE_API: Found 242 API endpoints
+2025-11-15 01:16:16,575 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:16,577 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:16,581 - qa_automata - INFO - GENERATE_API: Generating test for GET detail
+2025-11-15 01:16:16,588 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:16,591 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:16,592 - qa_automata - INFO -   - File: api/GET_detail
+2025-11-15 01:16:16,594 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:16,596 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:16:16,597 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:16,598 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:16,598 - qa_automata - INFO - AI_START: Generating api test for api/GET_detail
+2025-11-15 01:16:16,599 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:16:16,599 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:16:16,607 - qa_automata - INFO - AI_DATA: Request data length: 801 chars
+2025-11-15 01:16:16,608 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_detail
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл...
+2025-11-15 01:16:16,610 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:24,857 - qa_automata - INFO - ✅ Ollama response received, length: 772
+2025-11-15 01:16:24,858 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 772
+2025-11-15 01:16:24,858 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /detail', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/detail');
+    expect(response.s...
+2025-11-15 01:16:24,858 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_detail.js
+2025-11-15 01:16:24,859 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:24,860 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:24,861 - qa_automata - INFO - GENERATE_API: Generating test for GET id
+2025-11-15 01:16:24,863 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:24,863 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:24,864 - qa_automata - INFO -   - File: api/GET_id
+2025-11-15 01:16:24,864 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:24,864 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:16:24,865 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:24,865 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:24,866 - qa_automata - INFO - AI_START: Generating api test for api/GET_id
+2025-11-15 01:16:24,866 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:16:24,866 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:16:24,867 - qa_automata - INFO - AI_DATA: Request data length: 797 chars
+2025-11-15 01:16:24,867 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_id
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл не ...
+2025-11-15 01:16:24,869 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:36,844 - qa_automata - INFO - ✅ Ollama response received, length: 818
+2025-11-15 01:16:36,844 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 818
+2025-11-15 01:16:36,845 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /api/GET_id', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/api/GET_id');
+    expect(re...
+2025-11-15 01:16:36,845 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_id.js
+2025-11-15 01:16:36,846 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:36,847 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:36,847 - qa_automata - INFO - GENERATE_API: Generating test for GET slug
+2025-11-15 01:16:36,850 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:36,850 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:36,851 - qa_automata - INFO -   - File: api/GET_slug
+2025-11-15 01:16:36,852 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:36,853 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:16:36,854 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:36,855 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:36,856 - qa_automata - INFO - AI_START: Generating api test for api/GET_slug
+2025-11-15 01:16:36,856 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:16:36,857 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:16:36,858 - qa_automata - INFO - AI_DATA: Request data length: 799 chars
+2025-11-15 01:16:36,858 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_slug
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл н...
+2025-11-15 01:16:36,858 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:46,808 - qa_automata - INFO - ✅ Ollama response received, length: 732
+2025-11-15 01:16:46,808 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 732
+2025-11-15 01:16:46,808 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /slug', () => {
+  test('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/slug');
+    expect(response.sta...
+2025-11-15 01:16:46,809 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_slug.js
+2025-11-15 01:16:46,811 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:46,811 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:46,811 - qa_automata - INFO - GENERATE_API: Generating test for GET slug
+2025-11-15 01:16:46,815 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:46,815 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:46,815 - qa_automata - INFO -   - File: api/GET_slug
+2025-11-15 01:16:46,815 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:46,815 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:16:46,816 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:46,816 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:46,817 - qa_automata - INFO - AI_START: Generating api test for api/GET_slug
+2025-11-15 01:16:46,817 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:16:46,817 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:16:46,822 - qa_automata - INFO - AI_DATA: Request data length: 799 chars
+2025-11-15 01:16:46,823 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_slug
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл н...
+2025-11-15 01:16:46,823 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:16:52,574 - qa_automata - INFO - ✅ Ollama response received, length: 712
+2025-11-15 01:16:52,575 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 712
+2025-11-15 01:16:52,575 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /slug', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/slug');
+    expect(response.statu...
+2025-11-15 01:16:52,576 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_slug.js
+2025-11-15 01:16:52,577 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:52,579 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s\backend\tests.py
+2025-11-15 01:16:52,580 - qa_automata - INFO - GENERATE_API: Generating test for GET requestBody
+2025-11-15 01:16:52,582 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:16:52,583 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:16:52,583 - qa_automata - INFO -   - File: api/GET_requestBody
+2025-11-15 01:16:52,584 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:16:52,584 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:16:52,585 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:16:52,588 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:16:52,589 - qa_automata - INFO - AI_START: Generating api test for api/GET_requestBody
+2025-11-15 01:16:52,590 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:16:52,590 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:16:52,591 - qa_automata - INFO - AI_DATA: Request data length: 806 chars
+2025-11-15 01:16:52,591 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_requestBody
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+     ...
+2025-11-15 01:16:52,592 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:17:06,475 - qa_automata - INFO - ✅ Ollama response received, length: 475
+2025-11-15 01:17:06,476 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 475
+2025-11-15 01:17:06,476 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /api/requestBody', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/api/requestBody');
+   ...
+2025-11-15 01:17:06,477 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_requestBody.js
+2025-11-15 01:17:06,477 - qa_automata - INFO - GENERATE_API: Generated 4 API test files
+2025-11-15 01:17:06,480 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:17:06,480 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:17:06,480 - qa_automata - INFO -   - File: integration/auth.py
+2025-11-15 01:17:06,481 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:17:06,481 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:17:06,482 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:17:06,482 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:17:06,482 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:17:06,483 - qa_automata - INFO - AI_START: Generating integration test for integration/auth.py
+2025-11-15 01:17:06,483 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:17:06,484 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:17:06,484 - qa_automata - INFO - AI_DATA: Request data length: 821 chars
+2025-11-15 01:17:06,485 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/auth.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА...
+2025-11-15 01:17:06,489 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:17:17,784 - qa_automata - INFO - ✅ Ollama response received, length: 194
+2025-11-15 01:17:17,785 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 194
+2025-11-15 01:17:17,785 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('Integration Test for auth.py', () => {
+    it('should pass as no functions or classes are defined in the module', () => {
+        expect(true).toBe(true);
+    });
+});
+```...
+2025-11-15 01:17:17,789 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:17:17,790 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:17:17,790 - qa_automata - INFO -   - File: integration/chat.py
+2025-11-15 01:17:17,790 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:17:17,791 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:17:17,791 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:17:17,792 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:17:17,792 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:17:17,793 - qa_automata - INFO - AI_START: Generating integration test for integration/chat.py
+2025-11-15 01:17:17,793 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:17:17,794 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:17:17,794 - qa_automata - INFO - AI_DATA: Request data length: 821 chars
+2025-11-15 01:17:17,794 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/chat.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА...
+2025-11-15 01:17:17,795 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:17:31,284 - qa_automata - INFO - ✅ Ollama response received, length: 366
+2025-11-15 01:17:31,285 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 366
+2025-11-15 01:17:31,285 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('Integration Test for chat module', () => {
+  test('should perform basic integration flow without errors', async () => {
+    // Placeholder test case for integration testing
+   ...
+2025-11-15 01:17:31,290 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:17:31,291 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:17:31,291 - qa_automata - INFO -   - File: integration/covers.py
+2025-11-15 01:17:31,291 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:17:31,292 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:17:31,292 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:17:31,292 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:17:31,292 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:17:31,292 - qa_automata - INFO - AI_START: Generating integration test for integration/covers.py
+2025-11-15 01:17:31,292 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:17:31,293 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:17:31,293 - qa_automata - INFO - AI_DATA: Request data length: 823 chars
+2025-11-15 01:17:31,293 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/covers.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙ...
+2025-11-15 01:17:31,294 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:17:42,484 - qa_automata - INFO - ✅ Ollama response received, length: 167
+2025-11-15 01:17:42,485 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 167
+2025-11-15 01:17:42,485 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('Integration Test for covers.py', () => {
+    it('should pass basic integration check', () => {
+        expect(true).toBe(true);
+    });
+});
+```...
+2025-11-15 01:17:42,488 - qa_automata - ERROR - Error generating E2E test for {'name': 'api_workflow', 'description': 'Complete API workflow testing', 'user_flows': ['Authentication → Data retrieval → Data modification'], 'pages': ['Login', 'Dashboard', 'Details']}: 'type'
+2025-11-15 01:17:42,491 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:17:42,492 - qa_automata - INFO - PIPELINE: Пайплайн завершен
+2025-11-15 01:17:42,493 - qa_automata - INFO - PIPELINE: Результат keys = dict_keys(['status', 'project_name', 'generated_tests', 'test_files', 'coverage_estimate', 'framework_used', 'files_created', 'warnings', 'recommendations', 'generation_time', 'test_config_used', 'ai_provider_used', 'project_context'])
+2025-11-15 01:17:42,493 - qa_automata - INFO - PIPELINE: Статус = success
+2025-11-15 01:17:42,493 - qa_automata - INFO - PIPELINE: Сгенерировано тестов = 12
+2025-11-15 01:17:42,493 - qa_automata - INFO - SAVE: Сохранение тестов в базу данных...
+2025-11-15 01:17:42,494 - qa_automata - INFO - SAVE_TESTS_BATCH: Starting to save tests for project 4
+2025-11-15 01:17:42,814 - qa_automata - INFO - SAVE_TESTS_BATCH: Created test batch 17
+2025-11-15 01:17:42,814 - qa_automata - INFO - SAVE_TESTS_BATCH: Saving 12 tests to batch 17
+2025-11-15 01:17:42,815 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_tests.js
+2025-11-15 01:17:42,816 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_tests.js' to batch 17
+2025-11-15 01:17:42,816 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_eslintconfig.js
+2025-11-15 01:17:42,816 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_eslintconfig.js' to batch 17
+2025-11-15 01:17:42,817 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_index.js
+2025-11-15 01:17:42,818 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_index.js' to batch 17
+2025-11-15 01:17:42,818 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_viteconfig.js
+2025-11-15 01:17:42,819 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_viteconfig.js' to batch 17
+2025-11-15 01:17:42,820 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_main.js
+2025-11-15 01:17:42,821 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_main.js' to batch 17
+2025-11-15 01:17:42,821 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_detail.js
+2025-11-15 01:17:42,822 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_detail.js' to batch 17
+2025-11-15 01:17:42,822 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_id.js
+2025-11-15 01:17:42,822 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_id.js' to batch 17
+2025-11-15 01:17:42,823 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_slug.js
+2025-11-15 01:17:42,823 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_slug.js' to batch 17
+2025-11-15 01:17:42,824 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_requestBody.js
+2025-11-15 01:17:42,824 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_requestBody.js' to batch 17
+2025-11-15 01:17:42,825 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_auth.py.js
+2025-11-15 01:17:42,826 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_auth.py.js' to batch 17
+2025-11-15 01:17:42,826 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_chat.py.js
+2025-11-15 01:17:42,827 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_chat.py.js' to batch 17
+2025-11-15 01:17:42,827 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_covers.py.js
+2025-11-15 01:17:42,827 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_covers.py.js' to batch 17
+2025-11-15 01:17:42,905 - qa_automata - INFO - SAVE_TESTS_BATCH: Successfully saved 12 tests in batch 17 for project 4
+2025-11-15 01:17:42,906 - qa_automata - INFO - SUCCESS: Тесты сгенерированы и сохранены для проекта 4
+2025-11-15 01:17:42,906 - qa_automata - INFO - Cleaning up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:17:44,046 - qa_automata - INFO - Successfully cleaned up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_80hy9f8s
+2025-11-15 01:17:44,047 - qa_automata - INFO - Temporary repository cleaned up
+2025-11-15 01:29:00,098 - qa_automata - INFO - 🚀 INIT: Starting app dependencies initialization
+2025-11-15 01:29:00,099 - qa_automata - INFO - INIT: Pipeline initialized successfully
+2025-11-15 01:29:00,099 - qa_automata - INFO - INIT: Pipeline object: <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000265DF74AF90>
+2025-11-15 01:29:00,099 - qa_automata - INFO - INIT: Pipeline type: <class 'app.services.generate_pipeline.TestGenerationPipeline'>
+2025-11-15 01:29:00,100 - qa_automata - INFO - All app dependencies initialized
+2025-11-15 01:29:11,978 - qa_automata - INFO - START: Генерация тестов для проекта 4
+2025-11-15 01:29:11,979 - qa_automata - INFO - GET_PIPELINE: Checking pipeline status...
+2025-11-15 01:29:11,979 - qa_automata - INFO - GET_PIPELINE: Pipeline retrieved successfully: <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000265DF74AF90>
+2025-11-15 01:29:12,071 - qa_automata - INFO - Analysis found: 11, status: completed
+2025-11-15 01:29:12,072 - qa_automata - INFO - Analysis result keys: dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp'])
+2025-11-15 01:29:12,072 - qa_automata - INFO - Technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:12,072 - qa_automata - INFO - Downloading repository for test generation: https://github.com/danyayok/Axenix-hackRND2025
+2025-11-15 01:29:12,075 - qa_automata - INFO - Cloning https://github.com/danyayok/Axenix-hackRND2025 (branch: main) to C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:29:25,838 - qa_automata - INFO - Repository cloned successfully to C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:29:25,839 - qa_automata - INFO - Repository downloaded to: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:29:25,840 - qa_automata - INFO - PIPELINE: Запуск пайплайна генерации тестов...
+2025-11-15 01:29:25,841 - qa_automata - INFO - PIPELINE: test_generation_pipeline = <app.services.generate_pipeline.TestGenerationPipeline object at 0x00000265DF74AF90>
+2025-11-15 01:29:25,842 - qa_automata - INFO - PIPELINE: type = <class 'app.services.generate_pipeline.TestGenerationPipeline'>
+2025-11-15 01:29:25,842 - qa_automata - INFO - PIPELINE: project_info keys = dict_keys(['id', 'name', 'description', 'repo_url', 'branch', 'technology_stack', 'local_path'])
+2025-11-15 01:29:25,843 - qa_automata - INFO - PIPELINE: analysis_data keys = dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp'])
+2025-11-15 01:29:25,844 - qa_automata - INFO - PIPELINE: test_config = {'framework': 'auto', 'coverage_target': 80, 'generate_unit_tests': True, 'generate_integration_tests': True, 'generate_e2e_tests': True, 'include_comments': True, 'generate_documentation': False, 'documentation_format': 'txt', 'test_pattern': 'standard', 'test_directory': '', 'custom_test_path': False}
+2025-11-15 01:29:25,845 - qa_automata - INFO - API Endpoints found: []
+2025-11-15 01:29:25,846 - qa_automata - INFO - API Endpoints by file: {}
+2025-11-15 01:29:25,846 - qa_automata - WARNING - No API endpoints found in analysis data!
+2025-11-15 01:29:25,847 - qa_automata - INFO - Starting test generation for project: Axenix-hackRND2025
+2025-11-15 01:29:25,847 - qa_automata - INFO - 🔍 INITIAL_API_CHECK: API endpoints in analysis: 0
+2025-11-15 01:29:25,847 - qa_automata - WARNING - File structure is empty, analyzing repository directly
+2025-11-15 01:29:25,849 - qa_automata - INFO - [DEBUG] Directory contents: ['.git', '.gitignore', '.idea', '.sourcecraft', 'backend', 'hack', 'node_modules', 'package-lock.json', 'package.json', 'README.md']
+2025-11-15 01:29:25,967 - qa_automata - INFO - [DEBUG] Total files found by rglob: 1260
+2025-11-15 01:29:25,972 - qa_automata - INFO - [DEBUG] File 0: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\.git (is_file: False)
+2025-11-15 01:29:25,974 - qa_automata - INFO - [DEBUG] File 1: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\.gitignore (is_file: True)
+2025-11-15 01:29:25,975 - qa_automata - INFO - [DEBUG] File 2: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\.idea (is_file: False)
+2025-11-15 01:29:25,976 - qa_automata - INFO - [DEBUG] File 3: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\.sourcecraft (is_file: False)
+2025-11-15 01:29:25,976 - qa_automata - INFO - [DEBUG] File 4: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend (is_file: False)
+2025-11-15 01:29:25,977 - qa_automata - INFO - [DEBUG] File 5: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack (is_file: False)
+2025-11-15 01:29:25,977 - qa_automata - INFO - [DEBUG] File 6: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\node_modules (is_file: False)
+2025-11-15 01:29:25,978 - qa_automata - INFO - [DEBUG] File 7: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\package-lock.json (is_file: True)
+2025-11-15 01:29:25,979 - qa_automata - INFO - [DEBUG] File 8: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\package.json (is_file: True)
+2025-11-15 01:29:25,979 - qa_automata - INFO - [DEBUG] File 9: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\README.md (is_file: True)
+2025-11-15 01:29:26,381 - qa_automata - INFO - Total files found: 1093
+2025-11-15 01:29:28,682 - qa_automata - INFO - Detected framework: react (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\eslint.config.js': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\vite.config.js': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\404.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\App.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\Auth.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\Create.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\Home.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\main.jsx': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\404.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Conf.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Create.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Home.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Invite.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Notification.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Plan-Conference.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Profile.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\Settings.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\components\\Chat.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\components\\NavDiv.jsx': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\components\\ParticipantsPanel.jsx': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\src\\pages\\components\\RoomControls.jsx': 1})
+2025-11-15 01:29:28,683 - qa_automata - INFO - Detected framework: vue (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\package.json': 1})
+2025-11-15 01:29:28,717 - qa_automata - INFO - Detected framework: angular (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\package.json': 1})
+2025-11-15 01:29:28,718 - qa_automata - INFO - Detected framework: express (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\package.json': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\hack\\package.json': 1})
+2025-11-15 01:29:28,720 - qa_automata - INFO - Detected framework: fastapi (evidence: {'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\main.py': 4, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\auth.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\chat.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\covers.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\crypto.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\metrics.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\moderation.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\notifications.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\participants.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\recordings.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\rooms.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\rtc.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\state.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\sync.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\users.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\api\\ws.py': 2, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\middleware\\metrics_middleware.py': 1, 'C:\\Users\\Danial\\AppData\\Local\\Temp\\repo_0gpldrib\\backend\\app\\services\\ws_hub.py': 1})
+2025-11-15 01:29:28,723 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Starting endpoint detection in C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:29:28,823 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Found 66 Python files to analyze
+2025-11-15 01:29:28,824 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\tests.py
+2025-11-15 01:29:28,834 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET detail in backend\tests.py:98
+2025-11-15 01:29:28,839 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET id in backend\tests.py:110
+2025-11-15 01:29:28,845 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET slug in backend\tests.py:137
+2025-11-15 01:29:28,846 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET slug in backend\tests.py:157
+2025-11-15 01:29:28,847 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET requestBody in backend\tests.py:374
+2025-11-15 01:29:28,848 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET properties in backend\tests.py:384
+2025-11-15 01:29:28,849 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET type in backend\tests.py:387
+2025-11-15 01:29:28,851 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET required in backend\tests.py:388
+2025-11-15 01:29:28,854 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\tests.py
+2025-11-15 01:29:28,855 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\main.py
+2025-11-15 01:29:28,857 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:29:28,857 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:29:28,858 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:29:28,859 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:29:28,859 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:29:28,860 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:29:28,861 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET / in backend\app\main.py:74
+2025-11-15 01:29:28,861 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /favicon.ico in backend\app\main.py:78
+2025-11-15 01:29:28,862 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\main.py
+2025-11-15 01:29:28,863 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\auth.py
+2025-11-15 01:29:28,865 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:29:28,866 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:29:28,866 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:29:28,867 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:29:28,868 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:29:28,875 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:29:28,876 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /token/guest in backend\app\api\auth.py:15
+2025-11-15 01:29:28,877 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /login in backend\app\api\auth.py:32
+2025-11-15 01:29:28,878 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\auth.py
+2025-11-15 01:29:28,879 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\chat.py
+2025-11-15 01:29:28,883 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:29:28,884 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:29:28,885 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:29:28,891 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:29:28,894 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:29:28,895 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:29:28,896 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:29:28,897 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:29:28,898 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:29:28,898 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:29:28,899 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:29:28,900 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:29:28,903 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:29:28,904 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:29:28,905 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:29:28,906 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\chat.py:19
+2025-11-15 01:29:28,907 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug}/{message_id} in backend\app\api\chat.py:32
+2025-11-15 01:29:28,908 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug} in backend\app\api\chat.py:54
+2025-11-15 01:29:28,908 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/recent in backend\app\api\chat.py:86
+2025-11-15 01:29:28,909 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/count in backend\app\api\chat.py:104
+2025-11-15 01:29:28,910 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\chat.py
+2025-11-15 01:29:28,911 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\covers.py
+2025-11-15 01:29:28,914 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:29:28,915 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:29:28,916 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:29:28,916 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:29:28,917 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:29:28,918 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:29:28,923 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:29:28,923 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:29:28,927 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:29:28,928 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/upload in backend\app\api\covers.py:32
+2025-11-15 01:29:28,929 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\covers.py:48
+2025-11-15 01:29:28,930 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug} in backend\app\api\covers.py:55
+2025-11-15 01:29:28,931 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\covers.py
+2025-11-15 01:29:28,932 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\crypto.py
+2025-11-15 01:29:28,933 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:29:28,934 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:29:28,938 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:29:28,938 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:29:28,939 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:29:28,939 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:29:28,940 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/init in backend\app\api\crypto.py:17
+2025-11-15 01:29:28,941 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug}/my_key in backend\app\api\crypto.py:27
+2025-11-15 01:29:28,941 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\crypto.py
+2025-11-15 01:29:28,943 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\deps.py
+2025-11-15 01:29:28,950 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\metrics.py
+2025-11-15 01:29:28,953 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:29:28,954 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:29:28,955 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:29:28,955 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:29:28,956 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:29:28,956 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:29:28,958 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:29:28,959 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:29:28,960 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:29:28,962 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:29:28,962 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:29:28,963 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:29:28,964 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:29:28,965 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:29:28,965 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:29:28,966 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /system in backend\app\api\metrics.py:8
+2025-11-15 01:29:28,967 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /performance in backend\app\api\metrics.py:13
+2025-11-15 01:29:28,968 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /rooms/{room_slug} in backend\app\api\metrics.py:18
+2025-11-15 01:29:28,970 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /overview in backend\app\api\metrics.py:26
+2025-11-15 01:29:28,972 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /health in backend\app\api\metrics.py:33
+2025-11-15 01:29:28,975 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\metrics.py
+2025-11-15 01:29:28,977 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\moderation.py
+2025-11-15 01:29:28,978 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:29:28,979 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:29:28,979 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:29:28,980 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:29:28,981 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:29:28,981 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:29:28,982 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:29:28,982 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:29:28,983 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:29:28,984 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:29:28,985 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:29:28,986 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:29:28,987 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:29:28,988 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:29:28,989 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:29:28,990 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:29:28,991 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:29:28,991 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:29:28,992 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/promote_admin in backend\app\api\moderation.py:28
+2025-11-15 01:29:28,993 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/demote_admin in backend\app\api\moderation.py:37
+2025-11-15 01:29:28,995 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/force_mute in backend\app\api\moderation.py:46
+2025-11-15 01:29:28,996 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/kick in backend\app\api\moderation.py:55
+2025-11-15 01:29:28,997 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/speak in backend\app\api\moderation.py:65
+2025-11-15 01:29:28,997 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/force_video in backend\app\api\moderation.py:75
+2025-11-15 01:29:28,998 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 24 endpoints in backend\app\api\moderation.py
+2025-11-15 01:29:28,999 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\notifications.py
+2025-11-15 01:29:29,001 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:29:29,003 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:29:29,006 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:29:29,007 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:29:29,008 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:29:29,009 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:29:29,009 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:29:29,010 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:29:29,011 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:29:29,012 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:29:29,013 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:29:29,014 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:29:29,015 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id} in backend\app\api\notifications.py:11
+2025-11-15 01:29:29,016 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/read/{notification_id} in backend\app\api\notifications.py:21
+2025-11-15 01:29:29,017 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/read-all in backend\app\api\notifications.py:33
+2025-11-15 01:29:29,017 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id}/unread-count in backend\app\api\notifications.py:42
+2025-11-15 01:29:29,017 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\notifications.py
+2025-11-15 01:29:29,018 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\participants.py
+2025-11-15 01:29:29,023 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:29:29,024 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:29:29,025 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:29:29,025 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:29:29,026 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:29:29,027 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:29:29,028 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:29:29,028 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:29:29,029 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:29:29,030 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:29:29,030 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:29:29,031 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:29:29,032 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /join in backend\app\api\participants.py:26
+2025-11-15 01:29:29,032 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /leave in backend\app\api\participants.py:52
+2025-11-15 01:29:29,033 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /heartbeat in backend\app\api\participants.py:70
+2025-11-15 01:29:29,033 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\participants.py:88
+2025-11-15 01:29:29,034 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\participants.py
+2025-11-15 01:29:29,038 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\recordings.py
+2025-11-15 01:29:29,040 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:29:29,041 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:29:29,043 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:29:29,044 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:29:29,045 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:29:29,046 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:29:29,047 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:29:29,048 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:29:29,049 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:29:29,051 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/upload in backend\app\api\recordings.py:16
+2025-11-15 01:29:29,055 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\recordings.py:39
+2025-11-15 01:29:29,056 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{room_slug}/{rec_id} in backend\app\api\recordings.py:46
+2025-11-15 01:29:29,057 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\recordings.py
+2025-11-15 01:29:29,058 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\rooms.py
+2025-11-15 01:29:29,060 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:29:29,060 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:29:29,061 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:29:29,061 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:29:29,062 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:29:29,062 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:29:29,063 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:29:29,064 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:29:29,064 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:29:29,065 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{slug} in backend\app\api\rooms.py:49
+2025-11-15 01:29:29,066 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{slug}/exists in backend\app\api\rooms.py:63
+2025-11-15 01:29:29,066 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /join/by-invite in backend\app\api\rooms.py:67
+2025-11-15 01:29:29,067 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 12 endpoints in backend\app\api\rooms.py
+2025-11-15 01:29:29,068 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\rtc.py
+2025-11-15 01:29:29,071 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:29:29,072 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:29:29,072 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:29:29,073 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:29:29,075 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:29:29,077 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:29:29,079 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /token in backend\app\api\rtc.py:38
+2025-11-15 01:29:29,080 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /config in backend\app\api\rtc.py:84
+2025-11-15 01:29:29,080 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 8 endpoints in backend\app\api\rtc.py
+2025-11-15 01:29:29,082 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\state.py
+2025-11-15 01:29:29,087 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:29:29,088 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:29:29,089 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:29:29,090 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:29:29,090 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:29:29,091 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:29:29,091 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:29:29,092 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:29:29,092 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:29:29,092 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:29:29,093 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:29:29,093 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:29:29,093 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\state.py:16
+2025-11-15 01:29:29,094 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/topic in backend\app\api\state.py:24
+2025-11-15 01:29:29,095 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/lock in backend\app\api\state.py:32
+2025-11-15 01:29:29,096 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{room_slug}/mute_all in backend\app\api\state.py:40
+2025-11-15 01:29:29,097 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\api\state.py
+2025-11-15 01:29:29,097 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\sync.py
+2025-11-15 01:29:29,100 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:29:29,101 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:29:29,103 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:29:29,107 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{room_slug} in backend\app\api\sync.py:12
+2025-11-15 01:29:29,108 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 4 endpoints in backend\app\api\sync.py
+2025-11-15 01:29:29,109 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\users.py
+2025-11-15 01:29:29,111 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:29:29,112 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:29:29,113 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:29:29,114 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:29:29,115 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:29:29,117 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:29:29,117 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:29:29,119 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:29:29,120 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:29:29,121 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:29:29,123 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:29:29,123 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:29:29,125 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:29:29,125 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:29:29,126 - qa_automata - INFO - 🎯 FASTAPI_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:29:29,127 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET /{user_id} in backend\app\api\users.py:58
+2025-11-15 01:29:29,128 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: PATCH /{user_id} in backend\app\api\users.py:75
+2025-11-15 01:29:29,132 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/avatar in backend\app\api\users.py:104
+2025-11-15 01:29:29,133 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: DELETE /{user_id} in backend\app\api\users.py:130
+2025-11-15 01:29:29,138 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: POST /{user_id}/change-password in backend\app\api\users.py:149
+2025-11-15 01:29:29,140 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 20 endpoints in backend\app\api\users.py
+2025-11-15 01:29:29,142 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\api\ws.py
+2025-11-15 01:29:29,149 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET type in backend\app\api\ws.py:145
+2025-11-15 01:29:29,149 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET after_seq in backend\app\api\ws.py:221
+2025-11-15 01:29:29,150 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET limit in backend\app\api\ws.py:222
+2025-11-15 01:29:29,150 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET to in backend\app\api\ws.py:229
+2025-11-15 01:29:29,150 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET text in backend\app\api\ws.py:249
+2025-11-15 01:29:29,151 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET ciphertext_b64 in backend\app\api\ws.py:292
+2025-11-15 01:29:29,151 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET algo in backend\app\api\ws.py:298
+2025-11-15 01:29:29,152 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET is_typing in backend\app\api\ws.py:338
+2025-11-15 01:29:29,153 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET topic in backend\app\api\ws.py:356
+2025-11-15 01:29:29,155 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET is_locked in backend\app\api\ws.py:361
+2025-11-15 01:29:29,155 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET mute_all in backend\app\api\ws.py:366
+2025-11-15 01:29:29,156 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET mic_muted in backend\app\api\ws.py:379
+2025-11-15 01:29:29,156 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET cam_off in backend\app\api\ws.py:380
+2025-11-15 01:29:29,157 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 13 endpoints in backend\app\api\ws.py
+2025-11-15 01:29:29,158 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\core\config.py
+2025-11-15 01:29:29,159 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\core\security.py
+2025-11-15 01:29:29,162 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET uid in backend\app\core\security.py:30
+2025-11-15 01:29:29,163 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 1 endpoints in backend\app\core\security.py
+2025-11-15 01:29:29,163 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\db\base.py
+2025-11-15 01:29:29,165 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\db\session.py
+2025-11-15 01:29:29,168 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\middleware\metrics_middleware.py
+2025-11-15 01:29:29,178 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\crypto.py
+2025-11-15 01:29:29,181 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\event.py
+2025-11-15 01:29:29,183 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\membership.py
+2025-11-15 01:29:29,187 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\message.py
+2025-11-15 01:29:29,189 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\notification.py
+2025-11-15 01:29:29,192 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\recording.py
+2025-11-15 01:29:29,194 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\room.py
+2025-11-15 01:29:29,196 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\models\user.py
+2025-11-15 01:29:29,197 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\crypto_repo.py
+2025-11-15 01:29:29,201 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\event_repo.py
+2025-11-15 01:29:29,206 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\membership_repo.py
+2025-11-15 01:29:29,209 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\message_repo.py
+2025-11-15 01:29:29,212 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\notification_repo.py
+2025-11-15 01:29:29,215 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\recording_repo.py
+2025-11-15 01:29:29,217 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\room_repo.py
+2025-11-15 01:29:29,223 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\repositories\user_repo.py
+2025-11-15 01:29:29,226 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\auth.py
+2025-11-15 01:29:29,228 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\chat.py
+2025-11-15 01:29:29,230 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\membership.py
+2025-11-15 01:29:29,231 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\message.py
+2025-11-15 01:29:29,233 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\metrics.py
+2025-11-15 01:29:29,243 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\moderation.py
+2025-11-15 01:29:29,248 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\notification.py
+2025-11-15 01:29:29,249 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\room.py
+2025-11-15 01:29:29,251 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\rtc.py
+2025-11-15 01:29:29,257 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\signaling.py
+2025-11-15 01:29:29,259 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\state.py
+2025-11-15 01:29:29,261 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\schemas\user.py
+2025-11-15 01:29:29,262 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\chat.py
+2025-11-15 01:29:29,265 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\crypto.py
+2025-11-15 01:29:29,267 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\media.py
+2025-11-15 01:29:29,275 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\metrics.py
+2025-11-15 01:29:29,279 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET messages in backend\app\services\metrics.py:138
+2025-11-15 01:29:29,280 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:139
+2025-11-15 01:29:29,280 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:140
+2025-11-15 01:29:29,281 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET media_streams in backend\app\services\metrics.py:141
+2025-11-15 01:29:29,281 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:142
+2025-11-15 01:29:29,282 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:156
+2025-11-15 01:29:29,282 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET messages in backend\app\services\metrics.py:159
+2025-11-15 01:29:29,282 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET participants in backend\app\services\metrics.py:160
+2025-11-15 01:29:29,283 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET media_streams in backend\app\services\metrics.py:161
+2025-11-15 01:29:29,284 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET last_activity in backend\app\services\metrics.py:162
+2025-11-15 01:29:29,286 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET message_count in backend\app\services\metrics.py:165
+2025-11-15 01:29:29,287 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET ws_connections in backend\app\services\metrics.py:187
+2025-11-15 01:29:29,290 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET system_memory_percent in backend\app\services\metrics.py:188
+2025-11-15 01:29:29,291 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET process_cpu_percent in backend\app\services\metrics.py:189
+2025-11-15 01:29:29,292 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET system_memory_percent in backend\app\services\metrics.py:193
+2025-11-15 01:29:29,293 - qa_automata - INFO - 🎯 GENERIC_ENDPOINT: GET process_cpu_percent in backend\app\services\metrics.py:194
+2025-11-15 01:29:29,295 - qa_automata - INFO - ✅ API_ENDPOINT_FOUND: 16 endpoints in backend\app\services\metrics.py
+2025-11-15 01:29:29,296 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\moderation.py
+2025-11-15 01:29:29,298 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\participants.py
+2025-11-15 01:29:29,301 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\recording.py
+2025-11-15 01:29:29,311 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\rooms.py
+2025-11-15 01:29:29,314 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\state.py
+2025-11-15 01:29:29,317 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\sync.py
+2025-11-15 01:29:29,325 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\users.py
+2025-11-15 01:29:29,327 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\services\ws_hub.py
+2025-11-15 01:29:29,330 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\utils\ids.py
+2025-11-15 01:29:29,332 - qa_automata - INFO - 🔍 API_ENDPOINT_SEARCH: Analyzing backend\app\utils\text.py
+2025-11-15 01:29:29,334 - qa_automata - INFO - 📊 API_ENDPOINT_SUMMARY: Found 242 total endpoints in 19 files
+2025-11-15 01:29:29,337 - qa_automata - INFO - Starting E2E scenario analysis...
+2025-11-15 01:29:29,338 - qa_automata - INFO - 🔍 E2E_SCENARIO_SEARCH: Starting E2E scenario detection in C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:29:29,865 - qa_automata - INFO - 📊 E2E_SCENARIO_SUMMARY: Found 3 E2E scenarios
+2025-11-15 01:29:29,866 - qa_automata - INFO - FINAL ANALYSIS: 109 project files, 984 ignored files (931 from dependencies)
+2025-11-15 01:29:29,866 - qa_automata - INFO - FILE STRUCTURE: Contains 109 files
+2025-11-15 01:29:29,867 - qa_automata - INFO - FILE SUMMARY: {'total_files': 109, 'code_files': 107, 'test_files': 0, 'total_lines': 11336, 'total_size_kb': 386.76}
+2025-11-15 01:29:29,868 - qa_automata - INFO - SAMPLE FILES: ['package.json', 'README.md', 'backend\\Dockerfile', 'backend\\requirements.txt', 'backend\\tests.py']
+2025-11-15 01:29:29,869 - qa_automata - INFO - ANALYSIS_RESULT_KEYS: dict_keys(['technologies', 'frameworks', 'file_structure', 'file_structure_summary', 'test_analysis', 'dependencies', 'metrics', 'project_structure', 'complexity_metrics', 'coverage_estimate', 'source', 'branch', 'analysis_timestamp', 'api_endpoints', 'api_endpoints_by_file', 'e2e_scenarios'])
+2025-11-15 01:29:29,872 - qa_automata - INFO - ANALYSIS_TECHNOLOGIES: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:29,873 - qa_automata - INFO - ANALYSIS_METRICS: {'total_files': 109, 'code_files': 107, 'test_files': 0, 'total_lines': 11336, 'total_size_kb': 0, 'ignored_files': 984, 'ignored_directories': [], 'dependency_files_count': 931}
+2025-11-15 01:29:29,876 - qa_automata - INFO - 🔍 AFTER_ANALYSIS_API_CHECK: API endpoints: 242
+2025-11-15 01:29:29,877 - qa_automata - INFO - ANALYSIS_DATA_KEYS: dict_keys(['technologies', 'frameworks', 'file_structure_summary', 'test_analysis', 'project_structure', 'dependencies', 'complexity_metrics', 'source', 'branch', 'coverage_estimate', 'analysis_timestamp', 'file_structure', 'metrics', 'api_endpoints', 'api_endpoints_by_file', 'e2e_scenarios'])
+2025-11-15 01:29:29,877 - qa_automata - INFO - EXTRACT_START: Extracting code files
+2025-11-15 01:29:29,877 - qa_automata - INFO - EXTENSIONS_RESULT: Final extensions: ['.pyw', '.js', '.py', '.jsx', '.htm', '.html', '.less', '.css', '.scss']
+2025-11-15 01:29:29,877 - qa_automata - INFO - EXTRACT_ADDED: backend\tests.py
+2025-11-15 01:29:29,878 - qa_automata - INFO - EXTRACT_ADDED: hack\eslint.config.js
+2025-11-15 01:29:29,878 - qa_automata - INFO - EXTRACT_ADDED: hack\index.html
+2025-11-15 01:29:29,878 - qa_automata - INFO - EXTRACT_ADDED: hack\vite.config.js
+2025-11-15 01:29:29,878 - qa_automata - INFO - EXTRACT_ADDED: backend\app\main.py
+2025-11-15 01:29:29,879 - qa_automata - INFO - EXTRACT_ADDED: backend\app\test_metrics.py
+2025-11-15 01:29:29,879 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\auth.py
+2025-11-15 01:29:29,879 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\chat.py
+2025-11-15 01:29:29,879 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\covers.py
+2025-11-15 01:29:29,879 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\crypto.py
+2025-11-15 01:29:29,880 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\metrics.py
+2025-11-15 01:29:29,881 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\moderation.py
+2025-11-15 01:29:29,881 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\notifications.py
+2025-11-15 01:29:29,881 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\participants.py
+2025-11-15 01:29:29,882 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\recordings.py
+2025-11-15 01:29:29,883 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\rooms.py
+2025-11-15 01:29:29,883 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\rtc.py
+2025-11-15 01:29:29,884 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\state.py
+2025-11-15 01:29:29,885 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\sync.py
+2025-11-15 01:29:29,886 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\users.py
+2025-11-15 01:29:29,887 - qa_automata - INFO - EXTRACT_ADDED: backend\app\api\ws.py
+2025-11-15 01:29:29,887 - qa_automata - INFO - EXTRACT_ADDED: backend\app\core\config.py
+2025-11-15 01:29:29,888 - qa_automata - INFO - EXTRACT_ADDED: backend\app\core\security.py
+2025-11-15 01:29:29,888 - qa_automata - INFO - EXTRACT_ADDED: backend\app\db\base.py
+2025-11-15 01:29:29,889 - qa_automata - INFO - EXTRACT_ADDED: backend\app\db\session.py
+2025-11-15 01:29:29,889 - qa_automata - INFO - EXTRACT_ADDED: backend\app\middleware\metrics_middleware.py
+2025-11-15 01:29:29,890 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\crypto.py
+2025-11-15 01:29:29,891 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\event.py
+2025-11-15 01:29:29,891 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\membership.py
+2025-11-15 01:29:29,892 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\message.py
+2025-11-15 01:29:29,893 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\notification.py
+2025-11-15 01:29:29,893 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\recording.py
+2025-11-15 01:29:29,895 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\room.py
+2025-11-15 01:29:29,896 - qa_automata - INFO - EXTRACT_ADDED: backend\app\models\user.py
+2025-11-15 01:29:29,897 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\crypto_repo.py
+2025-11-15 01:29:29,898 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\event_repo.py
+2025-11-15 01:29:29,899 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\membership_repo.py
+2025-11-15 01:29:29,900 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\message_repo.py
+2025-11-15 01:29:29,901 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\notification_repo.py
+2025-11-15 01:29:29,901 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\recording_repo.py
+2025-11-15 01:29:29,902 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\room_repo.py
+2025-11-15 01:29:29,904 - qa_automata - INFO - EXTRACT_ADDED: backend\app\repositories\user_repo.py
+2025-11-15 01:29:29,925 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\auth.py
+2025-11-15 01:29:29,929 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\chat.py
+2025-11-15 01:29:29,930 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\membership.py
+2025-11-15 01:29:29,931 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\message.py
+2025-11-15 01:29:29,933 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\metrics.py
+2025-11-15 01:29:29,933 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\moderation.py
+2025-11-15 01:29:29,934 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\notification.py
+2025-11-15 01:29:29,935 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\room.py
+2025-11-15 01:29:29,936 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\rtc.py
+2025-11-15 01:29:29,936 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\signaling.py
+2025-11-15 01:29:29,936 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\state.py
+2025-11-15 01:29:29,937 - qa_automata - INFO - EXTRACT_ADDED: backend\app\schemas\user.py
+2025-11-15 01:29:29,937 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\chat.py
+2025-11-15 01:29:29,938 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\crypto.py
+2025-11-15 01:29:29,938 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\media.py
+2025-11-15 01:29:29,939 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\metrics.py
+2025-11-15 01:29:29,939 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\moderation.py
+2025-11-15 01:29:29,940 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\participants.py
+2025-11-15 01:29:29,941 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\recording.py
+2025-11-15 01:29:29,942 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\rooms.py
+2025-11-15 01:29:29,943 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\state.py
+2025-11-15 01:29:29,944 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\sync.py
+2025-11-15 01:29:29,945 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\users.py
+2025-11-15 01:29:29,946 - qa_automata - INFO - EXTRACT_ADDED: backend\app\services\ws_hub.py
+2025-11-15 01:29:29,947 - qa_automata - INFO - EXTRACT_ADDED: backend\app\utils\ids.py
+2025-11-15 01:29:29,947 - qa_automata - INFO - EXTRACT_ADDED: backend\app\utils\text.py
+2025-11-15 01:29:29,948 - qa_automata - INFO - EXTRACT_ADDED: hack\src\404.css
+2025-11-15 01:29:29,949 - qa_automata - INFO - EXTRACT_ADDED: hack\src\404.jsx
+2025-11-15 01:29:29,950 - qa_automata - INFO - EXTRACT_ADDED: hack\src\App.css
+2025-11-15 01:29:29,950 - qa_automata - INFO - EXTRACT_ADDED: hack\src\App.jsx
+2025-11-15 01:29:29,952 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Auth.css
+2025-11-15 01:29:29,956 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Auth.jsx
+2025-11-15 01:29:29,956 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Create.css
+2025-11-15 01:29:29,958 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Create.jsx
+2025-11-15 01:29:29,958 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Home.css
+2025-11-15 01:29:29,958 - qa_automata - INFO - EXTRACT_ADDED: hack\src\Home.jsx
+2025-11-15 01:29:29,959 - qa_automata - INFO - EXTRACT_ADDED: hack\src\index.css
+2025-11-15 01:29:29,959 - qa_automata - INFO - EXTRACT_ADDED: hack\src\main.jsx
+2025-11-15 01:29:29,959 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\404.jsx
+2025-11-15 01:29:29,959 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Conf.jsx
+2025-11-15 01:29:29,960 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Create.jsx
+2025-11-15 01:29:29,960 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Home.jsx
+2025-11-15 01:29:29,961 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Invite.jsx
+2025-11-15 01:29:29,962 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Notification.jsx
+2025-11-15 01:29:29,963 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Plan-Conference.jsx
+2025-11-15 01:29:29,963 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Profile.jsx
+2025-11-15 01:29:29,964 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\Settings.jsx
+2025-11-15 01:29:29,965 - qa_automata - INFO - EXTRACT_ADDED: hack\src\сonfig\livekit.js
+2025-11-15 01:29:29,965 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\Chat.jsx
+2025-11-15 01:29:29,966 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\NavDiv.jsx
+2025-11-15 01:29:29,967 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\ParticipantsPanel.jsx
+2025-11-15 01:29:29,967 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\components\RoomControls.jsx
+2025-11-15 01:29:29,968 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\404.css
+2025-11-15 01:29:29,969 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Conf.css
+2025-11-15 01:29:29,970 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Create.css
+2025-11-15 01:29:29,971 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Global.css
+2025-11-15 01:29:29,972 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Home.css
+2025-11-15 01:29:29,973 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Invite.css
+2025-11-15 01:29:29,974 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\notification.css
+2025-11-15 01:29:29,975 - qa_automata - INFO - EXTRACT_ADDED: hack\src\pages\static\Profile.css
+2025-11-15 01:29:29,978 - qa_automata - INFO - EXTRACT_COMPLETE: Found 102 code files
+2025-11-15 01:29:29,978 - qa_automata - INFO - 🔍 FINAL_API_CHECK: 242 endpoints for generation
+2025-11-15 01:29:29,979 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:29,981 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:29,999 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:30,000 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:30,002 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:30,012 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:30,013 - qa_automata - INFO -   - File: backend\tests.py
+2025-11-15 01:29:30,014 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:30,015 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:29:30,015 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:30,015 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:30,015 - qa_automata - INFO - AI_START: Generating unit test for backend\tests.py
+2025-11-15 01:29:30,015 - qa_automata - INFO - AI_INFO: Framework: jest, File type: python_module
+2025-11-15 01:29:30,016 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:29:30,016 - qa_automata - INFO - AI_DATA: Request data length: 805 chars
+2025-11-15 01:29:30,016 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: backend\tests.py
+    - Тип: python_module
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Ф...
+2025-11-15 01:29:30,017 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:29:34,460 - qa_automata - INFO - ✅ Ollama response received, length: 189
+2025-11-15 01:29:34,461 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 189
+2025-11-15 01:29:34,461 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// backend/tests.py - пустой файл, тесты не требуются
+describe('Backend Tests', () => {
+  test('should pass as placeholder', () => {
+    expect(true).toBe(true);
+  });
+});
+```...
+2025-11-15 01:29:34,462 - qa_automata - INFO - Looking for file: hack\eslint.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\eslint.config.js
+2025-11-15 01:29:34,463 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 763 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\eslint.config.js
+2025-11-15 01:29:34,467 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:34,469 - qa_automata - INFO - Looking for file: hack\eslint.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\eslint.config.js
+2025-11-15 01:29:34,471 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 763 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\eslint.config.js
+2025-11-15 01:29:34,474 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:34,474 - qa_automata - INFO -   - File: hack\eslint.config.js
+2025-11-15 01:29:34,474 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:34,475 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:29:34,475 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:34,475 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:34,475 - qa_automata - INFO - AI_START: Generating unit test for hack\eslint.config.js
+2025-11-15 01:29:34,476 - qa_automata - INFO - AI_INFO: Framework: jest, File type: javascript_module
+2025-11-15 01:29:34,476 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:29:34,476 - qa_automata - INFO - AI_DATA: Request data length: 818 chars
+2025-11-15 01:29:34,476 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\eslint.config.js
+    - Тип: javascript_module
+    - Технология: javascript
+
+    ### 🏗️ СТРУКТУРА Ф...
+2025-11-15 01:29:34,477 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:29:46,291 - qa_automata - INFO - ✅ Ollama response received, length: 261
+2025-11-15 01:29:46,292 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 261
+2025-11-15 01:29:46,292 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('eslint.config.js', () => {
+  it('should export a valid ESLint configuration object', () => {
+    const config = require('./hack/eslint.config.js');
+    expect(config).toBeDefin...
+2025-11-15 01:29:46,293 - qa_automata - INFO - Looking for file: hack\index.html -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\index.html
+2025-11-15 01:29:46,294 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 353 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\index.html
+2025-11-15 01:29:46,296 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:46,297 - qa_automata - INFO - Looking for file: hack\index.html -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\index.html
+2025-11-15 01:29:46,298 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 353 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\index.html
+2025-11-15 01:29:46,299 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:46,299 - qa_automata - INFO -   - File: hack\index.html
+2025-11-15 01:29:46,299 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:46,300 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:29:46,300 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:46,300 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:46,300 - qa_automata - INFO - AI_START: Generating unit test for hack\index.html
+2025-11-15 01:29:46,300 - qa_automata - INFO - AI_INFO: Framework: jest, File type: html_template
+2025-11-15 01:29:46,301 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:29:46,301 - qa_automata - INFO - AI_DATA: Request data length: 802 chars
+2025-11-15 01:29:46,301 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\index.html
+    - Тип: html_template
+    - Технология: html
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл...
+2025-11-15 01:29:46,303 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:29:49,026 - qa_automata - INFO - ✅ Ollama response received, length: 132
+2025-11-15 01:29:49,027 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 132
+2025-11-15 01:29:49,027 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('hack/index.html', () => {
+  it('should render correctly', () => {
+    expect(true).toBe(true);
+  });
+});
+```...
+2025-11-15 01:29:49,027 - qa_automata - INFO - Looking for file: hack\vite.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\vite.config.js
+2025-11-15 01:29:49,029 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 161 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\vite.config.js
+2025-11-15 01:29:49,031 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:49,032 - qa_automata - INFO - Looking for file: hack\vite.config.js -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\vite.config.js
+2025-11-15 01:29:49,033 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 161 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\hack\vite.config.js
+2025-11-15 01:29:49,034 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:49,034 - qa_automata - INFO -   - File: hack\vite.config.js
+2025-11-15 01:29:49,040 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:49,040 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:29:49,041 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:49,041 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:49,042 - qa_automata - INFO - AI_START: Generating unit test for hack\vite.config.js
+2025-11-15 01:29:49,042 - qa_automata - INFO - AI_INFO: Framework: jest, File type: javascript_module
+2025-11-15 01:29:49,042 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:29:49,042 - qa_automata - INFO - AI_DATA: Request data length: 816 chars
+2025-11-15 01:29:49,043 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: hack\vite.config.js
+    - Тип: javascript_module
+    - Технология: javascript
+
+    ### 🏗️ СТРУКТУРА ФАЙ...
+2025-11-15 01:29:49,043 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:29:53,475 - qa_automata - INFO - ✅ Ollama response received, length: 1025
+2025-11-15 01:29:53,475 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 1025
+2025-11-15 01:29:53,476 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Тесты для файла hack/vite.config.js
+// Поскольку файл не содержит классов/функций, тестируем экспорт конфигурации Vite
+
+const viteConfig = require('../hack/vite.config.js');
+
+describe...
+2025-11-15 01:29:53,477 - qa_automata - INFO - Looking for file: backend\app\main.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\app\main.py
+2025-11-15 01:29:53,478 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 4875 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\app\main.py
+2025-11-15 01:29:53,482 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:53,483 - qa_automata - INFO - Looking for file: backend\app\main.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\app\main.py
+2025-11-15 01:29:53,484 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 4875 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\app\main.py
+2025-11-15 01:29:53,488 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:53,489 - qa_automata - INFO -   - File: backend\app\main.py
+2025-11-15 01:29:53,489 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:53,490 - qa_automata - INFO -   - File keys: ['path', 'name', 'extension', 'type', 'technology', 'size', 'lines', 'is_test', 'has_content', 'ignored', 'enhanced_content', 'context_hints']
+2025-11-15 01:29:53,490 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:53,490 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:53,490 - qa_automata - INFO - AI_START: Generating unit test for backend\app\main.py
+2025-11-15 01:29:53,491 - qa_automata - INFO - AI_INFO: Framework: jest, File type: python_module
+2025-11-15 01:29:53,491 - qa_automata - INFO - AI_PROMPT: Prompt length: 2043 chars
+2025-11-15 01:29:53,492 - qa_automata - INFO - AI_DATA: Request data length: 808 chars
+2025-11-15 01:29:53,493 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: backend\app\main.py
+    - Тип: python_module
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+    ...
+2025-11-15 01:29:53,493 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:29:58,558 - qa_automata - INFO - ✅ Ollama response received, length: 820
+2025-11-15 01:29:58,560 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 820
+2025-11-15 01:29:58,560 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// Тест для backend\app\main.py
+// Поскольку файл не содержит классов/функций, тест будет проверять сам факт импорта модуля
+// Это позволяет убедиться, что файл синтаксически корректен и...
+2025-11-15 01:29:58,561 - qa_automata - INFO - GENERATE_API: Found 242 API endpoints
+2025-11-15 01:29:58,562 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:58,563 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:29:58,564 - qa_automata - INFO - GENERATE_API: Generating test for GET detail
+2025-11-15 01:29:58,566 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:29:58,567 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:29:58,567 - qa_automata - INFO -   - File: api/GET_detail
+2025-11-15 01:29:58,568 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:29:58,568 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:29:58,568 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:29:58,569 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:29:58,570 - qa_automata - INFO - AI_START: Generating api test for api/GET_detail
+2025-11-15 01:29:58,570 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:29:58,571 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:29:58,572 - qa_automata - INFO - AI_DATA: Request data length: 801 chars
+2025-11-15 01:29:58,573 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_detail
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл...
+2025-11-15 01:29:58,574 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:03,239 - qa_automata - INFO - ✅ Ollama response received, length: 997
+2025-11-15 01:30:03,240 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 997
+2025-11-15 01:30:03,240 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+const request = require('supertest');
+const app = require('../app'); 
+
+describe('GET /api/detail', () => {
+    it('should return 200 and correct response structure', async () => {
+      ...
+2025-11-15 01:30:03,241 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_detail.js
+2025-11-15 01:30:03,242 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:03,243 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:03,243 - qa_automata - INFO - GENERATE_API: Generating test for GET id
+2025-11-15 01:30:03,246 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:03,247 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:03,247 - qa_automata - INFO -   - File: api/GET_id
+2025-11-15 01:30:03,248 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:03,248 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:30:03,249 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:03,250 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:30:03,251 - qa_automata - INFO - AI_START: Generating api test for api/GET_id
+2025-11-15 01:30:03,252 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:30:03,252 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:30:03,254 - qa_automata - INFO - AI_DATA: Request data length: 797 chars
+2025-11-15 01:30:03,256 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_id
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл не ...
+2025-11-15 01:30:03,259 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:07,368 - qa_automata - INFO - ✅ Ollama response received, length: 669
+2025-11-15 01:30:07,368 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 669
+2025-11-15 01:30:07,369 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /api/GET_id', () => {
+  it('should return 200 and valid response structure', async () => {
+    const response = await global.testRequest.get('/api/GET_id');
+    expect(resp...
+2025-11-15 01:30:07,371 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_id.js
+2025-11-15 01:30:07,372 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:07,374 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:07,375 - qa_automata - INFO - GENERATE_API: Generating test for GET slug
+2025-11-15 01:30:07,379 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:07,379 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:07,379 - qa_automata - INFO -   - File: api/GET_slug
+2025-11-15 01:30:07,380 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:07,380 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:30:07,380 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:07,380 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:30:07,381 - qa_automata - INFO - AI_START: Generating api test for api/GET_slug
+2025-11-15 01:30:07,381 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:30:07,382 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:30:07,383 - qa_automata - INFO - AI_DATA: Request data length: 799 chars
+2025-11-15 01:30:07,383 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_slug
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл н...
+2025-11-15 01:30:07,384 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:12,238 - qa_automata - INFO - ✅ Ollama response received, length: 749
+2025-11-15 01:30:12,238 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 749
+2025-11-15 01:30:12,239 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /slug', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/slug');
+    expect(response.statu...
+2025-11-15 01:30:12,239 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_slug.js
+2025-11-15 01:30:12,240 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:12,241 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:12,241 - qa_automata - INFO - GENERATE_API: Generating test for GET slug
+2025-11-15 01:30:12,244 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:12,245 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:12,245 - qa_automata - INFO -   - File: api/GET_slug
+2025-11-15 01:30:12,245 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:12,245 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:30:12,246 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:12,246 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:30:12,246 - qa_automata - INFO - AI_START: Generating api test for api/GET_slug
+2025-11-15 01:30:12,246 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:30:12,246 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:30:12,247 - qa_automata - INFO - AI_DATA: Request data length: 799 chars
+2025-11-15 01:30:12,248 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_slug
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+      Файл н...
+2025-11-15 01:30:12,248 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:16,249 - qa_automata - INFO - ✅ Ollama response received, length: 721
+2025-11-15 01:30:16,250 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 721
+2025-11-15 01:30:16,250 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /slug', () => {
+  it('should return 200 and correct response structure', async () => {
+    const response = await global.testRequest.get('/slug');
+    expect(response.statu...
+2025-11-15 01:30:16,250 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_slug.js
+2025-11-15 01:30:16,251 - qa_automata - INFO - Looking for file: backend\tests.py -> C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:16,252 - qa_automata - INFO - GET_FILE_CONTENT: Successfully read 17493 chars from C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib\backend\tests.py
+2025-11-15 01:30:16,255 - qa_automata - INFO - GENERATE_API: Generating test for GET requestBody
+2025-11-15 01:30:16,258 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:16,259 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:16,259 - qa_automata - INFO -   - File: api/GET_requestBody
+2025-11-15 01:30:16,259 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:16,260 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'extension', 'technology', 'endpoint_info', 'content_preview', 'has_content', 'ignored', 'is_test', 'real_content']
+2025-11-15 01:30:16,260 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:16,260 - qa_automata - INFO -   - Has content: True
+2025-11-15 01:30:16,260 - qa_automata - INFO - AI_START: Generating api test for api/GET_requestBody
+2025-11-15 01:30:16,260 - qa_automata - INFO - AI_INFO: Framework: jest, File type: api_endpoint
+2025-11-15 01:30:16,261 - qa_automata - INFO - AI_PROMPT: Prompt length: 2017 chars
+2025-11-15 01:30:16,261 - qa_automata - INFO - AI_DATA: Request data length: 806 chars
+2025-11-15 01:30:16,261 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: api/GET_requestBody
+    - Тип: api_endpoint
+    - Технология: python
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА:
+     ...
+2025-11-15 01:30:16,262 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:23,298 - qa_automata - INFO - ✅ Ollama response received, length: 331
+2025-11-15 01:30:23,299 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 331
+2025-11-15 01:30:23,299 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('GET /api/requestBody', () => {
+  it('should return 200 and correct response body', async () => {
+    const response = await global.testRequest.get('/api/requestBody');
+    expe...
+2025-11-15 01:30:23,299 - qa_automata - INFO - GENERATE_API: Successfully generated API test: test_api_get_requestBody.js
+2025-11-15 01:30:23,300 - qa_automata - INFO - GENERATE_API: Generated 4 API test files
+2025-11-15 01:30:23,302 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:23,303 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:23,305 - qa_automata - INFO -   - File: integration/auth.py
+2025-11-15 01:30:23,306 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:23,306 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:30:23,307 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:23,307 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:30:23,308 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:30:23,308 - qa_automata - INFO - AI_START: Generating integration test for integration/auth.py
+2025-11-15 01:30:23,309 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:30:23,310 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:30:23,310 - qa_automata - INFO - AI_DATA: Request data length: 821 chars
+2025-11-15 01:30:23,311 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/auth.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА...
+2025-11-15 01:30:23,311 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:25,491 - qa_automata - INFO - ✅ Ollama response received, length: 165
+2025-11-15 01:30:25,492 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 165
+2025-11-15 01:30:25,492 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('Integration Test for auth.py', () => {
+    it('should pass basic integration check', () => {
+        expect(true).toBe(true);
+    });
+});
+```...
+2025-11-15 01:30:25,494 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:25,495 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:25,495 - qa_automata - INFO -   - File: integration/chat.py
+2025-11-15 01:30:25,496 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:25,496 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:30:25,496 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:25,496 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:30:25,496 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:30:25,497 - qa_automata - INFO - AI_START: Generating integration test for integration/chat.py
+2025-11-15 01:30:25,497 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:30:25,497 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:30:25,497 - qa_automata - INFO - AI_DATA: Request data length: 821 chars
+2025-11-15 01:30:25,497 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/chat.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙЛА...
+2025-11-15 01:30:25,498 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:27,691 - qa_automata - INFO - ✅ Ollama response received, length: 152
+2025-11-15 01:30:27,692 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 152
+2025-11-15 01:30:27,693 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+describe('Chat Integration', () => {
+  it('should integrate chat components correctly', () => {
+    expect(true).toBe(true);
+  });
+});
+```...
+2025-11-15 01:30:27,696 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:27,697 - qa_automata - INFO - AI_RECEIVED_DATA:
+2025-11-15 01:30:27,698 - qa_automata - INFO -   - File: integration/covers.py
+2025-11-15 01:30:27,699 - qa_automata - INFO -   - File type: <class 'dict'>
+2025-11-15 01:30:27,700 - qa_automata - INFO -   - File keys: ['path', 'name', 'type', 'has_content', 'ignored']
+2025-11-15 01:30:27,701 - qa_automata - INFO -   - Project technologies: ['javascript', 'docker', 'python', 'html', 'css']
+2025-11-15 01:30:27,709 - qa_automata - INFO -   - Has content: False
+2025-11-15 01:30:27,709 - qa_automata - WARNING - AI: No file content available!
+2025-11-15 01:30:27,710 - qa_automata - INFO - AI_START: Generating integration test for integration/covers.py
+2025-11-15 01:30:27,711 - qa_automata - INFO - AI_INFO: Framework: jest, File type: integration_module
+2025-11-15 01:30:27,713 - qa_automata - INFO - AI_PROMPT: Prompt length: 1577 chars
+2025-11-15 01:30:27,714 - qa_automata - INFO - AI_DATA: Request data length: 823 chars
+2025-11-15 01:30:27,715 - qa_automata - INFO - AI_DATA_SAMPLE: 
+    ## 🎯 КРИТИЧЕСКАЯ ИНФОРМАЦИЯ ДЛЯ ТЕСТИРОВАНИЯ:
+
+    ### 📁 ФАЙЛ ДЛЯ ТЕСТИРОВАНИЯ:
+    - Путь: integration/covers.py
+    - Тип: integration_module
+    - Технология: unknown
+
+    ### 🏗️ СТРУКТУРА ФАЙ...
+2025-11-15 01:30:27,715 - qa_automata - INFO - AI_OLLAMA: Trying Ollama...
+2025-11-15 01:30:32,868 - qa_automata - INFO - ✅ Ollama response received, length: 246
+2025-11-15 01:30:32,869 - qa_automata - INFO - AI_OLLAMA_SUCCESS: Response received, length: 246
+2025-11-15 01:30:32,869 - qa_automata - INFO - AI_OLLAMA_SAMPLE: ```javascript
+// integration/covers.test.js
+describe('Integration test for covers module', () => {
+  test('should pass basic integration check', () => {
+    // Placeholder test case for integration se...
+2025-11-15 01:30:32,871 - qa_automata - ERROR - Error in _generate_test_files: TestGenerationPipeline._generate_e2e_tests() missing 1 required positional argument: 'repo_path'
+2025-11-15 01:30:32,874 - qa_automata - INFO - Enhanced context prepared with 26 key components
+2025-11-15 01:30:32,875 - qa_automata - INFO - PIPELINE: Пайплайн завершен
+2025-11-15 01:30:32,876 - qa_automata - INFO - PIPELINE: Результат keys = dict_keys(['status', 'project_name', 'generated_tests', 'test_files', 'coverage_estimate', 'framework_used', 'files_created', 'warnings', 'recommendations', 'generation_time', 'test_config_used', 'ai_provider_used', 'project_context'])
+2025-11-15 01:30:32,876 - qa_automata - INFO - PIPELINE: Статус = success
+2025-11-15 01:30:32,876 - qa_automata - INFO - PIPELINE: Сгенерировано тестов = 12
+2025-11-15 01:30:32,876 - qa_automata - INFO - SAVE: Сохранение тестов в базу данных...
+2025-11-15 01:30:32,877 - qa_automata - INFO - SAVE_TESTS_BATCH: Starting to save tests for project 4
+2025-11-15 01:30:33,249 - qa_automata - INFO - SAVE_TESTS_BATCH: Created test batch 18
+2025-11-15 01:30:33,250 - qa_automata - INFO - SAVE_TESTS_BATCH: Saving 12 tests to batch 18
+2025-11-15 01:30:33,250 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_tests.js
+2025-11-15 01:30:33,251 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_tests.js' to batch 18
+2025-11-15 01:30:33,252 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_eslintconfig.js
+2025-11-15 01:30:33,252 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_eslintconfig.js' to batch 18
+2025-11-15 01:30:33,252 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_index.js
+2025-11-15 01:30:33,253 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_index.js' to batch 18
+2025-11-15 01:30:33,253 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_viteconfig.js
+2025-11-15 01:30:33,255 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_viteconfig.js' to batch 18
+2025-11-15 01:30:33,255 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_unit_main.js
+2025-11-15 01:30:33,256 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_unit_main.js' to batch 18
+2025-11-15 01:30:33,256 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_detail.js
+2025-11-15 01:30:33,257 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_detail.js' to batch 18
+2025-11-15 01:30:33,257 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_id.js
+2025-11-15 01:30:33,258 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_id.js' to batch 18
+2025-11-15 01:30:33,259 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_slug.js
+2025-11-15 01:30:33,259 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_slug.js' to batch 18
+2025-11-15 01:30:33,259 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_api_get_requestBody.js
+2025-11-15 01:30:33,260 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_api_get_requestBody.js' to batch 18
+2025-11-15 01:30:33,260 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_auth.py.js
+2025-11-15 01:30:33,261 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_auth.py.js' to batch 18
+2025-11-15 01:30:33,261 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_chat.py.js
+2025-11-15 01:30:33,262 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_chat.py.js' to batch 18
+2025-11-15 01:30:33,263 - qa_automata - INFO - SAVE_TESTS_BATCH: Processing test file: test_integration_covers.py.js
+2025-11-15 01:30:33,263 - qa_automata - INFO - SAVE_TESTS_BATCH: Added test 'test_integration_covers.py.js' to batch 18
+2025-11-15 01:30:33,374 - qa_automata - INFO - SAVE_TESTS_BATCH: Successfully saved 12 tests in batch 18 for project 4
+2025-11-15 01:30:33,375 - qa_automata - INFO - SUCCESS: Тесты сгенерированы и сохранены для проекта 4
+2025-11-15 01:30:33,376 - qa_automata - INFO - Cleaning up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:30:34,357 - qa_automata - INFO - Successfully cleaned up temporary repository: C:\Users\Danial\AppData\Local\Temp\repo_0gpldrib
+2025-11-15 01:30:34,358 - qa_automata - INFO - Temporary repository cleaned up

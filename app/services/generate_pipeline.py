@@ -220,7 +220,7 @@ class TestGenerationPipeline:
 
     async def _generate_unit_tests(self, project_analysis: Dict, framework: str,
                                    config: Dict, repo_path: str) -> Tuple[Dict[str, str], int, str]:
-        """Генерирует unit тесты с ПОЛНЫМ КОНТЕКСТОМ ФАЙЛА"""
+        """Генерирует unit тесты с правильным фреймворком для каждого файла"""
         test_files = {}
         code_files = project_analysis.get("code_files", [])
         ai_provider = "unknown"
@@ -229,12 +229,15 @@ class TestGenerationPipeline:
 
         for file_info in files_to_test:
             try:
+                # Определяем фреймворк для конкретного файла
+                file_framework = self._get_test_framework_for_file(file_info, framework)
+
                 if not isinstance(file_info, dict):
                     continue
 
                 file_info_copy = file_info.copy()
 
-                # ПОЛУЧАЕМ РАСШИРЕННОЕ СОДЕРЖИМОЕ ФАЙЛА
+                # Получаем расширенное содержимое файла
                 enhanced_content = self._get_enhanced_file_content(file_info_copy.get("path", ""), repo_path)
                 file_info_copy["enhanced_content"] = enhanced_content
                 file_info_copy["has_content"] = bool(enhanced_content.get("content"))
@@ -242,12 +245,13 @@ class TestGenerationPipeline:
                 # Подготавливаем контекст проекта
                 project_context = self._prepare_context(project_analysis)
 
-                # ДОБАВЛЯЕМ СПЕЦИФИЧЕСКУЮ ИНФОРМАЦИЮ ДЛЯ ТЕСТИРОВАНИЯ
+                # Добавляем специфическую информацию для тестирования
                 file_specific_context = {
                     "file_criticality": self._assess_criticality(file_info_copy),
                     "is_core_component": self._is_critical_file(file_info_copy),
                     "suggested_test_scenarios": self._suggest_test_scenarios(file_info_copy, project_analysis),
-                    "required_imports": self._get_required_test_imports(enhanced_content.get("analysis", {}), framework)
+                    "required_imports": self._get_required_test_imports(enhanced_content.get("analysis", {}),
+                                                                        file_framework)
                 }
 
                 enhanced_file_info = {
@@ -264,24 +268,26 @@ class TestGenerationPipeline:
 
                 test_content = await self.ai_service.generate_test_content(
                     file_info=enhanced_file_info,
-                    project_context=enhanced_context,  # ✅ Полный контекст
+                    project_context=enhanced_context,
                     test_type="unit",
-                    framework=framework,
+                    framework=file_framework,  # ✅ Используем фреймворк для конкретного файла
                     config=config
                 )
 
                 if test_content:
-                    filename = self._generate_filename(file_info_copy, "unit", framework)
+                    filename = self._generate_filename(file_info_copy, "unit", file_framework)
                     test_files[filename] = test_content
                     ai_provider = "ai_generated"
                 else:
-                    filename, content = await self._create_fallback_test(file_info_copy, framework, project_analysis)
+                    filename, content = await self._create_fallback_test(file_info_copy, file_framework,
+                                                                         project_analysis)
                     test_files[filename] = content
                     ai_provider = "fallback"
 
             except Exception as e:
                 logger.error(f"Error generating unit test for {file_info.get('path', 'unknown')}: {e}")
-                filename, content = await self._create_fallback_test(file_info, framework, project_analysis)
+                file_framework = self._get_test_framework_for_file(file_info, framework)
+                filename, content = await self._create_fallback_test(file_info, file_framework, project_analysis)
                 test_files[filename] = content
                 ai_provider = "fallback"
 
@@ -306,12 +312,16 @@ class TestGenerationPipeline:
 
     async def _generate_api_tests(self, project_analysis: Dict, framework: str,
                                   config: Dict, repo_path: str) -> Tuple[Dict[str, str], int, str]:
-        """Генерирует API тесты с реальным кодом эндпоинтов"""
+        """Генерирует API тесты с правильным фреймворком (pytest для FastAPI)"""
         test_files = {}
         ai_provider = "unknown"
 
         api_endpoints = project_analysis.get("api_endpoints", [])
         logger.info(f"GENERATE_API: Found {len(api_endpoints)} API endpoints")
+
+        # Для FastAPI используем pytest
+        api_framework = "pytest" if any(
+            f in project_analysis.get('frameworks', []) for f in ['fastapi', 'flask', 'django']) else framework
 
         for endpoint in api_endpoints[:config.get("max_api_tests", 5)]:
             try:
@@ -323,7 +333,7 @@ class TestGenerationPipeline:
                     "path": f"api/{endpoint.get('method', 'GET')}_{endpoint.get('path', '').replace('/', '_')}",
                     "name": f"{endpoint.get('method', 'GET')}_{endpoint.get('path', '').replace('/', '_')}",
                     "type": "api_endpoint",
-                    "extension": ".py",
+                    "extension": ".py",  # ✅ Для API тестов используем Python
                     "technology": "python",
                     "endpoint_info": endpoint,
                     "content_preview": endpoint_file_content[:2000] if endpoint_file_content else "No content",
@@ -339,7 +349,7 @@ class TestGenerationPipeline:
                     file_info=mock_file_info,
                     project_context=self._prepare_context(project_analysis),
                     test_type="api",
-                    framework=framework,
+                    framework=api_framework,  # ✅ Используем правильный фреймворк для API
                     config=config
                 )
 
@@ -347,7 +357,7 @@ class TestGenerationPipeline:
                     # Создаем безопасное имя файла
                     safe_method = endpoint.get('method', 'get').lower()
                     safe_path = endpoint.get('path', '').replace('/', '_').replace(':', '').replace('*', '')
-                    filename = f"test_api_{safe_method}_{safe_path}.{self._get_file_ext(framework)}"
+                    filename = f"test_api_{safe_method}_{safe_path}.{self._get_file_ext(api_framework)}"
                     test_files[filename] = test_content
                     ai_provider = "ai_generated"
                     logger.info(f"GENERATE_API: Successfully generated API test: {filename}")
@@ -394,60 +404,289 @@ class TestGenerationPipeline:
 
         return test_files, len(test_files), ai_provider
 
-    async def _generate_e2e_tests(self, project_analysis: Dict, framework: str, config: Dict) -> Tuple[
+    async def _generate_e2e_tests(self, project_analysis: Dict, framework: str, config: Dict, repo_path: str) -> Tuple[
         Dict[str, str], int, str]:
-        """Генерация E2E тестов с реальным контекстом - ИСПРАВЛЕННАЯ ВЕРСИЯ"""
+        """Генерация E2E тестов с правильным фреймворком"""
         test_files = {}
         ai_provider = "unknown"
 
-        # Находим реальные E2E сценарии
-        e2e_scenarios = self._find_real_e2e_scenarios(project_analysis)
+        # Для E2E тестов используем Playwright для веб-приложений
+        e2e_framework = "playwright" if any(tech in project_analysis.get('technologies', []) for tech in
+                                            ['javascript', 'react', 'html', 'css']) else framework
 
-        for scenario in e2e_scenarios[:config.get("max_e2e_tests", 2)]:
+        # Получаем E2E сценарии из анализа
+        e2e_scenarios = project_analysis.get('e2e_scenarios', [])
+
+        # Если сценариев нет, создаем базовые
+        if not e2e_scenarios:
+            e2e_scenarios = self._create_default_e2e_scenarios(project_analysis)
+
+        logger.info(f"GENERATE_E2E: Found {len(e2e_scenarios)} E2E scenarios, using framework: {e2e_framework}")
+
+        for scenario in e2e_scenarios[:config.get("max_e2e_tests", 5)]:
             try:
-                # Используем существующий анализ для создания контекста
-                mock_file_info = {
-                    "path": f"e2e/{scenario['name']}",
-                    "name": scenario['name'],
-                    "type": "e2e_scenario",
-                    "scenario_data": scenario,
-                    "api_endpoints": self._format_api_routes(project_analysis.get('api_endpoints', [])),
-                    "user_flows": scenario.get('user_flows', []),
-                    "pages": scenario.get('pages', [])
-                }
+                # Создаем расширенный контекст для E2E теста
+                e2e_context = self._prepare_e2e_context(scenario, project_analysis, repo_path)
 
                 test_content = await self.ai_service.generate_test_content(
-                    file_info=mock_file_info,
+                    file_info={
+                        "path": f"e2e/{scenario['name']}",
+                        "name": scenario['name'],
+                        "type": "e2e_scenario",
+                        "scenario_data": scenario,
+                        "e2e_context": e2e_context
+                    },
                     project_context=self._prepare_context(project_analysis),
                     test_type="e2e",
-                    framework=framework,
+                    framework=e2e_framework,  # ✅ Используем правильный E2E фреймворк
                     config=config
                 )
 
-                if test_content:
-                    filename = f"test_e2e_{scenario['name']}.{self._get_file_ext(framework)}"
+                if test_content and len(test_content.strip()) > 100:
+                    filename = f"test_e2e_{scenario['name']}.{self._get_file_ext(e2e_framework)}"
                     test_files[filename] = test_content
                     ai_provider = "ai_generated"
+                    logger.info(f"GENERATE_E2E: Successfully generated E2E test: {filename}")
+                else:
+                    # Fallback для E2E тестов
+                    fallback_content = self._create_e2e_fallback_test(scenario, e2e_framework)
+                    filename = f"test_e2e_{scenario['name']}.{self._get_file_ext(e2e_framework)}"
+                    test_files[filename] = fallback_content
+                    ai_provider = "fallback"
 
             except Exception as e:
-                logger.error(f"Error generating E2E test for {scenario}: {e}")
+                logger.error(f"GENERATE_E2E: Error generating E2E test for {scenario['name']}: {e}")
+                # Создаем fallback тест при ошибке
+                fallback_content = self._create_e2e_fallback_test(scenario, e2e_framework)
+                filename = f"test_e2e_{scenario['name']}.{self._get_file_ext(e2e_framework)}"
+                test_files[filename] = fallback_content
+                ai_provider = "fallback"
 
+        logger.info(f"GENERATE_E2E: Generated {len(test_files)} E2E test files")
         return test_files, len(test_files), ai_provider
 
+    def _prepare_e2e_context(self, scenario: Dict, project_analysis: Dict, repo_path: str) -> Dict:
+        """Подготавливает контекст для E2E теста"""
+        return {
+            "scenario": scenario,
+            "application_info": {
+                "technologies": project_analysis.get('technologies', []),
+                "frameworks": project_analysis.get('frameworks', []),
+                "api_endpoints": project_analysis.get('api_endpoints', []),
+                "authentication_required": self._has_authentication(project_analysis)
+            },
+            "test_data": {
+                "users": self._generate_test_users(scenario),
+                "sample_data": self._generate_sample_data(scenario),
+                "environment": "testing"
+            },
+            "navigation_flow": scenario.get('steps', []),
+            "assertions": self._generate_e2e_assertions(scenario)
+        }
+
+    def _create_e2e_fallback_test(self, scenario: Dict, framework: str) -> str:
+        """Создает fallback E2E тест при ошибке AI"""
+        test_name = scenario['name']
+        description = scenario.get('description', 'E2E test scenario')
+        steps = scenario.get('steps', [])
+
+        if framework in ['pytest', 'playwright']:
+            return f'''
+    # E2E Test: {test_name}
+    # Description: {description}
+
+    import pytest
+    from playwright.sync_api import sync_playwright
+
+    class Test{test_name.title().replace('_', '')}:
+
+        def test_{test_name}(self):
+            """{description}"""
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+
+                try:
+                    # Test Steps:
+    {chr(10).join([f'                # {step}' for step in steps])}
+
+                    # TODO: Implement actual test steps
+                    page.goto("http://localhost:3000")
+
+                    # Basic assertions
+                    assert page.title() is not None
+                    assert page.url is not None
+
+                finally:
+                    browser.close()
+
+        def test_{test_name}_steps(self):
+            """Verify all scenario steps"""
+            expected_steps = {steps}
+            assert len(expected_steps) > 0, "Scenario should have defined steps"
+
+            # Add specific step validations here
+            for step in expected_steps:
+                assert isinstance(step, str), f"Step should be string: {{step}}"
+    '''
+        else:
+            return f'''
+    # E2E Test: {test_name}
+    # Description: {description}
+
+    // TODO: Implement E2E test for: {description}
+    // Steps: {', '.join(steps)}
+
+    // This is a fallback E2E test template
+    // Replace with actual implementation using your preferred E2E framework
+    '''
+
+    def _create_default_e2e_scenarios(self, project_analysis: Dict) -> List[Dict]:
+        """Создает стандартные E2E сценарии если не найдены в анализе"""
+        default_scenarios = [
+            {
+                'name': 'application_smoke_test',
+                'type': 'e2e',
+                'description': 'Basic application smoke test',
+                'steps': [
+                    'Open application homepage',
+                    'Verify page loads correctly',
+                    'Check critical elements present',
+                    'Verify no console errors'
+                ],
+                'expected_outcome': 'Application starts without critical errors',
+                'priority': 'high',
+                'complexity': 'simple'
+            },
+            {
+                'name': 'user_journey_flow',
+                'type': 'e2e',
+                'description': 'Complete user journey through main features',
+                'steps': [
+                    'Access application',
+                    'Navigate through main sections',
+                    'Perform key user actions',
+                    'Verify data persistence',
+                    'Check error handling'
+                ],
+                'expected_outcome': 'User can complete main journey without issues',
+                'priority': 'high',
+                'complexity': 'medium'
+            }
+        ]
+
+        # Добавляем сценарии на основе API endpoints
+        api_endpoints = project_analysis.get('api_endpoints', [])
+        if api_endpoints:
+            default_scenarios.append({
+                'name': 'api_integration_flow',
+                'type': 'e2e',
+                'description': 'End-to-end API integration test',
+                'steps': [
+                    'Start application backend',
+                    'Initialize test database',
+                    'Execute key API calls',
+                    'Verify API responses',
+                    'Check data consistency'
+                ],
+                'expected_outcome': 'All critical APIs function correctly',
+                'priority': 'high',
+                'complexity': 'high'
+            })
+
+        return default_scenarios
+
+    def _has_authentication(self, project_analysis: Dict) -> bool:
+        """Проверяет требует ли приложение аутентификации"""
+        auth_indicators = ['auth', 'login', 'jwt', 'token', 'session']
+
+        # Проверяем файлы
+        for file_path in project_analysis.get('file_structure', {}).keys():
+            if any(indicator in file_path.lower() for indicator in auth_indicators):
+                return True
+
+        # Проверяем API endpoints
+        for endpoint in project_analysis.get('api_endpoints', []):
+            if any(indicator in endpoint.get('path', '').lower() for indicator in auth_indicators):
+                return True
+
+        return False
+
+    def _generate_test_users(self, scenario: Dict) -> List[Dict]:
+        """Генерирует тестовых пользователей для E2E сценария"""
+        return [
+            {
+                "username": "test_user",
+                "password": "test_password123",
+                "role": "user",
+                "email": "test@example.com"
+            },
+            {
+                "username": "admin_user",
+                "password": "admin_password123",
+                "role": "admin",
+                "email": "admin@example.com"
+            }
+        ]
+
+    def _generate_sample_data(self, scenario: Dict) -> Dict:
+        """Генерирует примеры данных для E2E теста"""
+        return {
+            "sample_input": "test_data",
+            "expected_output": "expected_result",
+            "validation_rules": {
+                "required_fields": ["id", "name"],
+                "data_types": {"id": "integer", "name": "string"}
+            }
+        }
+
+    def _generate_e2e_assertions(self, scenario: Dict) -> List[str]:
+        """Генерирует утверждения для E2E теста"""
+        assertions = [
+            "Page loads without errors",
+            "Critical elements are visible",
+            "User interactions work correctly",
+            "Data validation passes",
+            "Navigation works as expected"
+        ]
+
+        # Добавляем специфичные утверждения на основе сценария
+        if 'auth' in scenario['name']:
+            assertions.extend([
+                "User can login successfully",
+                "Protected routes are accessible after auth",
+                "Logout functionality works"
+            ])
+
+        if 'api' in scenario['name']:
+            assertions.extend([
+                "API responses are valid",
+                "Error handling works for invalid requests",
+                "Data consistency maintained"
+            ])
+
+        return assertions
+
+    def _get_primary_language(self, technologies: List[str]) -> str:
+        """Определяет основной язык проекта с приоритетом бэкенда"""
+        priority_languages = ["python", "java", "javascript", "typescript", "go", "ruby", "php"]
+
+        for lang in priority_languages:
+            if lang in technologies:
+                return lang
+
+        return technologies[0] if technologies else "python"
     def _get_test_framework(self, technologies: List[str], existing_frameworks: List[str],
                             user_choice: str) -> str:
-        """Определяет фреймворк тестирования"""
+        """Определяет фреймворк тестирования с приоритетом по основному языку"""
         if user_choice != "auto":
             return user_choice
 
-        # Фильтруем неизвестные фреймворки
-        known_frameworks = [f for f in existing_frameworks if f and f != 'unknown']
-        if known_frameworks:
-            return known_frameworks[0]
+        # Определяем основной язык проекта
+        primary_language = self._get_primary_language(technologies)
 
-        # Определяем по основным технологиям проекта
-        primary_tech = technologies[0].lower() if technologies else "python"
-
+        # Сопоставляем язык с фреймворком
         framework_map = {
             "python": "pytest",
             "javascript": "jest",
@@ -461,7 +700,11 @@ class TestGenerationPipeline:
             "php": "phpunit"
         }
 
-        return framework_map.get(primary_tech, "pytest")
+        known_frameworks = [f for f in existing_frameworks if f and f != 'unknown']
+        if known_frameworks:
+            return known_frameworks[0]
+
+        return framework_map.get(primary_language, "pytest")
 
     def _calculate_coverage(self, generated_tests: int, existing_tests: int, total_files: int) -> float:
         """Рассчитывает оценку покрытия"""
@@ -527,20 +770,46 @@ class TestGenerationPipeline:
 
     async def _create_fallback_test(self, file_info: Dict, framework: str,
                                     project_analysis: Dict) -> Tuple[str, str]:
-        """Создает fallback тест при ошибке AI"""
+        """Создает fallback тест с правильным фреймворком"""
         file_name = file_info.get('name', 'unknown').replace('.', '').title()
-        content = f"""
-# Fallback test for {file_info.get('path', 'unknown')}
 
-import pytest
+        if framework == "pytest":
+            content = f'''
+    # Fallback test for {file_info.get('path', 'unknown')}
 
-class Test{file_name}:
-    def test_basic_functionality(self):
-        assert True
+    import pytest
 
-    def test_edge_cases(self):
-        assert 1 == 1
-"""
+    class Test{file_name}:
+        def test_basic_functionality(self):
+            """Basic test - replace with actual test logic"""
+            assert True
+
+        def test_edge_cases(self):
+            """Test edge cases"""
+            assert 1 == 1
+    '''
+        elif framework == "jest":
+            content = f'''
+    // Fallback test for {file_info.get('path', 'unknown')}
+
+    describe('{file_name}', () => {{
+        test('basic functionality', () => {{
+            expect(true).toBe(true);
+        }});
+
+        test('edge cases', () => {{
+            expect(1).toBe(1);
+        }});
+    }});
+    '''
+        else:
+            content = f'''
+    # Fallback test for {file_info.get('path', 'unknown')}
+    # Framework: {framework}
+
+    // TODO: Implement actual tests for {file_info.get('path', 'unknown')}
+    '''
+
         filename = self._generate_filename(file_info, "unit", framework)
         return filename, content
 
@@ -624,6 +893,24 @@ class Test{file_name}:
             f"Enhanced context prepared with {len(enhanced_context['semantic_analysis']['key_components'])} key components")
         return enhanced_context
 
+    def _get_test_framework_for_file(self, file_info: Dict, project_framework: str) -> str:
+        """Определяет фреймворк тестирования для конкретного файла"""
+        file_tech = file_info.get('technology', '').lower()
+        file_ext = file_info.get('extension', '').lower()
+
+        # Для Python файлов используем pytest
+        if file_tech == 'python' or file_ext in ['.py', '.pyw']:
+            return 'pytest'
+
+        # Для JavaScript/React файлов используем jest
+        if file_tech in ['javascript', 'react'] or file_ext in ['.js', '.jsx', '.ts', '.tsx']:
+            return 'jest'
+
+        # Для HTML/CSS файлов используем playwright для E2E
+        if file_tech in ['html', 'css'] or file_ext in ['.html', '.css']:
+            return 'playwright'
+
+        return project_framework
     def _create_empty_context(self) -> Dict[str, Any]:
         """Создает пустой контекст при отсутствии данных"""
         return {

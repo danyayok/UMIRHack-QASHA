@@ -333,6 +333,9 @@ class CodeAnalyzer:
         self._analyze_test_directories(repo_path_obj, analysis_result)
 
         self.detect_api_endpoints(repo_path_obj, analysis_result)
+        logger.info("Starting E2E scenario analysis...")
+        self.detect_e2e_scenarios(repo_path_obj, analysis_result)
+
         # Финальные вычисления
         analysis_result['metrics']['dependency_files_count'] = dependency_files_count
         analysis_result['metrics']['ignored_directories'] = list(analysis_result['metrics']['ignored_directories'])
@@ -1111,3 +1114,214 @@ class CodeAnalyzer:
         coverage = min(0.95, (file_ratio * 0.7) + framework_bonus + directory_bonus)
 
         return round(coverage * 100, 2)
+
+    def detect_e2e_scenarios(self, repo_path: Path, analysis_result: Dict[str, Any]):
+        """Обнаруживает E2E сценарии в проекте"""
+        e2e_scenarios = []
+
+        logger.info(f"🔍 E2E_SCENARIO_SEARCH: Starting E2E scenario detection in {repo_path}")
+
+        # Анализируем структуру проекта для E2E сценариев
+        project_structure = analysis_result.get('file_structure', {})
+
+        # 1. Анализ маршрутов и навигации
+        routes = self._extract_application_routes(repo_path)
+        if routes:
+            e2e_scenarios.extend(self._create_navigation_scenarios(routes))
+
+        # 2. Анализ пользовательских потоков
+        user_flows = self._analyze_user_flows(repo_path, project_structure)
+        e2e_scenarios.extend(user_flows)
+
+        # 3. Анализ бизнес-процессов
+        business_processes = self._analyze_business_processes(repo_path)
+        e2e_scenarios.extend(business_processes)
+
+        # 4. Анализ критических путей
+        critical_paths = self._analyze_critical_paths(project_structure)
+        e2e_scenarios.extend(critical_paths)
+
+        analysis_result['e2e_scenarios'] = e2e_scenarios
+        logger.info(f"📊 E2E_SCENARIO_SUMMARY: Found {len(e2e_scenarios)} E2E scenarios")
+
+    def _extract_application_routes(self, repo_path: Path) -> List[Dict]:
+        """Извлекает маршруты приложения для E2E тестирования"""
+        routes = []
+
+        # Анализ конфигураций маршрутизации
+        config_files = list(repo_path.rglob("*router*.py")) + \
+                       list(repo_path.rglob("*route*.py")) + \
+                       list(repo_path.rglob("*url*.py"))
+
+        for config_file in config_files:
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                # Поиск определений маршрутов
+                route_patterns = [
+                    (r'@.*\.route\(["\']([^"\']+)["\']', 'web_route'),
+                    (r'path\(["\']([^"\']+)["\']', 'django_route'),
+                    (r'url\(["\']([^"\']+)["\']', 'django_route_alt'),
+                    (r'<Route\s+path=["\']([^"\']+)["\']', 'react_route'),
+                ]
+
+                for pattern, route_type in route_patterns:
+                    matches = re.finditer(pattern, content)
+                    for match in matches:
+                        route_path = match.group(1)
+                        if route_path not in ['/', ''] and not route_path.startswith('#'):
+                            routes.append({
+                                'path': route_path,
+                                'type': route_type,
+                                'file': str(config_file.relative_to(repo_path)),
+                                'component': self._extract_route_component(content, route_path)
+                            })
+
+            except Exception as e:
+                logger.debug(f"Error analyzing routes in {config_file}: {e}")
+
+        return routes
+
+    def _create_navigation_scenarios(self, routes: List[Dict]) -> List[Dict]:
+        """Создает сценарии навигации на основе маршрутов"""
+        scenarios = []
+
+        for route in routes:
+            scenario = {
+                'name': f"navigation_{route['path'].replace('/', '_').replace('<', '').replace('>', '')}",
+                'type': 'e2e',
+                'description': f"Navigation to {route['path']}",
+                'steps': [
+                    f"Open application homepage",
+                    f"Navigate to {route['path']}",
+                    f"Verify page content loads correctly"
+                ],
+                'expected_outcome': f"Successfully navigated to {route['path']}",
+                'priority': 'high' if route['path'] == '/' else 'medium',
+                'complexity': 'simple'
+            }
+            scenarios.append(scenario)
+
+        return scenarios
+
+    def _analyze_user_flows(self, repo_path: Path, project_structure: Dict) -> List[Dict]:
+        """Анализирует пользовательские потоки"""
+        user_flows = []
+
+        # Поиск файлов связанных с пользовательскими действиями
+        auth_files = [f for f in project_structure.keys() if any(x in f.lower() for x in ['auth', 'login', 'register'])]
+        crud_files = [f for f in project_structure.keys() if
+                      any(x in f.lower() for x in ['create', 'update', 'delete'])]
+
+        # Сценарий аутентификации
+        if auth_files:
+            user_flows.append({
+                'name': 'user_authentication_flow',
+                'type': 'e2e',
+                'description': 'Complete user authentication flow',
+                'steps': [
+                    'Open login page',
+                    'Enter valid credentials',
+                    'Submit login form',
+                    'Verify successful authentication',
+                    'Check user dashboard access'
+                ],
+                'expected_outcome': 'User successfully authenticated and redirected to dashboard',
+                'priority': 'high',
+                'complexity': 'medium'
+            })
+
+        # Сценарий CRUD операций
+        if crud_files:
+            user_flows.append({
+                'name': 'data_crud_flow',
+                'type': 'e2e',
+                'description': 'Complete data creation, reading, updating, deletion flow',
+                'steps': [
+                    'Navigate to data management section',
+                    'Create new data entry',
+                    'Verify data creation',
+                    'Update existing data entry',
+                    'Verify data update',
+                    'Delete data entry',
+                    'Verify data deletion'
+                ],
+                'expected_outcome': 'All CRUD operations completed successfully',
+                'priority': 'high',
+                'complexity': 'high'
+            })
+
+        return user_flows
+
+    def _analyze_business_processes(self, repo_path: Path) -> List[Dict]:
+        """Анализирует бизнес-процессы приложения"""
+        business_processes = []
+
+        # Поиск файлов бизнес-логики
+        business_files = list(repo_path.rglob("*service*.py")) + \
+                         list(repo_path.rglob("*business*.py")) + \
+                         list(repo_path.rglob("*workflow*.py"))
+
+        for business_file in business_files[:5]:  # Ограничиваем для производительности
+            try:
+                with open(business_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                # Анализ сложных методов как бизнес-процессов
+                class_pattern = r'class\s+(\w+).*?def\s+(\w+)\([^)]*\):'
+                matches = re.finditer(class_pattern, content, re.DOTALL)
+
+                for match in matches:
+                    class_name = match.group(1)
+                    method_name = match.group(2)
+
+                    if any(keyword in method_name.lower() for keyword in ['process', 'handle', 'execute', 'run']):
+                        business_processes.append({
+                            'name': f"{class_name}_{method_name}_flow",
+                            'type': 'e2e',
+                            'description': f"Business process: {class_name}.{method_name}",
+                            'steps': [
+                                f"Initialize {class_name}",
+                                f"Execute {method_name} method",
+                                f"Verify process completion",
+                                f"Check result validation"
+                            ],
+                            'expected_outcome': f"Business process {method_name} executed successfully",
+                            'priority': 'medium',
+                            'complexity': 'high'
+                        })
+
+            except Exception as e:
+                logger.debug(f"Error analyzing business process in {business_file}: {e}")
+
+        return business_processes
+
+    def _analyze_critical_paths(self, project_structure: Dict) -> List[Dict]:
+        """Анализирует критические пути приложения"""
+        critical_paths = []
+
+        # Определяем критические компоненты
+        critical_components = [
+            'main', 'app', 'core', 'index', 'home',
+            'dashboard', 'admin', 'settings', 'profile'
+        ]
+
+        found_components = []
+        for file_path in project_structure.keys():
+            file_name = Path(file_path).stem.lower()
+            if any(component in file_name for component in critical_components):
+                found_components.append(file_path)
+
+        if found_components:
+            critical_paths.append({
+                'name': 'critical_components_access',
+                'type': 'e2e',
+                'description': 'Access to all critical application components',
+                'steps': [f"Access {component}" for component in found_components[:3]],
+                'expected_outcome': 'All critical components accessible and functional',
+                'priority': 'high',
+                'complexity': 'medium'
+            })
+
+        return critical_paths
