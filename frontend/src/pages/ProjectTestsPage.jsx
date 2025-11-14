@@ -1,4 +1,3 @@
-// src/pages/ProjectTestsPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, Routes, Route, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/layout';
@@ -6,6 +5,7 @@ import { projectsAPI, testsAPI } from '../services/api';
 import TestGenerator from '../components/features/tests/TestGenerator';
 import TestRunner from '../components/features/tests/TestRunner';
 import CICDOverview from '../components/features/tests/CICDOverview';
+import GeneratedTestsView from '../components/features/tests/GeneratedTestsView'; // НОВЫЙ ИМПОРТ
 
 const ProjectTestsPage = () => {
   const { id } = useParams();
@@ -73,6 +73,13 @@ const ProjectTestsPage = () => {
         >
           Запуск тестов
         </Link>
+        {/* НОВАЯ КНОПКА */}
+        <Link
+          to={`/projects/${id}/tests/generated`}
+          className="px-3 py-1 bg-slate-200 rounded hover:bg-slate-300"
+        >
+          📋 Сгенерированные тесты
+        </Link>
         <Link
           to={`/projects/${id}/tests/cicd`}
           className="px-3 py-1 bg-slate-200 rounded hover:bg-slate-300"
@@ -109,6 +116,12 @@ const ProjectTestsPage = () => {
             <TestRunner
               project={project}
               testResults={testResults}
+              onRunTests={handleRunTests}
+            />
+          } />
+          <Route path="generated" element={
+            <GeneratedTestsView
+              project={project}
               onRunTests={handleRunTests}
             />
           } />

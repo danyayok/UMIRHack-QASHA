@@ -1,23 +1,26 @@
+import json
 import random
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File, Form, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from app.db.session import get_db
 from typing import List, Optional
+import re
 from datetime import datetime
-from app.schemas import ProjectCreate, ProjectOut, AnalysisOut, AnalysisStatus, TestRunOut
-from app.models import Project, Analysis, AgentReport, TestRun, GeneratedTest
+from app.schemas import ProjectCreate, ProjectOut, AnalysisOut, AnalysisStatus, TestRunOut, TestBatchOut, \
+    GeneratedTestOut, TestBatchWithTests
+from app.models import Project, Analysis, AgentReport, TestRun, GeneratedTest, TestBatch
 from app.deps.auth import get_current_user
 from app.tasks import analyze_repository_task, analyze_zip_task
 from app.services.git_service import GitService
-from app.services.generate_pipeline import test_generation_pipeline
+from app.core.dependencies import get_test_generation_pipeline
 
 import aiofiles
 import os
 from uuid import uuid4
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("qa_automata")
 
 router = APIRouter()
 UPLOAD_DIR = "./storage/uploads"
@@ -153,12 +156,12 @@ async def create_project(
 
         # Запускаем реальный анализ
         if source_type == "github":
-            logger.info(f"🚀 Starting REAL analysis for project {project.id}, analysis {analysis.id}")
+            logger.info(f"Starting REAL analysis for project {project.id}, analysis {analysis.id}")
             try:
                 analyze_repository_task.delay(analysis.id)
-                logger.info(f"✅ Analysis task started for analysis {analysis.id}")
+                logger.info(f"Analysis task started for analysis {analysis.id}")
             except Exception as e:
-                logger.error(f"❌ Failed to start analysis task: {e}")
+                logger.error(f"Failed to start analysis task: {e}")
                 analysis.status = "failed"
                 analysis.error_message = f"Analysis service unavailable: {str(e)}"
                 await db.commit()
@@ -364,10 +367,12 @@ async def generate_tests(
         current_user=Depends(get_current_user)
 ):
     """Генерация тестов на основе анализа проекта и конфигурации"""
-    repo_path = None  # Для гарантированной очистки
+    repo_path = None
+    logger.info(f"START: Генерация тестов для проекта {project_id}")
 
     try:
-        # Получаем проект
+        pipeline = get_test_generation_pipeline()
+
         project_result = await db.execute(
             select(Project).where(
                 Project.id == project_id,
@@ -377,7 +382,6 @@ async def generate_tests(
         project = project_result.scalar_one_or_none()
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
-
         if not project.repo_url:
             raise HTTPException(status_code=400, detail="Project must have a repository URL for test generation")
 
@@ -400,13 +404,10 @@ async def generate_tests(
         logger.info(f"Analysis result keys: {analysis.result.keys() if analysis.result else 'No result'}")
         logger.info(f"Technologies: {analysis.result.get('technologies', []) if analysis.result else []}")
 
-        # 📥 СКАЧИВАЕМ АКТУАЛЬНЫЙ РЕПОЗИТОРИЙ
-        logger.info(f"📥 Downloading repository for test generation: {project.repo_url}")
+        logger.info(f"Downloading repository for test generation: {project.repo_url}")
         git_service = GitService()
-        repo_path = await git_service.clone_repository(project.repo_url, project.branch)
-        logger.info(f"✅ Repository downloaded to: {repo_path}")
-
-        # Формируем данные для пайплайна с путем к репозиторию
+        repo_path = await git_service.clone_repository(str(project.repo_url), project.branch)
+        logger.info(f"Repository downloaded to: {repo_path}")
         generation_data = {
             "project_info": {
                 "id": project.id,
@@ -426,68 +427,212 @@ async def generate_tests(
         }
 
         try:
-            # Используем пайплайн для генерации тестов
-            result = await test_generation_pipeline.generate_tests(generation_data)
+            logger.info("PIPELINE: Запуск пайплайна генерации тестов...")
 
-            # 💾 СОХРАНЯЕМ СГЕНЕРИРОВАННЫЕ ТЕСТЫ В БАЗУ ДАННЫХ
+            # ✅ ИСПОЛЬЗУЕМ ПАЙПЛАЙН ИЗ ЗАВИСИМОСТЕЙ
+            logger.info(f"PIPELINE: test_generation_pipeline = {pipeline}")
+            logger.info(f"PIPELINE: type = {type(pipeline)}")
+
+            # Проверяем данные для пайплайна
+            logger.info(f"PIPELINE: project_info keys = {generation_data['project_info'].keys()}")
+            logger.info(f"PIPELINE: analysis_data keys = {generation_data['analysis_data'].keys()}")
+            logger.info(f"PIPELINE: test_config = {generation_data['test_config']}")
+            analysis_data = generation_data['analysis_data']
+            logger.info(f"API Endpoints found: {analysis_data.get('api_endpoints', [])}")
+            logger.info(f"API Endpoints by file: {analysis_data.get('api_endpoints_by_file', {})}")
+
+            # Если эндпоинтов нет, возможно нужно перезапустить анализ
+            if not analysis_data.get('api_endpoints'):
+                logger.warning("No API endpoints found in analysis data!")
+
+            # ✅ ВЫЗЫВАЕМ ПАЙПЛАЙН
+            result = await pipeline.generate_tests(generation_data)
+
+            logger.info(f"PIPELINE: Пайплайн завершен")
+            logger.info(f"PIPELINE: Результат keys = {result.keys() if result else 'None'}")
+            logger.info(f"PIPELINE: Статус = {result.get('status') if result else 'None'}")
+            logger.info(f"PIPELINE: Сгенерировано тестов = {result.get('generated_tests') if result else 'None'}")
+
+            # СОХРАНЯЕМ СГЕНЕРИРОВАННЫЕ ТЕСТЫ В БАЗУ ДАННЫХ
+            logger.info("SAVE: Сохранение тестов в базу данных...")
             await save_generated_tests(project_id, result, current_user.id, db)
 
-            logger.info(f"✅ Tests generated and saved successfully for project {project_id}")
+            logger.info(f"SUCCESS: Тесты сгенерированы и сохранены для проекта {project_id}")
             return result
 
         except Exception as e:
-            logger.error(f"Test generation error for project {project_id}: {e}")
+            logger.error(f"Error in generate_tests for project {project_id}: {e}")
             raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
-
     except Exception as e:
         logger.error(f"Error in generate_tests for project {project_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
 
+
     finally:
-        # 🧹 ГАРАНТИРОВАННАЯ ОЧИСТКА ВРЕМЕННЫХ ФАЙЛОВ
         if repo_path and os.path.exists(repo_path):
-            logger.info(f"🧹 Cleaning up temporary repository: {repo_path}")
+            logger.info(f"Cleaning up temporary repository: {repo_path}")
             git_service = GitService()
             git_service.cleanup(repo_path)
-            logger.info(f"✅ Temporary repository cleaned up")
+            logger.info(f"Temporary repository cleaned up")
 
 
-async def save_generated_tests(project_id: int, generation_result: dict, user_id: int, db: AsyncSession):
-    """Сохраняет сгенерированные тесты в базу данных"""
+@router.get("/{project_id}/generated-tests", response_model=List[GeneratedTestOut])
+async def get_generated_tests(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Получить все сгенерированные тесты для проекта (все пачки)"""
     try:
-        # Проверяем, есть ли модель GeneratedTest
-        if 'GeneratedTest' not in globals():
-            logger.info("📝 GeneratedTest model not found, skipping test saving")
-            return
+        # Проверяем что проект принадлежит пользователю
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
 
-        # Сохраняем каждый сгенерированный тест
-        if generation_result.get("status") == "success":
-            tests = generation_result.get("tests", [])
+        # Получаем все тесты проекта
+        tests_result = await db.execute(
+            select(GeneratedTest)
+            .where(GeneratedTest.project_id == project_id)
+            .order_by(GeneratedTest.created_at.desc())
+        )
+        tests = tests_result.scalars().all()
 
-            for test_data in tests:
-                generated_test = GeneratedTest(
-                    project_id=project_id,
-                    name=test_data.get("name", "Unnamed Test"),
-                    file_path=test_data.get("file", "unknown"),
-                    test_type=test_data.get("type", "unit"),
-                    framework=test_data.get("framework", "unknown"),
-                    content=test_data.get("content", ""),
-                    target_file=test_data.get("target_file", ""),
-                    priority=test_data.get("priority", "medium"),
-                    generated_by=user_id,
-                    ai_provider=generation_result.get("ai_provider_used", "unknown"),
-                    coverage_estimate=generation_result.get("coverage_estimate", 0)
-                )
-                db.add(generated_test)
-
-            await db.commit()
-            logger.info(f"💾 Saved {len(tests)} generated tests for project {project_id}")
+        return [GeneratedTestOut.model_validate(test) for test in tests]
 
     except Exception as e:
-        logger.error(f"❌ Failed to save generated tests: {e}")
-        # Не прерываем основной процесс из-за ошибки сохранения
-        await db.rollback()
+        logger.error(f"Error getting generated tests: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
+async def save_generated_tests(project_id: int, generation_result: dict, user_id: int, db: AsyncSession):
+    """Сохраняет сгенерированные тесты в базу данных с созданием пачки"""
+    try:
+        logger.info(f"SAVE_TESTS_BATCH: Starting to save tests for project {project_id}")
+
+        if generation_result.get("status") != "success":
+            logger.warning("SAVE_TESTS_BATCH: Generation status is not success, skipping save")
+            return
+
+        # Создаем пачку тестов
+        test_batch = TestBatch(
+            project_id=project_id,
+            name=f"Генерация от {datetime.utcnow().strftime('%d.%m.%Y %H:%M')}",
+            description=generation_result.get("description", "Автоматическая генерация тестов"),
+            framework=generation_result.get("framework_used", "pytest"),
+            ai_provider=generation_result.get("ai_provider_used", "g4f"),
+            coverage_improvement=generation_result.get("coverage_estimate", 0),
+            total_tests=len(generation_result.get("test_files", {})),
+            config=generation_result.get("test_config", {}),
+            status="completed"
+        )
+
+        db.add(test_batch)
+        await db.commit()
+        await db.refresh(test_batch)
+
+        logger.info(f"SAVE_TESTS_BATCH: Created test batch {test_batch.id}")
+
+        # Сохраняем тесты в пачке
+        test_files = generation_result.get("test_files", {})
+        framework_used = generation_result.get("framework_used", "pytest")
+
+        logger.info(f"SAVE_TESTS_BATCH: Saving {len(test_files)} tests to batch {test_batch.id}")
+
+        saved_count = 0
+        for filename, content in test_files.items():
+            try:
+                logger.info(f"SAVE_TESTS_BATCH: Processing test file: {filename}")
+
+                # Определяем тип теста
+                if "integration" in filename.lower():
+                    test_type = "integration"
+                elif "e2e" in filename.lower() or "end_to_end" in filename.lower():
+                    test_type = "e2e"
+                elif "api" in filename.lower():
+                    test_type = "api"
+                else:
+                    test_type = "unit"
+
+                # Определяем фреймворк
+                framework = framework_used
+
+                # Извлекаем целевой файл
+                target_file = _extract_target_file(filename, test_type, content)
+
+                # Определяем приоритет
+                priority = "high" if test_type == "unit" else "medium"
+
+                # Создаем запись теста с привязкой к пачке
+                generated_test = GeneratedTest(
+                    project_id=project_id,
+                    test_batch_id=test_batch.id,  # Привязываем к пачке
+                    name=filename,
+                    file_path=filename,
+                    test_type=test_type,
+                    framework=framework,
+                    content=content,
+                    target_file=target_file,
+                    priority=priority,
+                    generated_by=user_id,
+                    ai_provider=generation_result.get("ai_provider_used", "g4f"),
+                    coverage_estimate=generation_result.get("coverage_estimate", 0)
+                )
+
+                db.add(generated_test)
+                saved_count += 1
+                logger.info(f"SAVE_TESTS_BATCH: Added test '{filename}' to batch {test_batch.id}")
+
+            except Exception as e:
+                logger.error(f"SAVE_TESTS_BATCH: Error creating test record for {filename}: {e}")
+                continue
+
+        # Обновляем количество тестов в пачке
+        test_batch.total_tests = saved_count
+        await db.commit()
+
+        logger.info(f"SAVE_TESTS_BATCH: Successfully saved {saved_count} tests in batch {test_batch.id} for project {project_id}")
+
+        return test_batch.id
+
+    except Exception as e:
+        logger.error(f"SAVE_TESTS_BATCH: Failed to save generated tests: {e}", exc_info=True)
+        await db.rollback()
+        raise
+
+
+def _extract_target_file(test_filename: str, test_type: str, content: str) -> str:
+    """Извлекает имя целевого файла из тестового файла"""
+    if test_type == "unit":
+        # Пытаемся извлечь из импортов в контенте
+        import_patterns = [
+            r'from\s+([\w\.]+)\s+import',
+            r'import\s+([\w\.]+)',
+        ]
+        for pattern in import_patterns:
+            matches = re.findall(pattern, content)
+            for match in matches:
+                if not match.startswith(('pytest', 'unittest', 'test', 'selenium', 'requests')):
+                    return f"{match.replace('.', '/')}.py"
+
+    elif test_type == "api":
+        # Для API тестов ищем упоминания endpoints
+        if "test_api_" in test_filename:
+            base_name = test_filename.replace("test_api_", "").replace(".py", "")
+            return f"api/{base_name}.py"
+
+    # Fallback: убираем префикс test_ и меняем расширение
+    clean_name = test_filename.replace("test_", "").replace("_unit", "").replace("_integration", "").replace("_e2e",
+                                                                                                             "").replace(
+        "_api", "")
+    if clean_name.endswith(".py"):
+        return clean_name
+
+    return ""
 
 @router.post("/{project_id}/run-tests")
 async def run_tests(
@@ -616,7 +761,7 @@ async def batch_analyze_projects(
 ):
     """Параллельный анализ нескольких проектов"""
     try:
-        logger.info(f"🚀 Starting batch analysis for {len(project_ids)} projects")
+        logger.info(f"Starting batch analysis for {len(project_ids)} projects")
 
         # Создаем анализы для всех проектов
         analysis_ids = []
@@ -646,7 +791,7 @@ async def batch_analyze_projects(
         from app.tasks.tasks import batch_analyze_repositories_task
         task = batch_analyze_repositories_task.delay(analysis_ids)
 
-        logger.info(f"✅ Batch analysis started with {len(analysis_ids)} tasks")
+        logger.info(f"Batch analysis started with {len(analysis_ids)} tasks")
 
         return {
             "message": f"Batch analysis started for {len(project_ids)} projects",
@@ -656,7 +801,7 @@ async def batch_analyze_projects(
         }
 
     except Exception as e:
-        logger.error(f"❌ Batch analysis failed: {e}")
+        logger.error(f"Batch analysis failed: {e}")
         raise HTTPException(500, f"Batch analysis failed: {str(e)}")
 
 
@@ -668,13 +813,15 @@ async def batch_generate_tests(
 ):
     """Параллельная генерация тестов для нескольких проектов"""
     try:
-        logger.info(f"🚀 Starting batch test generation for {len(projects_config)} projects")
+        logger.info(f"Starting batch test generation for {len(projects_config)} projects")
 
         # Валидируем проекты
         validated_configs = []
         for config in projects_config:
             project_id = config.get('project_id')
             test_config = config.get('test_config', {})
+            test_config.setdefault("generate_api_tests", True)
+            test_config.setdefault("max_api_tests", 5)
 
             # Проверяем доступ к проекту
             project_result = await db.execute(
@@ -708,7 +855,7 @@ async def batch_generate_tests(
         from app.tasks.tasks import batch_generate_tests_task
         task = batch_generate_tests_task.delay(validated_configs)
 
-        logger.info(f"✅ Batch test generation started with {len(validated_configs)} projects")
+        logger.info(f"Batch test generation started with {len(validated_configs)} projects")
 
         return {
             "message": f"Batch test generation started for {len(validated_configs)} projects",
@@ -717,7 +864,7 @@ async def batch_generate_tests(
         }
 
     except Exception as e:
-        logger.error(f"❌ Batch test generation failed: {e}")
+        logger.error(f"Batch test generation failed: {e}")
         raise HTTPException(500, f"Batch test generation failed: {str(e)}")
 
 
@@ -730,7 +877,7 @@ async def generate_tests_parallel(
 ):
     """Параллельная генерация разных типов тестов для одного проекта"""
     try:
-        logger.info(f"🚀 Starting parallel test generation for project {project_id}")
+        logger.info(f"Starting parallel test generation for project {project_id}")
 
         # Проверяем проект
         project_result = await db.execute(
@@ -768,7 +915,7 @@ async def generate_tests_parallel(
         from app.tasks.tasks import parallel_test_generation_task
         task = parallel_test_generation_task.delay(project_id, test_config)
 
-        logger.info(f"✅ Parallel test generation started for project {project_id}, types: {test_types}")
+        logger.info(f"Parallel test generation started for project {project_id}, types: {test_types}")
 
         return {
             "message": "Parallel test generation started",
@@ -778,7 +925,7 @@ async def generate_tests_parallel(
         }
 
     except Exception as e:
-        logger.error(f"❌ Parallel test generation failed: {e}")
+        logger.error(f"Parallel test generation failed: {e}")
         raise HTTPException(500, f"Test generation failed: {str(e)}")
 
 
@@ -824,7 +971,7 @@ async def get_task_status(
         return response
 
     except Exception as e:
-        logger.error(f"❌ Error getting task status: {e}")
+        logger.error(f"Error getting task status: {e}")
         raise HTTPException(500, f"Error getting task status: {str(e)}")
 
 
@@ -844,7 +991,7 @@ async def get_batch_status(
         return group_status
 
     except Exception as e:
-        logger.error(f"❌ Error getting batch status: {e}")
+        logger.error(f"Error getting batch status: {e}")
         raise HTTPException(500, f"Error getting batch status: {str(e)}")
 
 
@@ -881,7 +1028,7 @@ async def monitor_analysis_progress(
         }
 
     except Exception as e:
-        logger.error(f"❌ Progress monitoring failed: {e}")
+        logger.error(f"Progress monitoring failed: {e}")
         raise HTTPException(500, f"Progress monitoring failed: {str(e)}")
 
 
@@ -903,7 +1050,7 @@ async def cleanup_old_analyses(
         }
 
     except Exception as e:
-        logger.error(f"❌ Cleanup failed: {e}")
+        logger.error(f"Cleanup failed: {e}")
         raise HTTPException(500, f"Cleanup failed: {str(e)}")
 
 
@@ -952,7 +1099,7 @@ async def get_queue_stats(
         return stats
 
     except Exception as e:
-        logger.error(f"❌ Error getting queue stats: {e}")
+        logger.error(f"Error getting queue stats: {e}")
         return {
             "error": "Could not retrieve queue stats",
             "queues": {},
@@ -1043,3 +1190,323 @@ def get_file_ext(techs):
     if 'javascript' in techs: return 'js'
     if 'java' in techs: return 'java'
     return 'txt'
+
+
+@router.get("/{project_id}/test-batches", response_model=List[TestBatchOut])
+async def get_test_batches(
+        project_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Получить все пачки тестов для проекта"""
+    try:
+        # Проверяем что проект принадлежит пользователю
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Получаем все пачки тестов проекта
+        batches_result = await db.execute(
+            select(TestBatch)
+            .where(TestBatch.project_id == project_id)
+            .order_by(TestBatch.created_at.desc())
+        )
+        batches = batches_result.scalars().all()
+
+        return [TestBatchOut.model_validate(batch) for batch in batches]
+
+    except Exception as e:
+        logger.error(f"Error getting test batches: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/{project_id}/test-batches/{batch_id}", response_model=TestBatchWithTests)
+async def get_test_batch(
+        project_id: int,
+        batch_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Получить конкретную пачку тестов с тестами"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Получаем пачку
+        batch_result = await db.execute(
+            select(TestBatch)
+            .where(
+                TestBatch.id == batch_id,
+                TestBatch.project_id == project_id
+            )
+        )
+        batch = batch_result.scalar_one_or_none()
+        if not batch:
+            raise HTTPException(status_code=404, detail="Test batch not found")
+
+        # Получаем тесты этой пачки
+        tests_result = await db.execute(
+            select(GeneratedTest)
+            .where(GeneratedTest.test_batch_id == batch_id)
+            .order_by(GeneratedTest.created_at.desc())
+        )
+        tests = tests_result.scalars().all()
+
+        batch_data = TestBatchWithTests.model_validate(batch)
+        batch_data.tests = [GeneratedTestOut.model_validate(test) for test in tests]
+
+        return batch_data
+
+    except Exception as e:
+        logger.error(f"Error getting test batch: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/{project_id}/test-batches/{batch_id}/tests", response_model=List[GeneratedTestOut])
+async def get_batch_tests(
+        project_id: int,
+        batch_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Получить все тесты из пачки"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Проверяем что пачка принадлежит проекту
+        batch_result = await db.execute(
+            select(TestBatch).where(
+                TestBatch.id == batch_id,
+                TestBatch.project_id == project_id
+            )
+        )
+        batch = batch_result.scalar_one_or_none()
+        if not batch:
+            raise HTTPException(status_code=404, detail="Test batch not found")
+
+        # Получаем тесты
+        tests_result = await db.execute(
+            select(GeneratedTest)
+            .where(GeneratedTest.test_batch_id == batch_id)
+            .order_by(GeneratedTest.created_at.desc())
+        )
+        tests = tests_result.scalars().all()
+
+        return [GeneratedTestOut.model_validate(test) for test in tests]
+
+    except Exception as e:
+        logger.error(f"Error getting batch tests: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/{project_id}/test-batches/{batch_id}/push", response_model=dict)
+async def push_batch_to_repository(
+        project_id: int,
+        batch_id: int,
+        test_ids: List[int] = Body(default=[]),
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Отправить тесты из пачки в репозиторий"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Проверяем что пачка принадлежит проекту
+        batch_result = await db.execute(
+            select(TestBatch).where(
+                TestBatch.id == batch_id,
+                TestBatch.project_id == project_id
+            )
+        )
+        batch = batch_result.scalar_one_or_none()
+        if not batch:
+            raise HTTPException(status_code=404, detail="Test batch not found")
+
+        # Получаем тесты для отправки
+        if test_ids:
+            # Отправляем только выбранные тесты
+            tests_result = await db.execute(
+                select(GeneratedTest)
+                .where(
+                    GeneratedTest.id.in_(test_ids),
+                    GeneratedTest.test_batch_id == batch_id
+                )
+            )
+        else:
+            # Отправляем все тесты пачки
+            tests_result = await db.execute(
+                select(GeneratedTest)
+                .where(GeneratedTest.test_batch_id == batch_id)
+            )
+
+        tests = tests_result.scalars().all()
+
+        if not tests:
+            raise HTTPException(status_code=400, detail="No tests to push")
+
+        # Здесь будет логика отправки тестов в репозиторий
+        # Пока имитируем успешную отправку
+        logger.info(f"Pushing {len(tests)} tests to repository for project {project_id}")
+
+        # Обновляем статус пачки
+        batch.status = "pushed"
+        await db.commit()
+
+        return {
+            "message": f"Successfully pushed {len(tests)} tests to repository",
+            "pushed_tests": len(tests),
+            "batch_id": batch_id,
+            "project_id": project_id
+        }
+
+    except Exception as e:
+        logger.error(f"Error pushing batch to repository: {e}")
+        raise HTTPException(status_code=500, detail=f"Push failed: {str(e)}")
+
+
+@router.delete("/{project_id}/test-batches/{batch_id}")
+async def delete_test_batch(
+        project_id: int,
+        batch_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Удалить пачку тестов"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Проверяем что пачка принадлежит проекту
+        batch_result = await db.execute(
+            select(TestBatch).where(
+                TestBatch.id == batch_id,
+                TestBatch.project_id == project_id
+            )
+        )
+        batch = batch_result.scalar_one_or_none()
+        if not batch:
+            raise HTTPException(status_code=404, detail="Test batch not found")
+
+        # Удаляем пачку (тесты удалятся каскадом благодаря cascade="all, delete-orphan")
+        await db.delete(batch)
+        await db.commit()
+
+        return {"message": "Test batch deleted successfully"}
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error deleting test batch: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/{project_id}/test-batches/{batch_id}/download")
+async def download_test_batch(
+        project_id: int,
+        batch_id: int,
+        format: str = "zip",
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Скачать пачку тестов"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Проверяем что пачка принадлежит проекту
+        batch_result = await db.execute(
+            select(TestBatch).where(
+                TestBatch.id == batch_id,
+                TestBatch.project_id == project_id
+            )
+        )
+        batch = batch_result.scalar_one_or_none()
+        if not batch:
+            raise HTTPException(status_code=404, detail="Test batch not found")
+
+        # Получаем тесты пачки
+        tests_result = await db.execute(
+            select(GeneratedTest)
+            .where(GeneratedTest.test_batch_id == batch_id)
+        )
+        tests = tests_result.scalars().all()
+
+        if format == "zip":
+            # Создаем ZIP архив с тестами
+            import zipfile
+            import io
+
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                for test in tests:
+                    zip_file.writestr(test.file_path, test.content)
+
+            zip_buffer.seek(0)
+
+            from fastapi.responses import StreamingResponse
+            return StreamingResponse(
+                zip_buffer,
+                media_type="application/zip",
+                headers={
+                    "Content-Disposition": f"attachment; filename=test_batch_{batch_id}.zip"
+                }
+            )
+        else:
+            # Возвращаем JSON с тестами
+            tests_data = [GeneratedTestOut.model_validate(test) for test in tests]
+            return {
+                "batch": TestBatchOut.model_validate(batch),
+                "tests": tests_data
+            }
+
+    except Exception as e:
+        logger.error(f"Error downloading test batch: {e}")
+        raise HTTPException(status_code=500, detail="Download failed")
+

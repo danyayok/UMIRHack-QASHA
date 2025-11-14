@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';  // Добавляем импорт
+// hooks/useProjects.js
+import { useState, useEffect } from 'react';
 import { projectsAPI } from '../services/api';
 
 export function useProjects() {
@@ -10,7 +11,7 @@ export function useProjects() {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiService.getProjects();
+      const data = await projectsAPI.getProjects(); // Исправлено: projectsAPI вместо apiService
       setProjects(data);
     } catch (err) {
       setError(err.message);
@@ -20,7 +21,7 @@ export function useProjects() {
     }
   };
 
-const createProject = async (projectData) => {
+  const createProject = async (projectData) => {
     try {
       const formData = new FormData();
       Object.keys(projectData).forEach(key => {
@@ -31,8 +32,8 @@ const createProject = async (projectData) => {
       if (projectData.source_type === 'zip' && projectData.zip_file) {
         formData.append('zip_file', projectData.zip_file);
       }
-      const newProject = await apiService.createProject(formData);
-      await fetchProjects();
+      const newProject = await projectsAPI.createProject(formData); // Исправлено: projectsAPI вместо apiService
+      await fetchProjects(); // Исправлено: fetchProjects вместо loadProjects
       return newProject;
     } catch (error) {
       console.error('Failed to create project:', error);
@@ -51,7 +52,7 @@ const createProject = async (projectData) => {
   };
 
   useEffect(() => {
-    loadProjects();
+    fetchProjects(); // Исправлено: fetchProjects вместо loadProjects
   }, []);
 
   return {
@@ -60,6 +61,6 @@ const createProject = async (projectData) => {
     error,
     createProject,
     deleteProject,
-    refetch: loadProjects
+    refetch: fetchProjects // Исправлено: fetchProjects вместо loadProjects
   };
 }

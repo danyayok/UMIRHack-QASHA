@@ -9,7 +9,7 @@ import logging
 import stat
 import aiohttp
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("qa_automata")
 
 
 class GitService:
@@ -22,7 +22,7 @@ class GitService:
             # Создаем уникальную временную директорию
             temp_path = tempfile.mkdtemp(prefix="repo_")
 
-            logger.info(f"🔄 Cloning {repo_url} (branch: {branch}) to {temp_path}")
+            logger.info(f"Cloning {repo_url} (branch: {branch}) to {temp_path}")
 
             # Используем отдельный event loop для git операций
             try:
@@ -36,11 +36,11 @@ class GitService:
                 lambda: Repo.clone_from(repo_url, temp_path, branch=branch, depth=1)
             )
 
-            logger.info(f"✅ Repository cloned successfully to {temp_path}")
+            logger.info(f"Repository cloned successfully to {temp_path}")
             return temp_path
 
         except GitCommandError as e:
-            logger.error(f"❌ Git clone error: {e}")
+            logger.error(f"Git clone error: {e}")
 
             # Очищаем временную директорию при ошибке
             if 'temp_path' in locals() and os.path.exists(temp_path):
@@ -53,7 +53,7 @@ class GitService:
             else:
                 raise Exception(f"Failed to clone repository: {str(e)}")
         except Exception as e:
-            logger.error(f"❌ Unexpected error during clone: {e}")
+            logger.error(f"Unexpected error during clone: {e}")
 
             # Очищаем временную директорию при ошибке
             if 'temp_path' in locals() and os.path.exists(temp_path):
@@ -124,13 +124,13 @@ class GitService:
 
                 # Пытаемся удалить корневую директорию
                 os.rmdir(repo_path)
-                logger.info(f"✅ Successfully force-cleaned up {repo_path} after {attempt + 1} attempts")
+                logger.info(f"Successfully force-cleaned up {repo_path} after {attempt + 1} attempts")
                 return
 
             except Exception as e:
                 logger.warning(f"Force cleanup attempt {attempt + 1} failed for {repo_path}: {e}")
                 if attempt == max_retries - 1:
-                    logger.error(f"❌ Failed to cleanup {repo_path} after {max_retries} attempts")
+                    logger.error(f"Failed to cleanup {repo_path} after {max_retries} attempts")
                     # Можно добавить отправку уведомления или логирование в отдельный файл
 
     def cleanup(self, repo_path: str):
@@ -152,7 +152,7 @@ class GitService:
 
             # Рекурсивное удаление с обработкой ошибок доступа
             shutil.rmtree(repo_path, onerror=remove_readonly)
-            logger.info(f"✅ Successfully cleaned up temporary repository: {repo_path}")
+            logger.info(f"Successfully cleaned up temporary repository: {repo_path}")
 
         except PermissionError as e:
             logger.warning(f"Permission error during cleanup of {repo_path}: {e}")

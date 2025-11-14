@@ -1,11 +1,12 @@
 import os
 import asyncio
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Set, Tuple
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("qa_automata")
 
 
 class CodeAnalyzer:
@@ -169,7 +170,8 @@ class CodeAnalyzer:
         analysis_result = {
             'technologies': [],
             'frameworks': [],
-            'file_structure': {},
+            'file_structure': {},  # Полная структура файлов
+            'file_structure_summary': {},  # Сводка по файлам
             'test_analysis': {
                 'has_tests': False,
                 'test_frameworks': [],
@@ -202,15 +204,35 @@ class CodeAnalyzer:
                 'file_extensions': {},
             },
             'coverage_estimate': 0,
+            'source': 'github',
+            'branch': 'main',
+            'analysis_timestamp': datetime.utcnow().isoformat()
         }
-
         repo_path_obj = Path(repo_path)
+        if not repo_path_obj.exists():
+            logger.error(f"[DEBUG] Repository path does not exist: {repo_path}")
+            return analysis_result
+
+        try:
+            contents = list(repo_path_obj.iterdir())
+            logger.info(f"[DEBUG] Directory contents: {[str(c.name) for c in contents]}")
+        except Exception as e:
+            logger.error(f"[DEBUG] Error reading directory: {e}")
+
+        all_files = list(repo_path_obj.rglob('*'))
+        logger.info(f"[DEBUG] Total files found by rglob: {len(all_files)}")
+
+        for i, file_path in enumerate(all_files[:10]):
+            logger.info(f"[DEBUG] File {i}: {file_path} (is_file: {file_path.is_file()})")
         total_size = 0
         dependency_files_count = 0
 
-        # Собираем все файлы с агрессивной фильтрацией
         all_files = list(repo_path_obj.rglob('*'))
-        logger.info(f"Found {len(all_files)} total files in repository")
+
+        file_count = sum(1 for f in all_files if f.is_file())
+        logger.info(f"Total files found: {file_count}")
+        # ВАЖНО: Сохраняем плоскую структуру файлов для пайплайна
+        flat_file_structure = {}
 
         for file_path in all_files:
             if file_path.is_file():
@@ -253,7 +275,7 @@ class CodeAnalyzer:
                 if tech and tech not in analysis_result['technologies']:
                     analysis_result['technologies'].append(tech)
 
-                # 🔥 УМНАЯ проверка на тестовый файл
+                # УМНАЯ проверка на тестовый файл
                 is_test_file, test_framework = self._analyze_test_file(file_path)
                 if is_test_file:
                     analysis_result['metrics']['test_files'] += 1
@@ -288,7 +310,18 @@ class CodeAnalyzer:
                     'lines': self._count_file_lines(file_path)
                 }
 
+                # ВАЖНО: Сохраняем в file_structure (плоский формат для пайплайна)
                 analysis_result['file_structure'][relative_path] = file_info
+                flat_file_structure[relative_path] = file_info
+
+        # Создаем summary из собранных данных
+        analysis_result['file_structure_summary'] = {
+            'total_files': analysis_result['metrics']['total_files'],
+            'code_files': analysis_result['metrics']['code_files'],
+            'test_files': analysis_result['metrics']['test_files'],
+            'total_lines': analysis_result['metrics']['total_lines'],
+            'total_size_kb': round(total_size / 1024, 2)
+        }
 
         # Анализ зависимостей и фреймворков ПОСЛЕ сбора всех файлов
         self._analyze_dependencies(repo_path_obj, analysis_result)
@@ -296,11 +329,11 @@ class CodeAnalyzer:
         # Анализ фреймворков на основе ВСЕГО проекта
         self._analyze_frameworks_project_wide(repo_path_obj, analysis_result)
 
-        # 🔥 УМНЫЙ анализ тестовых директорий
+        # УМНЫЙ анализ тестовых директорий
         self._analyze_test_directories(repo_path_obj, analysis_result)
 
+        self.detect_api_endpoints(repo_path_obj, analysis_result)
         # Финальные вычисления
-        analysis_result['metrics']['total_size_kb'] = total_size / 1024
         analysis_result['metrics']['dependency_files_count'] = dependency_files_count
         analysis_result['metrics']['ignored_directories'] = list(analysis_result['metrics']['ignored_directories'])
 
@@ -312,11 +345,193 @@ class CodeAnalyzer:
         analysis_result['coverage_estimate'] = self._calculate_coverage_estimate(analysis_result)
 
         # Логируем итоговую статистику
-        logger.info(f"📊 Final analysis: {analysis_result['metrics']['total_files']} project files, "
+        logger.info(f"FINAL ANALYSIS: {analysis_result['metrics']['total_files']} project files, "
                     f"{analysis_result['metrics']['ignored_files']} ignored files "
                     f"({dependency_files_count} from dependencies)")
 
+        # Логируем структуру файлов
+        logger.info(f"FILE STRUCTURE: Contains {len(analysis_result['file_structure'])} files")
+        logger.info(f"FILE SUMMARY: {analysis_result['file_structure_summary']}")
+
+        # Логируем первые несколько файлов для отладки
+        file_keys = list(analysis_result['file_structure'].keys())[:5]
+        logger.info(f"SAMPLE FILES: {file_keys}")
+        logger.info(f"ANALYSIS_RESULT_KEYS: {analysis_result.keys()}")
+        logger.info(f"ANALYSIS_TECHNOLOGIES: {analysis_result['technologies']}")
+        logger.info(f"ANALYSIS_METRICS: {analysis_result['metrics']}")
         return analysis_result
+
+    def detect_api_endpoints(self, repo_path: Path, analysis_result: Dict[str, Any]):
+        """Обнаруживает API endpoints в проекте"""
+        api_endpoints = []
+
+        logger.info(f"🔍 API_ENDPOINT_SEARCH: Starting endpoint detection in {repo_path}")
+
+        # Анализируем ВСЕ Python файлы, а не только из file_structure
+        python_files = list(repo_path.rglob("*.py"))
+        logger.info(f"🔍 API_ENDPOINT_SEARCH: Found {len(python_files)} Python files to analyze")
+
+        for python_file in python_files:
+            # Пропускаем тестовые файлы и файлы из зависимостей
+            file_path_str = str(python_file.relative_to(repo_path))
+
+            if any(pattern in file_path_str for pattern in ['test_', '_test.py', '/test', '/tests']):
+                continue
+
+            if any(dep in file_path_str for dep in ['node_modules', '__pycache__', '.venv']):
+                continue
+
+            logger.info(f"🔍 API_ENDPOINT_SEARCH: Analyzing {file_path_str}")
+            endpoints = self._analyze_file_for_api_endpoints(python_file, repo_path)
+            if endpoints:
+                api_endpoints.extend(endpoints)
+                logger.info(f"✅ API_ENDPOINT_FOUND: {len(endpoints)} endpoints in {file_path_str}")
+
+        # Группируем endpoints по файлам
+        endpoints_by_file = {}
+        for endpoint in api_endpoints:
+            file_path = endpoint['file']
+            if file_path not in endpoints_by_file:
+                endpoints_by_file[file_path] = []
+            endpoints_by_file[file_path].append(endpoint)
+
+        analysis_result['api_endpoints'] = api_endpoints
+        analysis_result['api_endpoints_by_file'] = endpoints_by_file
+
+        logger.info(
+            f"📊 API_ENDPOINT_SUMMARY: Found {len(api_endpoints)} total endpoints in {len(endpoints_by_file)} files")
+
+    def _analyze_file_for_api_endpoints(self, file_path: Path, repo_root: Path) -> List[Dict]:
+        """Анализирует файл на наличие API endpoints с улучшенными паттернами"""
+        endpoints = []
+
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                lines = content.split('\n')
+
+            relative_path = str(file_path.relative_to(repo_root))
+
+            # Улучшенные паттерны для FastAPI
+            fastapi_patterns = [
+                # Стандартные декораторы FastAPI
+                (r'@(app|router)\.(get|post|put|delete|patch|options|head)\s*\(\s*["\']([^"\']+)["\']', 'FastAPI'),
+                # С параметрами пути и другими параметрами
+                (r'@(app|router)\.(get|post|put|delete|patch|options|head)\s*\(\s*["\']([^"\']+?)["\'][^)]*\)',
+                 'FastAPI'),
+                # С пробелами и разными кавычками
+                (r'@(app|router)\.(get|post|put|delete|patch|options|head)\s*\(\s*[\'"]([^\'"]+)[\'"]', 'FastAPI'),
+            ]
+
+            # Улучшенные паттерны для Flask
+            flask_patterns = [
+                (r'@(app|blueprint)\.route\s*\(\s*["\']([^"\']+)["\']\s*,\s*methods\s*=\s*\[([^\]]+)\]', 'Flask'),
+                (r'@(app|blueprint)\.route\s*\(\s*["\']([^"\']+)["\']', 'Flask'),
+                # Flask с разными вариантами
+                (r'@(app|bp|blueprint)\.route\s*\([^)]*[\'"]([^\'"]+)[\'"][^)]*\)', 'Flask'),
+            ]
+
+            # Новые паттерны для Starlette и других фреймворков
+            generic_patterns = [
+                # Общие HTTP методы
+                (r'\.(get|post|put|delete|patch)\s*\(\s*["\']([^"\']+)["\']', 'Generic'),
+                # Router добавление маршрутов
+                (r'\.add_route\s*\(\s*["\']([^"\']+)["\']', 'Generic'),
+            ]
+
+            # Поиск FastAPI endpoints
+            for pattern, framework in fastapi_patterns:
+                for i, line in enumerate(lines):
+                    matches = re.finditer(pattern, line)
+                    for match in matches:
+                        endpoint_path = match.group(3)
+                        method = match.group(2).upper() if match.group(2) else 'GET'
+
+                        endpoint = {
+                            'path': endpoint_path,
+                            'method': method,
+                            'framework': framework,
+                            'file': relative_path,
+                            'line': i + 1,
+                            'function_name': self._extract_function_name(lines, i),
+                            'full_line': line.strip()[:100]  # Ограничиваем длину для логов
+                        }
+                        endpoints.append(endpoint)
+                        logger.info(f"🎯 FASTAPI_ENDPOINT: {method} {endpoint_path} in {relative_path}:{i + 1}")
+
+            # Поиск Flask endpoints
+            for pattern, framework in flask_patterns:
+                for i, line in enumerate(lines):
+                    matches = re.finditer(pattern, line)
+                    for match in matches:
+                        endpoint_path = match.group(2) if match.group(2) else match.group(1)
+                        methods = ['GET']  # по умолчанию
+
+                        if len(match.groups()) >= 3 and match.group(3):
+                            methods = [m.strip().strip('"\'') for m in match.group(3).split(',')]
+
+                        for method in methods:
+                            endpoint = {
+                                'path': endpoint_path,
+                                'method': method.upper(),
+                                'framework': framework,
+                                'file': relative_path,
+                                'line': i + 1,
+                                'function_name': self._extract_function_name(lines, i),
+                                'full_line': line.strip()[:100]
+                            }
+                            endpoints.append(endpoint)
+                            logger.info(f"🎯 FLASK_ENDPOINT: {method} {endpoint_path} in {relative_path}:{i + 1}")
+
+            # Поиск generic endpoints
+            for pattern, framework in generic_patterns:
+                for i, line in enumerate(lines):
+                    matches = re.finditer(pattern, line)
+                    for match in matches:
+                        endpoint_path = match.group(2) if len(match.groups()) >= 2 else match.group(1)
+                        method = match.group(1).upper() if match.group(1) else 'GET'
+
+                        endpoint = {
+                            'path': endpoint_path,
+                            'method': method,
+                            'framework': framework,
+                            'file': relative_path,
+                            'line': i + 1,
+                            'function_name': self._extract_function_name(lines, i),
+                            'full_line': line.strip()[:100]
+                        }
+                        endpoints.append(endpoint)
+                        logger.info(f"🎯 GENERIC_ENDPOINT: {method} {endpoint_path} in {relative_path}:{i + 1}")
+
+        except Exception as e:
+            logger.error(f"❌ Error analyzing API endpoints in {file_path}: {e}")
+
+        return endpoints
+
+    def _extract_function_name(self, lines: List[str], line_index: int) -> str:
+        """Извлекает имя функции из декоратора endpoint"""
+        try:
+            # Ищем следующую строку после декоратора (обычно это определение функции)
+            for i in range(line_index + 1, min(line_index + 5, len(lines))):
+                line = lines[i].strip()
+
+                # Паттерны для определения функций
+                function_patterns = [
+                    r'def\s+(\w+)\s*\(',
+                    r'async\s+def\s+(\w+)\s*\(',
+                ]
+
+                for pattern in function_patterns:
+                    match = re.search(pattern, line)
+                    if match:
+                        return match.group(1)
+
+            # Если не нашли имя функции, возвращаем имя по умолчанию
+            return "unknown_function"
+
+        except Exception as e:
+            logger.debug(f"Error extracting function name: {e}")
+            return "unknown_function"
 
     def _should_ignore_file_aggressive(self, file_path: Path, repo_root: Path) -> Tuple[bool, str]:
         """АГРЕССИВНАЯ проверка на игнорирование файлов"""
@@ -401,7 +616,7 @@ class CodeAnalyzer:
             total_evidence = sum(evidence.values())
             if total_evidence >= min_matches:
                 detected_frameworks.append(framework)
-                logger.info(f"✅ Detected framework: {framework} (evidence: {evidence})")
+                logger.info(f"Detected framework: {framework} (evidence: {evidence})")
 
         analysis_result['frameworks'] = detected_frameworks
 

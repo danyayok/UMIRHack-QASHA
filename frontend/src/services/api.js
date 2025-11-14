@@ -9,7 +9,6 @@ class ApiError extends Error {
   }
 }
 
-// Улучшенный fetch с лучшей обработкой ошибок
 async function fetchWithAuth(url, options = {}) {
   const token = localStorage.getItem('token');
 
@@ -31,12 +30,10 @@ async function fetchWithAuth(url, options = {}) {
     const response = await fetch(`${BASE_URL}${url}`, config);
 
     if (!response.ok) {
-      // Пытаемся получить детали ошибки
       let errorDetails = null;
       try {
         errorDetails = await response.json();
       } catch {
-        // Если не JSON, используем текст
         errorDetails = await response.text();
       }
 
@@ -65,7 +62,6 @@ async function fetchWithAuth(url, options = {}) {
   }
 }
 
-// Auth API
 export const authAPI = {
   login: async (email, password) => {
     const formData = new URLSearchParams();
@@ -150,6 +146,8 @@ export const projectsAPI = {
     }),
 };
 
+
+// test api
 export const testsAPI = {
   generateTests: (projectId, config) =>
     fetchWithAuth(`/projects/${projectId}/generate-tests`, {
@@ -185,9 +183,69 @@ export const testsAPI = {
       method: 'POST',
       body: JSON.stringify(config),
     }),
+  getTestHistory: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/test-results`),
+
+  getTestRunDetails: (runId) =>
+    fetchWithAuth(`/tests/runs/${runId}`),
+
+  rerunTests: (projectId, config = {}) =>
+    fetchWithAuth(`/projects/${projectId}/run-tests`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
 };
 
+// generated testsссмисм
+export const generatedTestsAPI = {
+  // Пачки тестов
+  getTestBatches: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches`),
 
+  getTestBatch: (projectId, batchId) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}`),
+
+  getTestsFromBatch: (projectId, batchId) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/tests`),
+
+  pushBatchToRepository: (projectId, batchId, testIds = []) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/push`, {
+      method: 'POST',
+      body: JSON.stringify({ test_ids: testIds }),
+    }),
+
+  deleteTestBatch: (projectId, batchId) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}`, {
+      method: 'DELETE',
+    }),
+
+  downloadTestBatch: (projectId, batchId, format = 'zip') =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/download?format=${format}`),
+
+  // Поиск тестов
+  searchTests: (projectId, query, testType = null, framework = null) => {
+    const params = new URLSearchParams({ query });
+    if (testType) params.append('test_type', testType);
+    if (framework) params.append('framework', framework);
+
+    return fetchWithAuth(`/projects/${projectId}/test-batches/search?${params.toString()}`);
+  },
+
+  // Статистика по типам тестов
+  getTestsByType: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/tests/by-type`),
+
+  // Массовое удаление тестов
+  deleteBatchTests: (projectId, batchId, testIds) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/tests`, {
+      method: 'DELETE',
+      body: JSON.stringify(testIds),
+    }),
+  // Статус отправки
+  getPushStatus: (projectId, batchId) =>
+    fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/push-status`),
+
+};
 // Health check
 export const healthAPI = {
   check: () => fetch(`${BASE_URL}/health`).then(r => r.json())

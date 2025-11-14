@@ -163,3 +163,64 @@ class TestRunOut(TestRunBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class TestBatchBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    framework: Optional[str] = None
+    ai_provider: Optional[str] = None
+    coverage_improvement: Optional[float] = None
+    total_tests: int = 0
+    config: Optional[Dict[str, Any]] = None
+
+class TestBatchCreate(TestBatchBase):
+    project_id: int
+
+class TestBatchOut(TestBatchBase):
+    id: int
+    project_id: int
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class GeneratedTestBase(BaseModel):
+    name: str
+    file_path: str
+    test_type: str
+    framework: str
+    content: str
+    target_file: Optional[str] = None
+    priority: str = "medium"
+    ai_provider: Optional[str] = None
+    coverage_estimate: float = 0.0
+
+class GeneratedTestCreate(GeneratedTestBase):
+    project_id: int
+    test_batch_id: Optional[int] = None
+    generated_by: int
+
+class GeneratedTestOut(GeneratedTestBase):
+    id: int
+    project_id: int
+    test_batch_id: Optional[int]
+    generated_by: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class TestBatchWithTests(TestBatchOut):
+    tests: List[GeneratedTestOut] = []
+
+class TestGenerationResult(BaseModel):
+    status: str
+    batch_id: int
+    total_tests: int
+    coverage_improvement: float
+    framework_used: str
+    ai_provider_used: str
+    test_files: Dict[str, str]

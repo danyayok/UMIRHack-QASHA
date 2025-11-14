@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
 
+    OLLAMA_HOST: str
+    OLLAMA_API_KEY: str
+    OLLAMA_MODEL: str
     class Config:
         env_file = ".env"
         extra = "allow"

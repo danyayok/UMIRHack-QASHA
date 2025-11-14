@@ -19,3 +19,4 @@ redis==5.1.1
 aiofiles==23.2.1
 gitpython==3.1.40
 pathlib2==2.3.7.post1
+ollama

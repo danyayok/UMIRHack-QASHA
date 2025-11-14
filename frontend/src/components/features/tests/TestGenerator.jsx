@@ -23,52 +23,53 @@ const TestGenerator = ({ project, testResults, onRunTests }) => {
   });
 
   const [generating, setGenerating] = useState(false);
-  const [generatedTests, setGeneratedTests] = useState([]);
+  const [generatedTests, setGeneratedTests] = useState([]); // Инициализируем пустым массивом
   const [hasHtmlFiles, setHasHtmlFiles] = useState(false);
 
   // Проверяем наличие HTML файлов в проекте
   useEffect(() => {
-  const loadAnalysisData = async () => {
-    try {
-      const analysis = await projectsAPI.getLatestAnalysis(project.id);
-      if (analysis?.result) {
-        const result = analysis.result;
+    const loadAnalysisData = async () => {
+      try {
+        const analysis = await projectsAPI.getLatestAnalysis(project.id);
+        if (analysis?.result) {
+          const result = analysis.result;
 
-        // Проверяем технологии
-        const hasHtmlTech = result.technologies?.some(tech =>
-          tech.toLowerCase().includes('html')
-        );
+          // Проверяем технологии
+          const hasHtmlTech = result.technologies?.some(tech =>
+            tech.toLowerCase().includes('html')
+          );
 
-        // Проверяем структуру файлов (рекурсивно)
-        const hasHtmlFiles = checkFileStructure(result.file_structure || {});
+          // Проверяем структуру файлов (рекурсивно)
+          const hasHtmlFiles = checkFileStructure(result.file_structure || {});
 
-        // Проверяем фреймворки
-        const hasWebFrameworks = result.frameworks?.some(fw =>
-          ['react', 'vue', 'angular', 'django', 'flask', 'express']
-            .includes(fw.toLowerCase())
-        );
+          // Проверяем фреймворки
+          const hasWebFrameworks = result.frameworks?.some(fw =>
+            ['react', 'vue', 'angular', 'django', 'flask', 'express']
+              .includes(fw.toLowerCase())
+          );
 
-        setHasHtmlFiles(hasHtmlTech || hasHtmlFiles || hasWebFrameworks);
+          setHasHtmlFiles(hasHtmlTech || hasHtmlFiles || hasWebFrameworks);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки анализа:', error);
+        setHasHtmlFiles(false);
       }
-    } catch (error) {
-      console.error('Ошибка загрузки анализа:', error);
-      setHasHtmlFiles(false);
-    }
-  };
+    };
 
-  loadAnalysisData();
-}, [project.id]);
-const checkFileStructure = (structure) => {
-  for (const key in structure) {
-    if (key.toLowerCase().endsWith('.html') || key.toLowerCase().endsWith('.htm')) {
-      return true;
+    loadAnalysisData();
+  }, [project.id]);
+
+  const checkFileStructure = (structure) => {
+    for (const key in structure) {
+      if (key.toLowerCase().endsWith('.html') || key.toLowerCase().endsWith('.htm')) {
+        return true;
+      }
+      if (typeof structure[key] === 'object') {
+        if (checkFileStructure(structure[key])) return true;
+      }
     }
-    if (typeof structure[key] === 'object') {
-      if (checkFileStructure(structure[key])) return true;
-    }
-  }
-  return false;
-};
+    return false;
+  };
 
   const handleConfigChange = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -98,29 +99,35 @@ const checkFileStructure = (structure) => {
 
   const handleGenerateTests = async () => {
     setGenerating(true);
+    setGeneratedTests([]); // Сбрасываем предыдущие результаты
 
     try {
       const result = await testsAPI.generateTests(project.id, config);
 
       if (result.status === 'success') {
-        setGeneratedTests(result.tests);
-        alert(`✅ Сгенерировано ${result.generated_tests} тестов!`);
+        // Безопасно устанавливаем тесты с проверкой на существование
+        const tests = result.tests || result.generated_tests || [];
+        setGeneratedTests(Array.isArray(tests) ? tests : []);
+
+        alert(`✅ Сгенерировано ${result.generated_tests || tests.length} тестов!`);
+      } else {
+        alert('❌ Ошибка генерации тестов: ' + (result.error || 'Неизвестная ошибка'));
       }
     } catch (error) {
       console.error('Generation error:', error);
-      alert('❌ Ошибка генерации тестов');
+      alert('❌ Ошибка генерации тестов: ' + error.message);
     } finally {
       setGenerating(false);
     }
   };
 
-const getTestTypesDescription = () => {
-  const types = [];
-  if (config.generate_unit_tests) types.push('Unit');
-  if (config.generate_integration_tests) types.push('Интеграционные');
-  if (config.generate_e2e_tests && hasHtmlFiles) types.push('E2E');
-  return types.length > 0 ? types.join(', ') : 'Не выбраны';
-};
+  const getTestTypesDescription = () => {
+    const types = [];
+    if (config.generate_unit_tests) types.push('Unit');
+    if (config.generate_integration_tests) types.push('Интеграционные');
+    if (config.generate_e2e_tests && hasHtmlFiles) types.push('E2E');
+    return types.length > 0 ? types.join(', ') : 'Не выбраны';
+  };
 
   const getEstimatedTime = () => {
     let time = 0;
@@ -184,6 +191,9 @@ const getTestTypesDescription = () => {
         break;
     }
   };
+
+  // Безопасное отображение сгенерированных тестов
+  const safeGeneratedTests = Array.isArray(generatedTests) ? generatedTests : [];
 
   return (
     <div className="space-y-6">
@@ -523,32 +533,31 @@ const getTestTypesDescription = () => {
                 </div>
 
                 {/* Список сгенерированных тестов */}
-                {generatedTests.length > 0 && (
+                {safeGeneratedTests.length > 0 && (
                   <div className="bg-white rounded border shadow p-4">
-                    <h4 className="font-medium mb-3">Сгенерированные тесты</h4>
+                    <h4 className="font-medium mb-3">Сгенерированные тесты ({safeGeneratedTests.length})</h4>
                     <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {generatedTests.map((test, index) => (
+                      {safeGeneratedTests.map((test, index) => (
                         <div key={index} className="border rounded p-3">
                           <div className="flex justify-between items-start mb-2">
                             <div>
-                              <div className="font-medium">{test.name}</div>
-                              <div className="text-sm text-gray-500">{test.file} • {test.type}</div>
+                              <div className="font-medium">{test.name || `Тест ${index + 1}`}</div>
+                              <div className="text-sm text-gray-500">
+                                {test.file || 'unknown'} • {test.type || 'unit'}
+                              </div>
                             </div>
                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                              {test.framework}
+                              {test.framework || 'unknown'}
                             </span>
                           </div>
                           <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
-                            {test.content}
+                            {test.content || '// Содержимое теста не доступно'}
                           </pre>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
-
-                {/* Информация о проекте */}
-                <ProjectInfo project={project} />
               </div>
             </div>
 
