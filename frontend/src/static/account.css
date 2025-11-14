@@ -105,6 +105,7 @@
 #projects{
     grid-row-start: 6;
     grid-column-start: 2;
+    position: relative;
 }
 
 #buttproj{
@@ -135,6 +136,7 @@
     padding: 0;
     margin: 0;
     background-color: white;
+    border: none;
     border-radius: 1dvh;
     box-shadow: none;
     overflow: hidden;
@@ -151,41 +153,21 @@
     opacity: 1;
     margin-top: 1vh;
     overflow-y: auto;
+    scroll-behavior: smooth;
+    transition: scroll-behavior 0.3s ease;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: 0;
+}
+
+#list.visible::-webkit-scrollbar {
+    display: none;
 }
 
 #list.hidden {
     max-height: 0;
     opacity: 0;
     overflow-y: hidden;
-}
-
-/* Простой скроллбар - только ползунок */
-#list.visible::-webkit-scrollbar {
-    width: 0.3vw;
-}
-
-#list.visible::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-#list.visible::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 1dvh;
-}
-
-#list.visible::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Убираем кнопки стрелок */
-#list.visible::-webkit-scrollbar-button {
-    display: none;
-}
-
-/* Для Firefox - тонкий скроллбар */
-#list.visible {
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 transparent;
 }
 
 #list li {
@@ -215,6 +197,8 @@
     background-color: white;
     box-sizing: border-box;
     width: 100%;
+    animation: cardAppear 0.3s ease-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #card-name{
@@ -249,6 +233,7 @@
     background-image: url('../static/assets/gearcard.png');
     background-size: cover;
     border: none;
+    filter: brightness(0.7);
 }
 
 #bottom-row{
@@ -308,12 +293,12 @@
     height: 5.5555555555555555555555555555556vh;
     background-color: #0268FB;
     border-radius: 1dvh;
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     margin-top: 0.5vh;
     display: grid;
     grid-template-columns: 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw 2.0833333333333333333333333333333vw 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw;
     grid-template-rows: 0.46296296296296296296296296296296vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh 1.8518518518518518518518518518519vh 0.46296296296296296296296296296296vh;
-    z-index: 1000;
+    z-index: 1003;
 }
 
 #list .project-item:hover {
@@ -710,19 +695,10 @@
     gap: 2vh;
     box-sizing: border-box;
     max-width: calc(100vw - 12.5vw - 4vw);
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2vw;
-    width: 100%;
-    margin-bottom: 2vh;
-    box-sizing: border-box;
-    min-width: 0;
-}
-
-/* Простой скроллбар для контейнера карточек */
 .cards-container::-webkit-scrollbar {
     width: 0.3vw;
 }
@@ -744,9 +720,14 @@
     display: none;
 }
 
-.cards-container {
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 transparent;
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    width: 100%;
+    margin-bottom: 2vh;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .card {
@@ -798,10 +779,6 @@
     }
 }
 
-.card-grid {
-    animation: cardAppear 0.3s ease-out;
-}
-
 @media (max-width: 1600px) {
     .cards-grid {
         gap: 1.5vw;
@@ -818,61 +795,58 @@
     font-weight: 600;
 }
 
-.card-grid #gear {
-    filter: brightness(0.7);
-}
-
 .card {
     transition: all 0.5s ease;
 }
 
-.card-grid {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Убираем фон и стрелки скроллбара, оставляем только ползунок */
-#list.visible::-webkit-scrollbar {
-    width: 0.3vw;
-}
-
-#list.visible::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-#list.visible::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 1dvh;
-}
-
-#list.visible::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Убираем кнопки стрелок */
-#list.visible::-webkit-scrollbar-button {
-    display: none;
-}
-
-/* Для Firefox - тонкий скроллбар */
-#list.visible {
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 transparent;
-}
-
-/* Увеличиваем z-index для project-menu чтобы он был поверх скроллбара */
-.project-menu {
+.scroll-controls {
     position: absolute;
-    top: 100%;
-    left: 0%;
-    width: 10.416666666666666666666666666667vw;
-    height: 5.5555555555555555555555555555556vh;
-    background-color: #0268FB;
-    border-radius: 1dvh;
-    box-shadow: none;
-    margin-top: 0.5vh;
-    display: grid;
-    grid-template-columns: 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw 2.0833333333333333333333333333333vw 0.26041666666666666666666666666667vw 3.6458333333333333333333333333333vw 0.26041666666666666666666666666667vw;
-    grid-template-rows: 0.46296296296296296296296296296296vh 1.8518518518518518518518518518519vh 0.92592592592592592592592592592593vh 1.8518518518518518518518518518519vh 0.46296296296296296296296296296296vh;
-    z-index: 1001; /* Увеличиваем z-index */
+    right: 0.5vw;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    z-index: 1002;
 }
 
+.scroll-btn {
+    width: 1.2vw;
+    height: 1.2vw;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-up {
+    background-image: url('../static/assets/arrow1.png');
+}
+
+.scroll-down {
+    background-image: url('../static/assets/arrow.png');
+}
+
+.scroll-btn:hover {
+    background-color: rgba(2, 104, 251, 0.1);
+    transform: scale(1.05);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-btn:active {
+    background-color: rgba(2, 104, 251, 0.2) !important;
+    transform: scale(0.95) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.scroll-btn {
+    transition: all 0.1s ease;
+}

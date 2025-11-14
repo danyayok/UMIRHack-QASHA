@@ -30,7 +30,6 @@ export default function Account(){
     const [selectedProject, setSelectedProject] = useState(null)
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
     
-    // Состояния для данных профиля
     const [profileData, setProfileData] = useState({
         login: 'GermanGering1',
         email: 'german@example.com',
@@ -47,6 +46,9 @@ export default function Account(){
     const [avatar, setAvatar] = useState(null)
     const cardsContainerRef = useRef(null)
 
+    const scrollUpIntervalRef = useRef(null)
+    const scrollDownIntervalRef = useRef(null)
+
     useEffect(() => {
         const changesExist = 
             profileData.login !== initialProfileData.login ||
@@ -55,6 +57,17 @@ export default function Account(){
         
         setHasChanges(changesExist);
     }, [profileData, initialProfileData]);
+
+    useEffect(() => {
+        return () => {
+            if (scrollUpIntervalRef.current) {
+                clearInterval(scrollUpIntervalRef.current)
+            }
+            if (scrollDownIntervalRef.current) {
+                clearInterval(scrollDownIntervalRef.current)
+            }
+        }
+    }, [])
 
     const toggleList = () => {
         setIsListVisible(!isListVisible)
@@ -157,7 +170,6 @@ export default function Account(){
     };
 
     const addProject = (cardId) => {
-        // Проверяем лимит в 100 проектов
         if (projects.length >= 100) {
             alert('Достигнут максимальный лимит проектов (100)');
             return;
@@ -180,7 +192,6 @@ export default function Account(){
         
         setProjects([...projects, newProject])
         
-        // Обновляем карточки: заменяем новую карточку на проект и добавляем следующую новую
         const updatedCards = cards.map(card => {
             if (card.id === cardId) {
                 return { 
@@ -194,17 +205,15 @@ export default function Account(){
             return card
         })
         
-        // Добавляем новую карточку "добавить проект" в конец, если не достигли лимита
-        if (projects.length < 99) { // 99 потому что мы только что добавили один проект
+        if (projects.length < 99) {
             updatedCards.push({ 
-                id: Date.now() + 1, // Уникальный ID
+                id: Date.now() + 1,
                 type: 'new' 
             })
         }
         
         setCards(updatedCards)
 
-        // Прокручиваем к новой карточке
         setTimeout(() => {
             if (cardsContainerRef.current) {
                 cardsContainerRef.current.scrollTop = cardsContainerRef.current.scrollHeight;
@@ -294,7 +303,6 @@ export default function Account(){
         }
     }
 
-    // Функция для группировки карточек по рядам (по 3 в ряду)
     const groupCardsIntoRows = (cards) => {
         const rows = [];
         for (let i = 0; i < cards.length; i += 3) {
@@ -304,6 +312,50 @@ export default function Account(){
     }
 
     const cardRows = groupCardsIntoRows(cards);
+
+    const startScrollUp = () => {
+        scrollUp()
+        
+        scrollUpIntervalRef.current = setInterval(() => {
+            scrollUp()
+        }, 50)
+    }
+
+    const stopScrollUp = () => {
+        if (scrollUpIntervalRef.current) {
+            clearInterval(scrollUpIntervalRef.current)
+            scrollUpIntervalRef.current = null
+        }
+    }
+
+    const startScrollDown = () => {
+        scrollDown()
+        
+        scrollDownIntervalRef.current = setInterval(() => {
+            scrollDown()
+        }, 50)
+    }
+
+    const stopScrollDown = () => {
+        if (scrollDownIntervalRef.current) {
+            clearInterval(scrollDownIntervalRef.current)
+            scrollDownIntervalRef.current = null
+        }
+    }
+
+    const scrollUp = () => {
+        const list = document.getElementById('list')
+        if (list) {
+            list.scrollTop -= 20
+        }
+    }
+
+    const scrollDown = () => {
+        const list = document.getElementById('list')
+        if (list) {
+            list.scrollTop += 20
+        }
+    }
 
     return(
         <div id="travoman">
@@ -400,7 +452,36 @@ export default function Account(){
                         <button id='buttproj' onClick={toggleList}>
                             <p id='butt-sign'>Проекты</p>
                         </button>
-                        <ul id='list' className={isListVisible ? 'visible' : 'hidden'}>
+                        
+                        {isListVisible && projects.length > 3 && (
+                            <div className="scroll-controls">
+                                <button 
+                                    className="scroll-btn scroll-up" 
+                                    onMouseDown={startScrollUp}
+                                    onMouseUp={stopScrollUp}
+                                    onMouseLeave={stopScrollUp}
+                                    onTouchStart={startScrollUp}
+                                    onTouchEnd={stopScrollUp}
+                                >
+                                    
+                                </button>
+                                <button 
+                                    className="scroll-btn scroll-down" 
+                                    onMouseDown={startScrollDown}
+                                    onMouseUp={stopScrollDown}
+                                    onMouseLeave={stopScrollDown}
+                                    onTouchStart={startScrollDown}
+                                    onTouchEnd={stopScrollDown}
+                                >
+                                    
+                                </button>
+                            </div>
+                        )}
+                        
+                        <ul 
+                            id='list' 
+                            className={isListVisible ? 'visible' : 'hidden'}
+                        >
                             {projects.map((project) => (
                                 <li key={project.id} className="project-item">
                                     <span 
