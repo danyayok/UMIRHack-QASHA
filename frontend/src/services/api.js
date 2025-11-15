@@ -148,6 +148,7 @@ export const projectsAPI = {
 
 
 // test api
+// test api - убираем дубликаты
 export const testsAPI = {
   generateTests: (projectId, config) =>
     fetchWithAuth(`/projects/${projectId}/generate-tests`, {
@@ -165,24 +166,12 @@ export const testsAPI = {
 
   getTestResults: (projectId) =>
     fetchWithAuth(`/projects/${projectId}/test-results`),
-     runTests: (projectId) =>
-    fetchWithAuth(`/projects/${projectId}/run-tests`, {
-      method: 'POST',
-    }),
 
   runSpecificTest: (projectId, testFile) =>
     fetchWithAuth(`/projects/${projectId}/run-tests/${encodeURIComponent(testFile)}`, {
       method: 'POST',
     }),
 
-  getTestResults: (projectId) =>
-    fetchWithAuth(`/projects/${projectId}/test-results`),
-
-  generateTests: (projectId, config) =>
-    fetchWithAuth(`/projects/${projectId}/generate-tests`, {
-      method: 'POST',
-      body: JSON.stringify(config),
-    }),
   getTestHistory: (projectId) =>
     fetchWithAuth(`/projects/${projectId}/test-results`),
 
@@ -194,9 +183,37 @@ export const testsAPI = {
       method: 'POST',
       body: JSON.stringify(config),
     }),
+
+  generateTestCases: (projectId, config) =>
+    fetchWithAuth(`/projects/${projectId}/test-cases/generate`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+
+  uploadTestCaseFile: (projectId, formData) => {
+    const token = localStorage.getItem('token');
+    return fetch(`${BASE_URL}/projects/${projectId}/test-cases/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+  },
+
+  getTestCaseFiles: (projectId) =>
+    fetchWithAuth(`/projects/${projectId}/test-cases/files`),
+
+  importTestCasesFromFile: (projectId, fileId) =>
+    fetchWithAuth(`/projects/${projectId}/test-cases/import-from-file/${fileId}`, {
+      method: 'POST',
+    }),
+
+  exportTestCases: (projectId, format = 'excel') =>
+    fetchWithAuth(`/projects/${projectId}/test-cases/export?format=${format}`),
 };
 
-// generated testsссмисм
+// generated tests - оставляем методы для пуша здесь
 export const generatedTestsAPI = {
   // Пачки тестов
   getTestBatches: (projectId) =>
@@ -213,6 +230,28 @@ export const generatedTestsAPI = {
       method: 'POST',
       body: JSON.stringify({ test_ids: testIds }),
     }),
+
+  // НОВЫЕ МЕТОДЫ ДЛЯ ПУША ТЕСТОВ И ТЕСТ-КЕЙСОВ
+  pushTestsAndCases: (projectId, config) =>
+    fetchWithAuth(`/projects/${projectId}/push-tests-and-cases`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+
+  pushSingleTestCase: (projectId, caseId, config) =>
+    fetchWithAuth(`/projects/${projectId}/test-cases/${caseId}/push`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+
+  getTestCases: (projectId, filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.testType) params.append('test_type', filters.testType);
+    if (filters.priority) params.append('priority', filters.priority);
+    if (filters.status) params.append('status', filters.status);
+
+    return fetchWithAuth(`/projects/${projectId}/test-cases?${params.toString()}`);
+  },
 
   deleteTestBatch: (projectId, batchId) =>
     fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}`, {
@@ -241,10 +280,31 @@ export const generatedTestsAPI = {
       method: 'DELETE',
       body: JSON.stringify(testIds),
     }),
+
   // Статус отправки
   getPushStatus: (projectId, batchId) =>
     fetchWithAuth(`/projects/${projectId}/test-batches/${batchId}/push-status`),
+   generateTestCases: async (projectId, data) => {
+    const response = await fetch(`/api/v1/projects/${projectId}/generate-test-cases`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  },
 
+  exportTestCases: async (projectId, format, testCases) => {
+    const response = await fetch(`/api/v1/projects/${projectId}/export-test-cases`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ format, test_cases: testCases }),
+    });
+    return await response.json();
+  }
 };
 // Health check
 export const healthAPI = {

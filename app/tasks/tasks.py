@@ -491,49 +491,65 @@ async def parallel_test_generation_task(self, project_id: int, test_config: dict
             if not project:
                 raise Exception("Project not found")
 
-            # Получаем последний анализ
-            analysis_result = await db.execute(
-                select(Analysis)
-                .where(
-                    Analysis.project_id == project_id,
-                    Analysis.status == "completed"
+            # 🔥 ОБНОВЛЯЕМ: Получаем repo_path для передачи в контекст
+            git_service = GitService()
+            repo_path = await git_service.clone_repository(project.repo_url, project.branch)
+
+            try:
+                # Получаем последний анализ
+                analysis_result = await db.execute(
+                    select(Analysis)
+                    .where(
+                        Analysis.project_id == project_id,
+                        Analysis.status == "completed"
+                    )
+                    .order_by(Analysis.created_at.desc())
+                    .limit(1)
                 )
-                .order_by(Analysis.created_at.desc())
-                .limit(1)
-            )
-            analysis = analysis_result.scalar_one_or_none()
+                analysis = analysis_result.scalar_one_or_none()
 
-        if not analysis:
-            raise Exception("No completed analysis found")
+                if not analysis:
+                    raise Exception("No completed analysis found")
 
-        # Создаем задачи для разных типов тестов
-        tasks = []
+                # 🔥 ОБНОВЛЯЕМ: Передаем repo_path в test_config
+                enhanced_test_config = {
+                    **test_config,
+                    "repo_path": repo_path  # ✅ ДОБАВЛЯЕМ путь
+                }
 
-        if test_config.get("generate_unit_tests", True):
-            unit_task = generate_unit_tests_task.s(project_id, test_config, analysis.result)
-            tasks.append(unit_task)
+                # Создаем задачи для разных типов тестов
+                tasks = []
 
-        if test_config.get("generate_integration_tests", True):
-            integration_task = generate_integration_tests_task.s(project_id, test_config, analysis.result)
-            tasks.append(integration_task)
+                if enhanced_test_config.get("generate_unit_tests", True):
+                    unit_task = generate_unit_tests_task.s(project_id, enhanced_test_config, analysis.result)
+                    tasks.append(unit_task)
 
-        if test_config.get("generate_e2e_tests", False):
-            e2e_task = generate_e2e_tests_task.s(project_id, test_config, analysis.result)
-            tasks.append(e2e_task)
+                if enhanced_test_config.get("generate_integration_tests", True):
+                    integration_task = generate_integration_tests_task.s(project_id, enhanced_test_config, analysis.result)
+                    tasks.append(integration_task)
 
-        # Запускаем все задачи параллельно
-        if tasks:
-            job = group(tasks)
-            group_result = job.apply_async()
+                if enhanced_test_config.get("generate_e2e_tests", False):
+                    e2e_task = generate_e2e_tests_task.s(project_id, enhanced_test_config, analysis.result)
+                    tasks.append(e2e_task)
 
-            return {
-                "status": "parallel_generation_started",
-                "project_id": project_id,
-                "task_group_id": group_result.id,
-                "task_count": len(tasks)
-            }
-        else:
-            return {"status": "no_tasks_created", "project_id": project_id}
+                # Запускаем все задачи параллельно
+                if tasks:
+                    job = group(tasks)
+                    group_result = job.apply_async()
+
+                    return {
+                        "status": "parallel_generation_started",
+                        "project_id": project_id,
+                        "task_group_id": group_result.id,
+                        "task_count": len(tasks)
+                    }
+                else:
+                    return {"status": "no_tasks_created", "project_id": project_id}
+
+            finally:
+                # 🔥 ВАЖНО: Очищаем временный репозиторий
+                if repo_path and os.path.exists(repo_path):
+                    git_service.cleanup(repo_path)
 
     except Exception as e:
         logger.error(f"❌ Parallel test generation failed: {e}")
@@ -942,3 +958,56 @@ def _calculate_real_coverage(analysis_result):
     coverage = min(85, int(file_coverage_ratio * 70 + framework_bonus + structure_bonus))
 
     return max(10, coverage)  # Минимум 10% если есть тесты
+
+
+# Добавляем новые задачи
+@celery_app.task
+def parse_test_case_file_task(file_id: int, file_path: str, parsing_config: str):
+    """Задача для парсинга файла с тест-кейсами"""
+    try:
+        from app.services.test_case_parser import TestCaseParser
+        from app.db.session import AsyncSessionLocal
+
+        # Парсим файл
+        parser = TestCaseParser()
+        parsed_data = parser.parse_file(file_path, parsing_config)
+
+        # Обновляем статус файла в БД
+        with AsyncSessionLocal() as session:
+            from app.models import TestCaseFile
+            file = session.query(TestCaseFile).filter(TestCaseFile.id == file_id).first()
+            if file:
+                file.status = "parsed"
+                file.parsed_data = parsed_data
+                session.commit()
+
+        logger.info(f"✅ Successfully parsed test case file {file_id}")
+
+    except Exception as e:
+        logger.error(f"❌ Failed to parse test case file {file_id}: {e}")
+        # Обновляем статус на ошибку
+        with AsyncSessionLocal() as session:
+            from app.models import TestCaseFile
+            file = session.query(TestCaseFile).filter(TestCaseFile.id == file_id).first()
+            if file:
+                file.status = "error"
+                file.error_message = str(e)
+                session.commit()
+
+
+@celery_app.task
+def generate_test_cases_task(project_id: int, config: dict):
+    """Задача для генерации тест-кейсов"""
+    try:
+        from app.services.test_case_generator import TestCaseGenerator
+        from app.db.session import AsyncSessionLocal
+
+        generator = TestCaseGenerator()
+        result = generator.generate_test_cases(project_id, config)
+
+        logger.info(f"✅ Successfully generated test cases for project {project_id}")
+        return result
+
+    except Exception as e:
+        logger.error(f"❌ Failed to generate test cases for project {project_id}: {e}")
+        raise

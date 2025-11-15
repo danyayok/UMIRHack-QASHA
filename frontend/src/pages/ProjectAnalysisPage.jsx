@@ -14,23 +14,33 @@ const ProjectAnalysisPage = () => {
   const [loading, setLoading] = useState(true);
   const nav = useNavigate();
 
+  // Проверяем есть ли выполняющиеся анализы
+  const hasRunningAnalysis = analyses.some(a =>
+    a.status === 'pending' ||
+    a.status === 'cloning' ||
+    a.status === 'extracting' ||
+    a.status === 'analyzing' ||
+    a.status === 'generating'
+  );
+
   useEffect(() => {
     loadProjectData();
+  }, [id]);
+
+  // Автоматическое обновление при выполнении анализа
+  useEffect(() => {
+    if (!hasRunningAnalysis) return;
 
     const interval = setInterval(() => {
-      const hasRunning = analyses.some(a =>
-        a.status === 'pending' || a.status === 'running' || a.status === 'analyzing' || a.status === 'generating'
-      );
-      if (hasRunning) {
-        loadAnalyses();
-      }
-    }, 3000);
+      loadAnalyses();
+    }, 2000); // Обновляем каждые 2 секунды
 
     return () => clearInterval(interval);
-  }, [id]);
+  }, [hasRunningAnalysis]);
 
   async function loadProjectData() {
     try {
+      setLoading(true);
       const [projectData, allProjects] = await Promise.all([
         projectsAPI.getProject(id),
         projectsAPI.getProjects()
@@ -60,6 +70,7 @@ const ProjectAnalysisPage = () => {
   async function handleAnalyze() {
     try {
       await projectsAPI.analyzeProject(id);
+      // Начинаем автоматическое обновление
       setTimeout(loadAnalyses, 1000);
     } catch (err) {
       console.error('Ошибка запуска анализа:', err);
@@ -85,11 +96,17 @@ const ProjectAnalysisPage = () => {
         >
           Детали
         </Link>
+
         <button
           onClick={handleAnalyze}
-          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+          disabled={hasRunningAnalysis}
+          className={`px-3 py-1 rounded ${
+            hasRunningAnalysis
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          }`}
         >
-          🔄 Обновить анализ
+          {hasRunningAnalysis ? 'Анализ выполняется...' : '🚀 Запустить анализ'}
         </button>
       </div>
     )
@@ -109,6 +126,7 @@ const ProjectAnalysisPage = () => {
             analyses={analyses}
             onRefresh={loadAnalyses}
             onAnalyze={handleAnalyze}
+            hasRunningAnalysis={hasRunningAnalysis}
           />
         } />
         <Route path="details" element={

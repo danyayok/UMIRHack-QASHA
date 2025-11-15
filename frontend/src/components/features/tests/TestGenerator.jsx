@@ -9,18 +9,24 @@ import { projectsAPI, testsAPI } from '../../../services/api';
 const TestGenerator = ({ project, testResults, onRunTests }) => {
   const [activeMode, setActiveMode] = useState('tests');
   const [config, setConfig] = useState({
-    framework: 'auto',
-    coverage_target: 80,
-    generate_unit_tests: true,
-    generate_integration_tests: true,
-    generate_e2e_tests: false,
-    include_comments: true,
-    generate_documentation: false,
-    documentation_format: 'txt',
-    test_pattern: 'standard',
-    test_directory: '',
-    custom_test_path: false
-  });
+  framework: 'auto',
+  coverage_target: 80,
+  generate_unit_tests: true,
+  generate_integration_tests: true,
+  generate_e2e_tests: false,
+  include_comments: true,
+  generate_documentation: false,
+  documentation_format: 'txt',
+  test_pattern: 'standard',
+  test_directory: '',
+  custom_test_path: false,
+  generate_test_cases: false,
+  test_case_format: 'excel',
+  include_test_steps: true,
+  include_expected_results: true,
+  test_case_level: 'detailed',
+  max_test_cases: 50
+});
 
   const [generating, setGenerating] = useState(false);
   const [generatedTests, setGeneratedTests] = useState([]); // Инициализируем пустым массивом
@@ -97,29 +103,34 @@ const TestGenerator = ({ project, testResults, onRunTests }) => {
     return [...new Set(options)];
   };
 
-  const handleGenerateTests = async () => {
-    setGenerating(true);
-    setGeneratedTests([]); // Сбрасываем предыдущие результаты
+  const handleGenerateTestCases = async () => {
+  setGenerating(true);
 
-    try {
-      const result = await testsAPI.generateTests(project.id, config);
+  try {
+    const result = await testsAPI.generateTestCases(project.id, {
+      test_case_config: {
+        format: config.test_case_format,
+        include_steps: config.include_test_steps,
+        include_expected_results: config.include_expected_results,
+        level: config.test_case_level,
+        max_test_cases: config.max_test_cases
+      },
+      user_files: [] // Можно добавить загрузку файлов
+    });
 
-      if (result.status === 'success') {
-        // Безопасно устанавливаем тесты с проверкой на существование
-        const tests = result.tests || result.generated_tests || [];
-        setGeneratedTests(Array.isArray(tests) ? tests : []);
-
-        alert(`✅ Сгенерировано ${result.generated_tests || tests.length} тестов!`);
-      } else {
-        alert('❌ Ошибка генерации тестов: ' + (result.error || 'Неизвестная ошибка'));
-      }
-    } catch (error) {
-      console.error('Generation error:', error);
-      alert('❌ Ошибка генерации тестов: ' + error.message);
-    } finally {
-      setGenerating(false);
+    if (result.status === 'success') {
+      alert(`✅ Сгенерировано ${result.test_cases_count} тест-кейсов!`);
+      // Можно добавить отображение тест-кейсов
+    } else {
+      alert('❌ Ошибка генерации тест-кейсов: ' + (result.error || 'Неизвестная ошибка'));
     }
-  };
+  } catch (error) {
+    console.error('Test case generation error:', error);
+    alert('❌ Ошибка генерации тест-кейсов: ' + error.message);
+  } finally {
+    setGenerating(false);
+  }
+};
 
   const getTestTypesDescription = () => {
     const types = [];
@@ -458,6 +469,87 @@ const TestGenerator = ({ project, testResults, onRunTests }) => {
                     </div>
                   )}
                 </div>
+                 <div className="space-y-3 border-t pt-4">
+      <label className="flex items-center space-x-3">
+        <input
+          type="checkbox"
+          checked={config.generate_test_cases}
+          onChange={handleConfigChange('generate_test_cases')}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <span className="text-sm text-gray-700">
+          <div className="font-medium">Генерировать тест-кейсы</div>
+          <div className="text-gray-500">Создать структурированные тест-кейсы</div>
+        </span>
+      </label>
+
+      {config.generate_test_cases && (
+        <div className="ml-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Формат тест-кейсов
+            </label>
+            <select
+              value={config.test_case_format}
+              onChange={handleConfigChange('test_case_format')}
+              className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="excel">Excel</option>
+              <option value="word">Word</option>
+              <option value="txt">Text</option>
+              <option value="json">JSON</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={config.include_test_steps}
+                onChange={handleConfigChange('include_test_steps')}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">Включать шаги</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={config.include_expected_results}
+                onChange={handleConfigChange('include_expected_results')}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">Ожидаемые результаты</span>
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Уровень детализации
+            </label>
+            <select
+              value={config.test_case_level}
+              onChange={handleConfigChange('test_case_level')}
+              className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="minimal">Минимальный</option>
+              <option value="standard">Стандартный</option>
+              <option value="detailed">Детальный</option>
+            </select>
+          </div>
+
+          <Button
+            onClick={handleGenerateTestCases}
+            loading={generating}
+            variant="primary"
+            size="medium"
+            className="w-full"
+          >
+            📋 Сгенерировать тест-кейсы
+          </Button>
+        </div>
+      )}
+    </div>
               </div>
 
               {/* Правая колонка - Предпросмотр и действия */}

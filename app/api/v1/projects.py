@@ -1,19 +1,23 @@
 import json
 import random
+from pathlib import Path
+from app.core.dependencies import dependencies
+import uuid
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File, Form, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from app.db.session import get_db
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import re
 from datetime import datetime
 from app.schemas import ProjectCreate, ProjectOut, AnalysisOut, AnalysisStatus, TestRunOut, TestBatchOut, \
-    GeneratedTestOut, TestBatchWithTests
-from app.models import Project, Analysis, AgentReport, TestRun, GeneratedTest, TestBatch
+    GeneratedTestOut, TestBatchWithTests, TestCaseOut, TestCaseFileOut, TestCaseGenerationConfig, TestGenerationConfig
+from app.models import Project, Analysis, AgentReport, TestRun, GeneratedTest, TestBatch, TestCase, TestCaseFile
 from app.deps.auth import get_current_user
 from app.tasks import analyze_repository_task, analyze_zip_task
 from app.services.git_service import GitService
-from app.core.dependencies import get_test_generation_pipeline
+from app.core.dependencies import get_test_generation_pipeline, dependencies
 
 import aiofiles
 import os
@@ -26,6 +30,8 @@ router = APIRouter()
 UPLOAD_DIR = "./storage/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# Константы
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 @router.get("/", response_model=List[ProjectOut])
 async def get_projects(
@@ -107,7 +113,7 @@ async def create_project(
         description: Optional[str] = Form(None),
         source_type: str = Form(...),
         repo_url: Optional[str] = Form(None),
-        branch: Optional[str] = Form(None),  # Меняем на Optional
+        branch: Optional[str] = Form(None),
         auto_analyze: bool = Form(True),
         zip_file: Optional[UploadFile] = File(None),
         db: AsyncSession = Depends(get_db),
@@ -128,15 +134,14 @@ async def create_project(
         if repo_info.get('name'):
             name = repo_info['name'] or name
             description = repo_info['description'] or description
-            # Используем переданную ветку или ветку по умолчанию из репозитория
             branch = branch or repo_info.get('default_branch', 'main')
 
-    # Создаем проект - используем branch если он указан, иначе 'main'
+    # Создаем проект
     project = Project(
         name=name,
         description=description,
         repo_url=repo_url,
-        branch=branch or "main",  # Используем переданную ветку или 'main'
+        branch=branch or "main",
         owner_id=current_user.id
     )
 
@@ -177,9 +182,7 @@ async def create_project(
                         await out.write(chunk)
                 analyze_zip_task.delay(analysis.id, zip_path)
 
-    # Возвращаем проект без coverage (он появится после анализа)
     return ProjectOut.model_validate(project)
-
 
 @router.post("/{project_id}/analyze", response_model=AnalysisOut)
 async def analyze_project(
@@ -361,18 +364,27 @@ async def delete_project(
 
 @router.post("/{project_id}/generate-tests", response_model=dict)
 async def generate_tests(
-        project_id: int,
-        test_config: dict,
-        db: AsyncSession = Depends(get_db),
-        current_user=Depends(get_current_user)
+    project_id: int,
+    test_config: TestGenerationConfig = Body(...),  # Используем модель
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """Генерация тестов на основе анализа проекта и конфигурации"""
     repo_path = None
-    logger.info(f"START: Генерация тестов для проекта {project_id}")
+    logger.info(f"🚀 START: Test generation for project {project_id}")
 
     try:
-        pipeline = get_test_generation_pipeline()
+        test_config = test_config.model_dump()
+        # 🔥 ГАРАНТИРУЕМ что зависимости инициализированы
+        from app.core.dependencies import dependencies
+        if not dependencies.is_initialized():
+            logger.info("🔄 Dependencies not initialized, initializing now...")
+            dependencies.initialize()
 
+        pipeline = dependencies.test_generation_pipeline
+        logger.info(f"✅ PIPELINE_READY: {pipeline}")
+
+        # Проверяем проект
         project_result = await db.execute(
             select(Project).where(
                 Project.id == project_id,
@@ -384,6 +396,8 @@ async def generate_tests(
             raise HTTPException(status_code=404, detail="Project not found")
         if not project.repo_url:
             raise HTTPException(status_code=400, detail="Project must have a repository URL for test generation")
+
+        logger.info(f"📁 Project found: {project.name}, repo: {project.repo_url}")
 
         # Получаем последний завершенный анализ
         analysis_result = await db.execute(
@@ -400,80 +414,91 @@ async def generate_tests(
         if not analysis:
             raise HTTPException(status_code=400, detail="No completed analysis found for project")
 
-        logger.info(f"Analysis found: {analysis.id}, status: {analysis.status}")
-        logger.info(f"Analysis result keys: {analysis.result.keys() if analysis.result else 'No result'}")
-        logger.info(f"Technologies: {analysis.result.get('technologies', []) if analysis.result else []}")
+        logger.info(f"📊 Analysis found: {analysis.id}, has result: {bool(analysis.result)}")
 
-        logger.info(f"Downloading repository for test generation: {project.repo_url}")
+        # 🔥 ГАРАНТИРУЕМ что analysis.result не None
+        analysis_data = analysis.result or {}
+        logger.info(f"📋 Analysis data keys: {analysis_data.keys() if analysis_data else 'EMPTY'}")
+
+        # Скачиваем репозиторий
+        logger.info(f"📥 Downloading repository: {project.repo_url}, branch: {project.branch}")
         git_service = GitService()
-        repo_path = await git_service.clone_repository(str(project.repo_url), project.branch)
-        logger.info(f"Repository downloaded to: {repo_path}")
+        repo_path = await git_service.clone_repository(str(project.repo_url), project.branch or "main")
+        logger.info(f"✅ Repository downloaded to: {repo_path}")
+
+        # 🔥 УЛУЧШЕННАЯ ПОДГОТОВКА ДАННЫХ
         generation_data = {
             "project_info": {
                 "id": project.id,
                 "name": project.name,
                 "description": project.description,
                 "repo_url": project.repo_url,
-                "branch": project.branch,
+                "branch": project.branch or "main",
                 "technology_stack": project.technology_stack,
-                "local_path": repo_path  # Добавляем путь к локальной копии
+                "local_path": repo_path  # 🔥 ГАРАНТИРУЕМ путь
             },
-            "analysis_data": analysis.result,
-            "test_config": test_config,
+            "analysis_data": analysis_data,
+            "test_config": {
+                **test_config,
+                "repo_path": repo_path,  # 🔥 ДУБЛИРУЕМ для надежности
+                "generate_unit_tests": test_config.get("generate_unit_tests", True),
+                "generate_api_tests": test_config.get("generate_api_tests", True),
+                "generate_integration_tests": test_config.get("generate_integration_tests", True),
+                "generate_e2e_tests": test_config.get("generate_e2e_tests", False),
+                "max_unit_tests": test_config.get("max_unit_tests", 5),
+                "max_api_tests": test_config.get("max_api_tests", 5)
+            },
             "generation_context": {
                 "timestamp": datetime.utcnow().isoformat(),
-                "user_id": current_user.id
+                "user_id": current_user.id,
+                "project_id": project_id
             }
         }
 
+        logger.info("🎯 Starting test generation pipeline...")
+
+        # 🔥 ЗАПУСКАЕМ ПАЙПЛАЙН С ОБРАБОТКОЙ ОШИБОК
         try:
-            logger.info("PIPELINE: Запуск пайплайна генерации тестов...")
-
-            # ✅ ИСПОЛЬЗУЕМ ПАЙПЛАЙН ИЗ ЗАВИСИМОСТЕЙ
-            logger.info(f"PIPELINE: test_generation_pipeline = {pipeline}")
-            logger.info(f"PIPELINE: type = {type(pipeline)}")
-
-            # Проверяем данные для пайплайна
-            logger.info(f"PIPELINE: project_info keys = {generation_data['project_info'].keys()}")
-            logger.info(f"PIPELINE: analysis_data keys = {generation_data['analysis_data'].keys()}")
-            logger.info(f"PIPELINE: test_config = {generation_data['test_config']}")
-            analysis_data = generation_data['analysis_data']
-            logger.info(f"API Endpoints found: {analysis_data.get('api_endpoints', [])}")
-            logger.info(f"API Endpoints by file: {analysis_data.get('api_endpoints_by_file', {})}")
-
-            # Если эндпоинтов нет, возможно нужно перезапустить анализ
-            if not analysis_data.get('api_endpoints'):
-                logger.warning("No API endpoints found in analysis data!")
-
-            # ✅ ВЫЗЫВАЕМ ПАЙПЛАЙН
             result = await pipeline.generate_tests(generation_data)
 
-            logger.info(f"PIPELINE: Пайплайн завершен")
-            logger.info(f"PIPELINE: Результат keys = {result.keys() if result else 'None'}")
-            logger.info(f"PIPELINE: Статус = {result.get('status') if result else 'None'}")
-            logger.info(f"PIPELINE: Сгенерировано тестов = {result.get('generated_tests') if result else 'None'}")
+            logger.info(f"✅ PIPELINE_COMPLETE: Status: {result.get('status')}")
+            logger.info(f"📊 RESULTS: {result.get('generated_tests', 0)} tests generated")
+            logger.info(f"📁 FILES: {len(result.get('test_files', {}))} test files")
 
-            # СОХРАНЯЕМ СГЕНЕРИРОВАННЫЕ ТЕСТЫ В БАЗУ ДАННЫХ
-            logger.info("SAVE: Сохранение тестов в базу данных...")
-            await save_generated_tests(project_id, result, current_user.id, db)
+            # 🔥 ГАРАНТИРУЕМ сохранение результатов даже при частичном успехе
+            if result.get("status") == "success" and result.get("test_files"):
+                logger.info("💾 Saving generated tests to database...")
+                await save_generated_tests(project_id, result, current_user.id, db)
+                logger.info(f"✅ TESTS_SAVED: Tests saved for project {project_id}")
+            else:
+                logger.warning(f"⚠️ NO_TESTS_GENERATED: {result.get('error', 'Unknown error')}")
 
-            logger.info(f"SUCCESS: Тесты сгенерированы и сохранены для проекта {project_id}")
             return result
 
-        except Exception as e:
-            logger.error(f"Error in generate_tests for project {project_id}: {e}")
-            raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
+        except Exception as pipeline_error:
+            logger.error(f"❌ PIPELINE_EXECUTION_ERROR: {pipeline_error}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Test generation pipeline failed: {str(pipeline_error)}"
+            )
+
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error in generate_tests for project {project_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Test generation failed: {str(e)}")
-
-
+        logger.error(f"❌ GENERATE_TESTS_ERROR: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Test generation failed: {str(e)}"
+        )
     finally:
         if repo_path and os.path.exists(repo_path):
-            logger.info(f"Cleaning up temporary repository: {repo_path}")
-            git_service = GitService()
-            git_service.cleanup(repo_path)
-            logger.info(f"Temporary repository cleaned up")
+            try:
+                logger.info(f"🧹 Cleaning up temporary repository: {repo_path}")
+                git_service = GitService()
+                git_service.cleanup(repo_path)
+                logger.info("✅ Temporary repository cleaned up")
+            except Exception as cleanup_error:
+                logger.warning(f"⚠️ CLEANUP_ERROR: {cleanup_error}")
 
 
 @router.get("/{project_id}/generated-tests", response_model=List[GeneratedTestOut])
@@ -1510,3 +1535,581 @@ async def download_test_batch(
         logger.error(f"Error downloading test batch: {e}")
         raise HTTPException(status_code=500, detail="Download failed")
 
+
+# Добавляем новые эндпоинты для работы с тест-кейсами
+
+@router.post("/{project_id}/generate-test-cases", response_model=Dict[str, Any])
+async def generate_test_cases(
+        project_id: int,
+        test_case_config: Dict[str, Any] = Body(...),
+        user_files: List[Dict[str, Any]] = Body(default=[]),
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Генерация тест-кейсов для проекта"""
+    try:
+        logger.info(f"🎯 START: Test case generation for project {project_id}")
+
+        # 1. Проверяем существование проекта и права доступа
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # 2. Получаем последний анализ
+        analysis_result = await db.execute(
+            select(Analysis)
+            .where(
+                Analysis.project_id == project_id,
+                Analysis.status == "completed"
+            )
+            .order_by(Analysis.created_at.desc())
+            .limit(1)
+        )
+        analysis = analysis_result.scalar_one_or_none()
+
+        if not analysis:
+            raise HTTPException(
+                status_code=400,
+                detail="No completed analysis found for project. Please analyze project first."
+            )
+
+        # 3. Получаем локальный путь к репозиторию
+        repo_path = None
+        if project.repo_url:
+            try:
+                git_service = GitService()
+                repo_path = await git_service.clone_repository(
+                    str(project.repo_url),
+                    project.branch or "main"
+                )
+                logger.info(f"📁 Repository cloned to: {repo_path}")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not clone repository: {e}")
+                # Продолжаем без локального пути
+
+        # 4. Подготавливаем данные для генерации
+        project_info = {
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "repo_url": project.repo_url,
+            "branch": project.branch or "main",
+            "technology_stack": project.technology_stack,
+            "local_path": repo_path
+        }
+
+        analysis_data = analysis.result or {}
+
+        generation_data = {
+            "project_info": project_info,
+            "analysis_data": analysis_data,
+            "test_case_config": test_case_config,
+            "user_files": user_files,
+            "user_id": current_user.id
+        }
+
+        logger.info(f"📊 Generation data prepared: {len(analysis_data.keys())} analysis keys")
+
+        # 5. Инициализируем пайплайн если нужно
+        if not dependencies.is_initialized():
+            logger.info("🔄 Initializing dependencies...")
+            dependencies.initialize()
+
+        pipeline = dependencies.test_generation_pipeline
+
+        if not pipeline:
+            raise HTTPException(status_code=500, detail="Test generation pipeline not available")
+
+        # 6. Генерируем тест-кейсы
+        logger.info("🚀 Starting test case generation pipeline...")
+        result = await pipeline.generate_test_cases(generation_data)
+
+        # 7. Сохраняем результаты если генерация успешна
+        if result.get("status") == "success":
+            test_cases = result.get("test_cases", [])
+            if test_cases:
+                logger.info(f"💾 Saving {len(test_cases)} test cases to database...")
+                saved_count = await save_generated_test_cases(project_id, result, current_user.id, db)
+                result["saved_count"] = saved_count
+
+        # 8. Очищаем временные файлы
+        if repo_path and os.path.exists(repo_path):
+            try:
+                git_service = GitService()
+                git_service.cleanup(repo_path)
+                logger.info("🧹 Temporary repository cleaned up")
+            except Exception as cleanup_error:
+                logger.warning(f"⚠️ Cleanup error: {cleanup_error}")
+
+        logger.info(f"✅ Test case generation completed: {len(result.get('test_cases', []))} cases generated")
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ TEST_CASE_GENERATION_FAILED: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Test case generation failed: {str(e)}"
+        )
+
+
+@router.post("/{project_id}/test-cases/upload", response_model=TestCaseFileOut)
+async def upload_test_case_file(
+        project_id: int,
+        file: UploadFile = File(...),
+        parsing_config: str = Form("{}"),
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user),
+        background_tasks: BackgroundTasks
+):
+    """Загрузка файла с тест-кейсами (Excel, Word, etc.)"""
+    try:
+        # Проверяем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Проверяем тип файла
+        allowed_extensions = {'.xlsx', '.xls', '.docx', '.doc', '.csv', '.txt'}
+        file_extension = Path(file.filename).suffix.lower()
+
+        if file_extension not in allowed_extensions:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file format. Allowed: {', '.join(allowed_extensions)}"
+            )
+
+        # Читаем и проверяем размер файла
+        content = await file.read()
+        if len(content) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=400,
+                detail=f"File too large. Maximum size is {MAX_FILE_SIZE // 1024 // 1024}MB"
+            )
+
+        # Сохраняем файл
+        file_id = str(uuid.uuid4())
+        filename = f"{file_id}_{file.filename}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+
+        async with aiofiles.open(file_path, "wb") as out:
+            await out.write(content)
+
+        # Определяем формат файла
+        file_format = "text"
+        if file_extension in ['.xlsx', '.xls']:
+            file_format = "excel"
+        elif file_extension in ['.docx', '.doc']:
+            file_format = "word"
+        elif file_extension == '.csv':
+            file_format = "csv"
+
+        # Создаем запись в БД
+        test_case_file = TestCaseFile(
+            project_id=project_id,
+            filename=filename,
+            original_filename=file.filename,
+            file_format=file_format,
+            file_size=len(content),
+            uploaded_by=current_user.id,
+            status="uploaded"
+        )
+
+        db.add(test_case_file)
+        await db.commit()
+        await db.refresh(test_case_file)
+
+        # Запускаем парсинг файла в фоне
+        from app.tasks.tasks import parse_test_case_file_task
+        background_tasks.add_task(
+            parse_test_case_file_task,
+            test_case_file.id,
+            file_path,
+            parsing_config
+        )
+
+        return TestCaseFileOut.model_validate(test_case_file)
+
+    except Exception as e:
+        logger.error(f"❌ File upload failed: {e}")
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+
+
+@router.get("/{project_id}/test-cases", response_model=List[TestCaseOut])
+async def get_project_test_cases(
+        project_id: int,
+        skip: int = 0,
+        limit: int = 100,
+        test_type: Optional[str] = None,
+        priority: Optional[str] = None,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Получить все тест-кейсы проекта с пагинацией и фильтрацией"""
+    try:
+        # Проверяем доступ к проекту
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Строим запрос с фильтрами
+        query = select(TestCase).where(TestCase.project_id == project_id)
+
+        if test_type:
+            query = query.where(TestCase.test_type == test_type)
+        if priority:
+            query = query.where(TestCase.priority == priority)
+
+        query = query.offset(skip).limit(limit).order_by(TestCase.created_at.desc())
+
+        test_cases_result = await db.execute(query)
+        test_cases = test_cases_result.scalars().all()
+
+        return [TestCaseOut.model_validate(tc) for tc in test_cases]
+
+    except Exception as e:
+        logger.error(f"Error getting test cases: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+def _detect_file_type(filename: str) -> str:
+    """Определяет тип файла по расширению"""
+    extension = Path(filename).suffix.lower()
+    file_types = {
+        '.xlsx': 'excel', '.xls': 'excel',
+        '.docx': 'word', '.doc': 'word',
+        '.pdf': 'pdf',
+        '.csv': 'csv',
+        '.txt': 'text', '.md': 'text'
+    }
+    return file_types.get(extension, 'unknown')
+
+
+
+
+
+@router.get("/{project_id}/test-cases/files", response_model=List[TestCaseFileOut])
+async def get_test_case_files(
+        project_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Получить все загруженные файлы с тест-кейсами"""
+    try:
+        # Проверяем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Получаем файлы
+        files_result = await db.execute(
+            select(TestCaseFile)
+            .where(TestCaseFile.project_id == project_id)
+            .order_by(TestCaseFile.uploaded_at.desc())
+        )
+        files = files_result.scalars().all()
+
+        return [TestCaseFileOut.model_validate(file) for file in files]
+
+    except Exception as e:
+        logger.error(f"Error getting test case files: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+
+
+
+
+@router.post("/{project_id}/test-cases/import-from-file/{file_id}", response_model=dict)
+async def import_test_cases_from_file(
+        project_id: int,
+        file_id: int,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Импорт тест-кейсов из загруженного файла"""
+    try:
+        # Проверяем проект и файл
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        file_result = await db.execute(
+            select(TestCaseFile).where(
+                TestCaseFile.id == file_id,
+                TestCaseFile.project_id == project_id
+            )
+        )
+        test_case_file = file_result.scalar_one_or_none()
+        if not test_case_file:
+            raise HTTPException(status_code=404, detail="Test case file not found")
+
+        if test_case_file.status != "parsed":
+            raise HTTPException(status_code=400, detail="File not parsed yet")
+
+        # Импортируем тест-кейсы из parsed_data
+        imported_count = 0
+        if test_case_file.parsed_data and "test_cases" in test_case_file.parsed_data:
+            for tc_data in test_case_file.parsed_data["test_cases"]:
+                test_case = TestCase(
+                    project_id=project_id,
+                    name=tc_data.get("name", "Unnamed Test Case"),
+                    description=tc_data.get("description"),
+                    test_case_id=tc_data.get("test_case_id", f"TC{imported_count + 1:03d}"),
+                    priority=tc_data.get("priority", "medium"),
+                    test_type=tc_data.get("test_type", "functional"),
+                    steps=tc_data.get("steps", []),
+                    preconditions=tc_data.get("preconditions"),
+                    postconditions=tc_data.get("postconditions"),
+                    created_by=current_user.id
+                )
+                db.add(test_case)
+                imported_count += 1
+
+            await db.commit()
+
+        return {
+            "message": f"Successfully imported {imported_count} test cases",
+            "imported_count": imported_count,
+            "file_id": file_id
+        }
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error importing test cases: {e}")
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+
+@router.get("/{project_id}/test-cases/export", response_model=dict)
+async def export_test_cases(
+        project_id: int,
+        format: str = "excel",  # excel, word, txt
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Экспорт тест-кейсов в указанном формате"""
+    try:
+        # Проверяем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # Получаем тест-кейсы
+        test_cases_result = await db.execute(
+            select(TestCase).where(TestCase.project_id == project_id)
+        )
+        test_cases = test_cases_result.scalars().all()
+
+        # Генерируем файл в нужном формате
+        from app.services.test_case_export import TestCaseExporter
+        exporter = TestCaseExporter()
+        export_result = await exporter.export_test_cases(test_cases, format)
+
+        return export_result
+
+    except Exception as e:
+        logger.error(f"Error exporting test cases: {e}")
+        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+
+
+# Вспомогательная функция для сохранения тест-кейсов
+async def save_generated_test_cases(project_id: int, generation_result: dict, user_id: int, db: AsyncSession) -> int:
+    """Сохраняет сгенерированные тест-кейсы в базу данных"""
+    try:
+        test_cases = generation_result.get("test_cases", [])
+        saved_count = 0
+
+        logger.info(f"💾 Saving {len(test_cases)} test cases for project {project_id}")
+
+        for tc_data in test_cases:
+            try:
+                # Создаем запись тест-кейса
+                test_case = TestCase(
+                    project_id=project_id,
+                    name=tc_data.get("name", "Unnamed Test Case"),
+                    description=tc_data.get("description", ""),
+                    test_case_id=tc_data.get("test_case_id", f"TC{saved_count + 1:03d}"),
+                    priority=tc_data.get("priority", "medium"),
+                    test_type=tc_data.get("test_type", "functional"),
+                    steps=tc_data.get("steps", []),
+                    preconditions=tc_data.get("preconditions"),
+                    postconditions=tc_data.get("postconditions"),
+                    created_by=user_id,
+                    status="draft",
+                    source_type=tc_data.get("source_type", "ai_generated"),
+                    source_reference=tc_data.get("source_reference", {})
+                )
+
+                db.add(test_case)
+                saved_count += 1
+
+            except Exception as e:
+                logger.error(f"❌ Error saving test case {tc_data.get('name')}: {e}")
+                continue
+
+        await db.commit()
+        logger.info(f"✅ Successfully saved {saved_count} test cases for project {project_id}")
+
+        return saved_count
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"❌ Failed to save test cases: {e}")
+        raise
+
+
+@router.post("/{project_id}/push-tests-and-cases", response_model=dict)
+async def push_tests_and_cases(
+        project_id: int,
+        push_config: dict = Body(...),
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    """Пуш тестов и тест-кейсов в репозиторий в отдельную ветку и папку"""
+    try:
+        logger.info(f"🚀 Starting push tests and cases for project {project_id}")
+
+        # Проверяем проект
+        project_result = await db.execute(
+            select(Project).where(
+                Project.id == project_id,
+                Project.owner_id == current_user.id
+            )
+        )
+        project = project_result.scalar_one_or_none()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        if not project.repo_url:
+            raise HTTPException(status_code=400, detail="Project must have a repository URL")
+
+        # Получаем тесты и тест-кейсы для пуша
+        test_batch_id = push_config.get('test_batch_id')
+        test_case_ids = push_config.get('test_case_ids', [])
+        include_test_cases = push_config.get('include_test_cases', True)
+        commit_message = push_config.get('commit_message', 'Add generated tests and test cases')
+        test_cases_format = push_config.get('test_cases_format', 'markdown')
+
+        # Настройки ветки и папки
+        branch_name = push_config.get('branch_name', 'qa-automated-tests')
+        test_folder = push_config.get('test_folder', 'qa_automated_tests')
+
+        # Получаем тесты из пачки
+        tests_to_push = []
+        if test_batch_id:
+            batch_result = await db.execute(
+                select(TestBatch).where(
+                    TestBatch.id == test_batch_id,
+                    TestBatch.project_id == project_id
+                )
+            )
+            batch = batch_result.scalar_one_or_none()
+            if batch:
+                tests_result = await db.execute(
+                    select(GeneratedTest).where(GeneratedTest.test_batch_id == test_batch_id)
+                )
+                tests_to_push = tests_result.scalars().all()
+
+        # Получаем тест-кейсы
+        test_cases_to_push = []
+        if include_test_cases and test_case_ids:
+            cases_result = await db.execute(
+                select(TestCase).where(
+                    TestCase.id.in_(test_case_ids),
+                    TestCase.project_id == project_id
+                )
+            )
+            test_cases_to_push = cases_result.scalars().all()
+
+        # Скачиваем репозиторий
+        git_service = GitService()
+        repo_path = await git_service.clone_repository(str(project.repo_url), project.branch or "main")
+
+        # Используем GitService напрямую
+        result = await git_service.push_tests_to_repository(
+            repo_path=repo_path,
+            tests=[{
+                "name": test.name,
+                "file_path": test.file_path,
+                "content": test.content,
+                "test_type": test.test_type,
+                "framework": test.framework
+            } for test in tests_to_push],
+            test_cases=[{
+                "id": tc.id,
+                "name": tc.name,
+                "test_case_id": tc.test_case_id,
+                "description": tc.description,
+                "steps": tc.steps,
+                "priority": tc.priority,
+                "test_type": tc.test_type,
+                "preconditions": tc.preconditions,
+                "postconditions": tc.postconditions
+            } for tc in test_cases_to_push] if include_test_cases else None,
+            commit_message=commit_message,
+            branch=branch_name,
+            test_folder=test_folder
+        )
+
+        # Обновляем статусы
+        if result.get("success"):
+            # Обновляем статус пачки
+            if test_batch_id and batch:
+                batch.status = "pushed"
+                batch.branch_name = branch_name
+
+            # Обновляем статус тест-кейсов
+            for tc in test_cases_to_push:
+                tc.status = "pushed"
+
+            await db.commit()
+
+            logger.info(
+                f"✅ Successfully pushed {len(tests_to_push)} tests and {len(test_cases_to_push)} test cases to branch '{branch_name}' in folder '{test_folder}'")
+
+        return result
+
+    except Exception as e:
+        logger.error(f"❌ Push tests and cases failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Push failed: {str(e)}")

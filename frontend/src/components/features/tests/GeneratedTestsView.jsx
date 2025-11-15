@@ -12,10 +12,19 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
   const [pushLoading, setPushLoading] = useState(false);
   const [viewMode, setViewMode] = useState('batches');
   const [error, setError] = useState(null);
-  const [selectedTest, setSelectedTest] = useState(null); // Для просмотра конкретного теста
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [testCases, setTestCases] = useState([]);
+  const [selectedTestCases, setSelectedTestCases] = useState(new Set());
+  const [showPushModal, setShowPushModal] = useState(false);
+  const [pushConfig, setPushConfig] = useState({
+    commit_message: 'Add generated tests and test cases',
+    include_test_cases: true,
+    test_cases_format: 'markdown'
+  });
 
   useEffect(() => {
     loadTestBatches();
+    loadTestCases();
   }, [project.id]);
 
   const loadTestBatches = async () => {
@@ -34,6 +43,17 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
     }
   };
 
+  const loadTestCases = async () => {
+    try {
+      const cases = await generatedTestsAPI.getTestCases(project.id, {
+        status: 'draft' // Загружаем только неотправленные тест-кейсы
+      });
+      setTestCases(cases || []);
+    } catch (error) {
+      console.error('Ошибка загрузки тест-кейсов:', error);
+    }
+  };
+
   const loadBatchTests = async (batchId) => {
     try {
       setError(null);
@@ -42,7 +62,6 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
 
       if (batchData) {
         setSelectedBatch(batchData);
-        // Код тестов уже содержится в batchData.tests[].content
         setBatchTests(batchData.tests || []);
         setViewMode('tests');
       }
@@ -52,23 +71,20 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
     }
   };
 
-  // Просмотр конкретного теста - данные уже загружены!
+  // Просмотр конкретного теста
   const viewTestCode = (testId) => {
     setSelectedTest(testId);
   };
 
-  // Закрыть просмотр кода теста
   const closeTestCode = () => {
     setSelectedTest(null);
   };
 
-  // Получить код теста из уже загруженных данных
   const getTestCode = (testId) => {
     const test = batchTests.find(t => t.id === testId);
     return test?.content || test?.code || '// Код теста не доступен';
   };
 
-  // Получить объект теста по ID
   const getTest = (testId) => {
     return batchTests.find(t => t.id === testId);
   };
@@ -85,6 +101,18 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
     });
   };
 
+  const handleTestCaseSelect = (caseId) => {
+    setSelectedTestCases(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(caseId)) {
+        newSelection.delete(caseId);
+      } else {
+        newSelection.add(caseId);
+      }
+      return newSelection;
+    });
+  };
+
   const handleSelectAllTests = () => {
     if (selectedTests.size === batchTests.length) {
       setSelectedTests(new Set());
@@ -93,18 +121,57 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
     }
   };
 
-  const handlePushBatchToRepo = async (batchId) => {
+  const handleSelectAllTestCases = () => {
+    if (selectedTestCases.size === testCases.length) {
+      setSelectedTestCases(new Set());
+    } else {
+      setSelectedTestCases(new Set(testCases.map(tc => tc.id)));
+    }
+  };
+
+  const handlePushToRepository = async () => {
+    if (!selectedBatch && selectedTestCases.size === 0) {
+      alert('Выберите тесты или тест-кейсы для отправки в репозиторий');
+      return;
+    }
+
     try {
       setPushLoading(true);
       setError(null);
-      const result = await generatedTestsAPI.pushBatchToRepository(project.id, batchId);
+
+      const pushData = {
+        test_batch_id: selectedBatch?.id,
+        test_case_ids: Array.from(selectedTestCases),
+        include_test_cases: pushConfig.include_test_cases,
+        commit_message: pushConfig.commit_message,
+        test_cases_format: pushConfig.test_cases_format
+      };
+
+      const result = await generatedTestsAPI.pushTestsAndCases(project.id, pushData);
+
       console.log('📤 Push result:', result);
 
-      alert(`✅ ${result.message || 'Пачка тестов успешно отправлена в репозиторий!'}`);
+      if (result.status === 'success') {
+        alert(`✅ ${result.message || 'Тесты и тест-кейсы успешно отправлены в репозиторий!'}`);
 
-      setTestBatches(prev => prev.map(batch =>
-        batch.id === batchId ? { ...batch, status: 'pushed' } : batch
-      ));
+        // Обновляем данные
+        loadTestBatches();
+        loadTestCases();
+
+        // Сбрасываем выбор
+        setSelectedTests(new Set());
+        setSelectedTestCases(new Set());
+        setShowPushModal(false);
+
+        // Обновляем статус пачки в UI
+        if (selectedBatch) {
+          setTestBatches(prev => prev.map(batch =>
+            batch.id === selectedBatch.id ? { ...batch, status: 'pushed' } : batch
+          ));
+        }
+      } else {
+        throw new Error(result.error || 'Ошибка при отправке');
+      }
     } catch (error) {
       console.error('Ошибка отправки тестов:', error);
       setError('Ошибка отправки тестов: ' + error.message);
@@ -114,25 +181,30 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
     }
   };
 
-  const handlePushSelectedTests = async () => {
-    if (selectedTests.size === 0) {
-      alert('Выберите тесты для отправки в репозиторий');
-      return;
-    }
-
+  const handlePushBatchToRepo = async (batchId) => {
     try {
       setPushLoading(true);
       setError(null);
-      const testIdsArray = Array.from(selectedTests);
-      const result = await generatedTestsAPI.pushBatchToRepository(
-        project.id,
-        selectedBatch.id,
-        testIdsArray
-      );
 
-      console.log('📤 Push selected result:', result);
-      alert(`✅ ${result.message || `${selectedTests.size} тестов успешно отправлены в репозиторий!`}`);
-      setSelectedTests(new Set());
+      const pushData = {
+        test_batch_id: batchId,
+        test_case_ids: [],
+        include_test_cases: false,
+        commit_message: 'Add generated tests',
+        test_cases_format: 'markdown'
+      };
+
+      const result = await generatedTestsAPI.pushTestsAndCases(project.id, pushData);
+
+      if (result.status === 'success') {
+        alert(`✅ ${result.message || 'Пачка тестов успешно отправлена в репозиторий!'}`);
+
+        setTestBatches(prev => prev.map(batch =>
+          batch.id === batchId ? { ...batch, status: 'pushed' } : batch
+        ));
+      } else {
+        throw new Error(result.error || 'Ошибка при отправке');
+      }
     } catch (error) {
       console.error('Ошибка отправки тестов:', error);
       setError('Ошибка отправки тестов: ' + error.message);
@@ -181,6 +253,134 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
 
   return (
     <div className="space-y-6">
+      {/* Модальное окно пуша */}
+      {showPushModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">🚀 Отправка в репозиторий</h3>
+
+            <div className="space-y-4">
+              {/* Выбор тест-кейсов */}
+              <div>
+                <h4 className="font-medium mb-3">Тест-кейсы для отправки ({selectedTestCases.size})</h4>
+                <div className="max-h-40 overflow-y-auto border rounded-lg">
+                  {testCases.map(testCase => (
+                    <div
+                      key={testCase.id}
+                      className={`p-3 border-b last:border-b-0 flex items-center space-x-3 cursor-pointer ${
+                        selectedTestCases.has(testCase.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => handleTestCaseSelect(testCase.id)}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTestCases.has(testCase.id)}
+                        onChange={() => {}}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{testCase.test_case_id}</div>
+                        <div className="text-sm text-gray-600">{testCase.name}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-sm text-gray-600">
+                    Выбрано: {selectedTestCases.size} тест-кейсов
+                  </span>
+                  <Button
+                    onClick={handleSelectAllTestCases}
+                    variant="secondary"
+                    size="small"
+                  >
+                    {selectedTestCases.size === testCases.length ? 'Снять выделение' : 'Выделить все'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Настройки пуша */}
+              <div>
+                <h4 className="font-medium mb-3">Настройки отправки</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Сообщение коммита
+                    </label>
+                    <input
+                      type="text"
+                      value={pushConfig.commit_message}
+                      onChange={(e) => setPushConfig(prev => ({
+                        ...prev,
+                        commit_message: e.target.value
+                      }))}
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={pushConfig.include_test_cases}
+                      onChange={(e) => setPushConfig(prev => ({
+                        ...prev,
+                        include_test_cases: e.target.checked
+                      }))}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Включать тест-кейсы в документацию
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Сводка */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h5 className="font-medium mb-2">Сводка отправки</h5>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-600">Тесты:</span>
+                    <span className="font-medium ml-2">
+                      {selectedBatch ? `${selectedBatch.total_tests} из пачки` : 'Не выбраны'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Тест-кейсы:</span>
+                    <span className="font-medium ml-2">{selectedTestCases.size}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Формат:</span>
+                    <span className="font-medium ml-2">{pushConfig.test_cases_format}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Репозиторий:</span>
+                    <span className="font-medium ml-2">{project.repo_url}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button
+                onClick={() => setShowPushModal(false)}
+                variant="secondary"
+                disabled={pushLoading}
+              >
+                Отмена
+              </Button>
+              <Button
+                onClick={handlePushToRepository}
+                loading={pushLoading}
+                variant="primary"
+              >
+                📤 Отправить в репозиторий
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Заголовок и действия */}
       <div className="bg-white rounded-lg border shadow-sm p-6">
         <div className="flex justify-between items-center">
@@ -206,7 +406,6 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
 
           <div className="flex items-center space-x-3">
             {selectedTest ? (
-              // Кнопки для режима просмотра кода теста
               <>
                 <Button
                   onClick={closeTestCode}
@@ -228,7 +427,6 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                 </Button>
               </>
             ) : viewMode === 'tests' ? (
-              // Кнопки для режима просмотра тестов
               <>
                 <Button
                   onClick={handleSelectAllTests}
@@ -238,13 +436,11 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                   {selectedTests.size === batchTests.length ? 'Снять выделение' : 'Выделить все'}
                 </Button>
                 <Button
-                  onClick={handlePushSelectedTests}
-                  loading={pushLoading}
-                  disabled={selectedTests.size === 0}
+                  onClick={() => setShowPushModal(true)}
                   variant="primary"
                   size="medium"
                 >
-                  📤 Отправить выбранные ({selectedTests.size})
+                  📤 Отправить в репозиторий
                 </Button>
                 <Button
                   onClick={handleBackToBatches}
@@ -254,7 +450,15 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                   ← Назад к пачкам
                 </Button>
               </>
-            ) : null}
+            ) : (
+              <Button
+                onClick={() => setShowPushModal(true)}
+                variant="primary"
+                size="medium"
+              >
+                📤 Отправить в репозиторий
+              </Button>
+            )}
 
             {!selectedTest && (
               <Button
@@ -301,11 +505,13 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                   {testBatches.map(batch => (
                     <div
                       key={batch.id}
-                      className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => loadBatchTests(batch.id)}
+                      className="p-6 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
+                        <div
+                          className="flex-1 cursor-pointer"
+                          onClick={() => loadBatchTests(batch.id)}
+                        >
                           <div className="flex items-center space-x-3 mb-2">
                             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(batch.status)}`}>
                               {getStatusIcon(batch.status)} {batch.status}
@@ -399,24 +605,34 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                     {testBatches.filter(b => b.status === 'pushed').length}
                   </span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Тест-кейсов:</span>
+                  <span className="font-medium text-purple-600">
+                    {testCases.length}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="bg-white rounded-lg border shadow-sm p-4">
-              <h3 className="font-semibold mb-3">🎯 Эффективность AI</h3>
+              <h3 className="font-semibold mb-3">🎯 Быстрые действия</h3>
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>GigaChat:</span>
-                  <span className="font-medium">
-                    {testBatches.filter(b => b.ai_provider === 'giga').length} пачек
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>g4f:</span>
-                  <span className="font-medium">
-                    {testBatches.filter(b => b.ai_provider === 'g4f').length} пачек
-                  </span>
-                </div>
+                <Button
+                  onClick={() => setShowPushModal(true)}
+                  variant="primary"
+                  size="small"
+                  className="w-full justify-center"
+                >
+                  📤 Отправить в репозиторий
+                </Button>
+                <Button
+                  onClick={loadTestBatches}
+                  variant="secondary"
+                  size="small"
+                  className="w-full justify-center"
+                >
+                  🔄 Обновить данные
+                </Button>
               </div>
             </div>
           </div>
@@ -507,7 +723,7 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                       test={test}
                       isSelected={selectedTests.has(test.id)}
                       onSelect={handleTestSelect}
-                      onView={viewTestCode} // Передаем функцию просмотра
+                      onView={viewTestCode}
                     />
                   ))}
                 </div>
@@ -571,66 +787,22 @@ const GeneratedTestsView = ({ project, onRunTests }) => {
                   Выбрать unit тесты
                 </Button>
                 <Button
-                  onClick={handlePushBatchToRepo}
+                  onClick={() => setShowPushModal(true)}
                   variant="primary"
                   size="small"
                   className="w-full justify-center"
                 >
-                  📤 Отправить всю пачку
+                  📤 Отправить в репозиторий
                 </Button>
               </div>
             </div>
-
-<div className="bg-white rounded-lg border shadow-sm p-4">
-  <h3 className="font-semibold mb-3">📋 Документация E2E тестов</h3>
-  <div className="space-y-3">
-    <div className="text-sm text-gray-600 mb-3">
-      Документация по end-to-end тестированию будет сгенерирована автоматически
-    </div>
-
-    <div className="grid grid-cols-1 gap-2">
-      <Button
-        onClick={() => alert('Функция в разработке')}
-        variant="secondary"
-        size="small"
-        className="w-full justify-center"
-      >
-        📄 Просмотреть TXT документацию
-      </Button>
-
-      <Button
-        onClick={() => alert('Функция в разработке')}
-        variant="secondary"
-        size="small"
-        className="w-full justify-center"
-      >
-        📝 Просмотреть DOC документацию
-      </Button>
-
-      <Button
-        onClick={() => alert('Функция в разработке')}
-        variant="secondary"
-        size="small"
-        className="w-full justify-center"
-      >
-        📊 Просмотреть Excel отчет
-      </Button>
-    </div>
-
-    <div className="border-t pt-3 mt-3">
-      <div className="flex justify-between items-center text-xs text-gray-500">
-        <span>Статус:</span>
-        <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">В разработке</span>
-      </div>
-    </div>
-  </div>
-</div>
           </div>
         </div>
       )}
     </div>
   );
 };
+
 const getTestTypeColor = (type) => {
   const colors = {
     unit: 'bg-blue-100 text-blue-800',
@@ -640,7 +812,8 @@ const getTestTypeColor = (type) => {
   };
   return colors[type] || 'bg-gray-100 text-gray-800';
 };
-// Обновленный компонент TestCard с кнопкой просмотра кода
+
+// Компонент TestCard
 const TestCard = ({ test, isSelected, onSelect, onView }) => {
   const getTestTypeColor = (type) => {
     const colors = {

@@ -12,38 +12,69 @@ function getSourceIcon(project) {
 }
 
 function getProjectStatus(project) {
-  // Если нет coverage и нет анализа - ожидание
-  if (!project.coverage && !project.latest_analysis) {
+  // Если есть последний анализ, смотрим его статус
+  if (project.latest_analysis && project.latest_analysis.status) {
+    const analysis = project.latest_analysis;
+
+    switch (analysis.status) {
+      case 'completed':
+        return {
+          status: 'analyzed',
+          text: '✅ Анализ завершен',
+          color: 'text-green-600',
+          hasCoverage: true
+        };
+      case 'failed':
+        return {
+          status: 'failed',
+          text: `❌ Ошибка анализа`,
+          color: 'text-red-600',
+          hasCoverage: false
+        };
+      case 'pending':
+      case 'cloning':
+      case 'extracting':
+      case 'analyzing':
+      case 'generating':
+        const statusText = {
+          pending: 'Ожидание запуска',
+          cloning: 'Клонирование репозитория',
+          extracting: 'Извлечение файлов',
+          analyzing: 'Анализ кода',
+          generating: 'Генерация тестов'
+        };
+        return {
+          status: 'in_progress',
+          text: `🔄 ${statusText[analysis.status] || analysis.status}`,
+          color: 'text-blue-600',
+          hasCoverage: false
+        };
+      default:
+        return {
+          status: 'unknown',
+          text: `❓ Статус: ${analysis.status}`,
+          color: 'text-gray-600',
+          hasCoverage: false
+        };
+    }
+  }
+
+  // Если нет анализа или статуса - проверяем coverage
+  if (project.coverage !== undefined && project.coverage !== null) {
     return {
-      status: 'pending',
-      text: '⏳ Ожидание анализа',
-      color: 'text-yellow-600'
+      status: 'analyzed',
+      text: '✅ Анализ завершен',
+      color: 'text-green-600',
+      hasCoverage: true
     };
   }
 
-  // Если есть анализ с тестами
-  if (project.latest_analysis?.result?.test_analysis?.has_tests) {
-    const frameworks = project.latest_analysis.result.test_analysis.test_frameworks;
-    return {
-      status: 'has_tests',
-      text: `✅ ${frameworks.length > 0 ? frameworks.join(', ') : 'Тесты есть'}`,
-      color: 'text-green-600'
-    };
-  }
-
-  // Если есть анализ но нет тестов
-  if (project.latest_analysis && !project.latest_analysis.result?.test_analysis?.has_tests) {
-    return {
-      status: 'no_tests',
-      text: '❌ Нет тестов',
-      color: 'text-red-600'
-    };
-  }
-
+  // Если нет анализа вообще
   return {
-    status: 'unknown',
-    text: '❓ Анализ не завершен',
-    color: 'text-gray-600'
+    status: 'no_analysis',
+    text: '⏳ Ожидание анализа',
+    color: 'text-yellow-600',
+    hasCoverage: false
   };
 }
 
@@ -65,7 +96,7 @@ export default function ProjectCard({ project, onOpen, onDelete }) {
 
   return (
     <div
-      className="rounded-lg shadow-md overflow-hidden cursor-pointer w-72 hover:shadow-lg transition-shadow bg-white"
+      className="rounded-lg shadow-md overflow-hidden cursor-pointer w-72 hover:shadow-lg transition-shadow bg-white flex flex-col h-full"
       onClick={() => onOpen(project)}
     >
       <div className={`p-4 text-white font-semibold relative ${getCoverageColor(coverage)}`}>
@@ -79,15 +110,18 @@ export default function ProjectCard({ project, onOpen, onDelete }) {
           </p>
         )}
 
-        <div className="absolute bottom-2 right-2 bg-black/20 px-2 py-1 rounded text-xs">
-          {coverage}%
-        </div>
+        {/* Показываем coverage если анализ завершен или если есть значение coverage */}
+        {projectStatus.hasCoverage && (
+          <div className="absolute bottom-2 right-2 bg-black/20 px-2 py-1 rounded text-xs">
+            {coverage}%
+          </div>
+        )}
       </div>
 
-      <div className="p-3 space-y-2">
+      <div className="p-3 flex-grow space-y-2">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Покрытие: {coverage}%
+          <div className={`text-xs font-medium ${projectStatus.color} truncate max-w-[180px]`}>
+            {projectStatus.text}
           </div>
           {project.repo_url ? (
             <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
@@ -100,9 +134,12 @@ export default function ProjectCard({ project, onOpen, onDelete }) {
           )}
         </div>
 
-        <div className={`text-xs font-medium ${projectStatus.color}`}>
-          {projectStatus.text}
-        </div>
+        {/* Показываем coverage в основном контенте только если анализ завершен */}
+        {projectStatus.hasCoverage && (
+          <div className="text-sm text-gray-600">
+            Покрытие тестами: {coverage}%
+          </div>
+        )}
 
         {project.latest_analysis?.result?.technologies && (
           <div className="flex flex-wrap gap-1">
@@ -118,16 +155,16 @@ export default function ProjectCard({ project, onOpen, onDelete }) {
             )}
           </div>
         )}
+      </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-            title="Удалить проект"
-          >
-            🗑️
-          </button>
-        </div>
+      <div className="p-2 border-t border-gray-100 flex justify-end">
+        <button
+          onClick={handleDelete}
+          className="text-gray-400 hover:text-red-500 transition-colors p-1"
+          title="Удалить проект"
+        >
+          🗑️
+        </button>
       </div>
     </div>
   );

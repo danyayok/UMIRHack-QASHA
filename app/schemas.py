@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
-
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
@@ -183,6 +182,7 @@ class TestBatchOut(TestBatchBase):
     status: str
     created_at: datetime
     updated_at: datetime
+    branch_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -224,3 +224,98 @@ class TestGenerationResult(BaseModel):
     framework_used: str
     ai_provider_used: str
     test_files: Dict[str, str]
+
+# Базовые схемы для тест-кейсов
+class TestCaseStepBase(BaseModel):
+    step_number: int
+    action: str
+    expected_result: str
+    data: Optional[Dict[str, Any]] = None
+
+class TestCaseBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    test_case_id: str
+    priority: str  # high, medium, low
+    test_type: str  # functional, e2e, api, integration
+    preconditions: Optional[str] = None
+    postconditions: Optional[str] = None
+    steps: List[TestCaseStepBase]
+
+class TestCaseCreate(TestCaseBase):
+    project_id: int
+    test_batch_id: Optional[int] = None
+
+class TestCaseOut(TestCaseBase):
+    id: int
+    project_id: int
+    test_batch_id: Optional[int]
+    status: str
+    created_by: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class TestCaseFileBase(BaseModel):
+    filename: str
+    original_filename: str
+    file_format: str
+    file_size: int
+
+class TestCaseFileCreate(TestCaseFileBase):
+    project_id: int
+    content: Optional[str] = None
+
+class TestCaseFileOut(TestCaseFileBase):
+    id: int
+    project_id: int
+    status: str
+    error_message: Optional[str]
+    parsed_data: Optional[Dict[str, Any]]
+    uploaded_by: int
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TestGenerationConfig(BaseModel):
+    """Конфигурация для генерации тестов"""
+    generate_unit_tests: bool = True
+    generate_api_tests: bool = True
+    generate_integration_tests: bool = True
+    generate_e2e_tests: bool = False
+    max_unit_tests: int = Field(default=5, ge=1, le=50)
+    max_api_tests: int = Field(default=5, ge=1, le=50)
+    max_integration_tests: int = Field(default=3, ge=1, le=20)
+    max_e2e_tests: int = Field(default=2, ge=0, le=10)
+    framework: str = "auto"  # auto, pytest, jest, junit, etc.
+    test_style: str = "descriptive"  # descriptive, minimal, comprehensive
+    include_comments: bool = True
+    include_assertions: bool = True
+    coverage_target: float = Field(default=70.0, ge=0.0, le=100.0)
+
+    model_config = ConfigDict(from_attributes=True)
+# Схемы для генерации тест-кейсов
+class TestCaseGenerationConfig(BaseModel):
+    generate_test_cases: bool = False
+    test_case_format: str = "excel"  # excel, word, txt
+    test_case_level: str = "detailed"  # basic, detailed, comprehensive
+    include_test_steps: bool = True
+    include_expected_results: bool = True
+    include_ui_interactions: bool = True
+    test_case_template: str = "standard"
+
+class TestGenerationWithCasesConfig(TestGenerationConfig):
+    test_case_config: TestCaseGenerationConfig
+
+# Схемы для парсинга файлов
+class TestCaseParsingConfig(BaseModel):
+    document_type: str  # excel, word, txt
+    sheet_name: Optional[str] = None
+    test_cases_column: Optional[str] = "A"
+    expected_results_column: Optional[str] = "B"
+    parse_comments: bool = True
+    generate_from_spec: bool = True

@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     OLLAMA_HOST: str
     OLLAMA_API_KEY: str
     OLLAMA_MODEL: str
+
+    GITHUB_TOKEN: str = ""
+    GITHUB_USERNAME: str = "danyayok"
     class Config:
         env_file = ".env"
         extra = "allow"

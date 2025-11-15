@@ -1,13 +1,17 @@
 // src/components/features/analysis/AnalysisOverview.jsx
 import React from 'react';
 
-const AnalysisOverview = ({ project, analyses, onRefresh, onAnalyze }) => {
+const AnalysisOverview = ({
+  project,
+  analyses,
+  onAnalyze,
+  hasRunningAnalysis
+}) => {
   const latestAnalysis = analyses[0];
 
   const formatAnalysisResult = (result) => {
     if (!result) return 'Нет данных анализа';
 
-    // Новый формат (реальный анализ)
     if (result.file_structure_summary && result.test_analysis) {
       const {
         technologies = [],
@@ -60,7 +64,6 @@ const AnalysisOverview = ({ project, analyses, onRefresh, onAnalyze }) => {
       `.trim();
     }
 
-    // Старый формат
     if (result.technologies && Array.isArray(result.technologies)) {
       return `
 📋 АНАЛИЗ ПРОЕКТА
@@ -77,44 +80,45 @@ const AnalysisOverview = ({ project, analyses, onRefresh, onAnalyze }) => {
 
   const getProgress = (analysis) => {
     const progressMap = {
-      "pending": 0,
+      "pending": 10,
       "cloning": 25,
-      "extracting": 25,
-      "analyzing": 50,
-      "generating": 75,
+      "extracting": 40,
+      "analyzing": 60,
+      "generating": 80,
       "completed": 100,
       "failed": 0
     };
     return progressMap[analysis?.status] || 0;
   };
 
-  const isAnalyzing = analyses.some(a =>
-    a.status === 'pending' || a.status === 'running' || a.status === 'analyzing' || a.status === 'generating'
-  );
+  const getStatusText = (status) => {
+    const statusTexts = {
+      pending: '⏳ Ожидание запуска',
+      cloning: '📥 Клонирование репозитория',
+      extracting: '📦 Извлечение файлов',
+      analyzing: '🔍 Анализ кода',
+      generating: '⚡ Генерация тестов',
+      completed: '✅ Анализ завершен',
+      failed: '❌ Ошибка анализа'
+    };
+    return statusTexts[status] || status;
+  };
 
   return (
     <div className="p-4 bg-white rounded shadow space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-semibold">Обзор анализа</h3>
-        <div className="flex gap-3">
-          <button
-            onClick={onRefresh}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-          >
-            🔄 Обновить
-          </button>
-          <button
-            onClick={onAnalyze}
-            disabled={isAnalyzing}
-            className={`px-4 py-2 rounded font-medium ${
-              isAnalyzing
-                ? 'bg-gray-400 text-white cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            {isAnalyzing ? 'Анализ выполняется...' : '🔄 Запустить анализ'}
-          </button>
-        </div>
+        <button
+          onClick={onAnalyze}
+          disabled={hasRunningAnalysis}
+          className={`px-4 py-2 rounded font-medium ${
+            hasRunningAnalysis
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          }`}
+        >
+          {hasRunningAnalysis ? 'Анализ выполняется...' : '🚀 Запустить анализ'}
+        </button>
       </div>
 
       <p className="text-slate-600">{project.description || 'Нет описания'}</p>
@@ -141,21 +145,20 @@ const AnalysisOverview = ({ project, analyses, onRefresh, onAnalyze }) => {
         {latestAnalysis ? (
           <div className="mt-2 p-4 border rounded bg-slate-50">
             <div className="flex justify-between items-center mb-3">
-              <span className="font-medium">Статус:
-                <span className={`ml-2 ${
-                  latestAnalysis.status === 'completed' ? 'text-green-600' :
-                  latestAnalysis.status === 'failed' ? 'text-red-600' :
-                  'text-blue-600'
-                }`}>
-                  {latestAnalysis.status}
-                </span>
+              <span className="font-medium">
+                {getStatusText(latestAnalysis.status)}
               </span>
               <span className="text-sm text-slate-500">
                 {new Date(latestAnalysis.created_at).toLocaleString()}
               </span>
             </div>
 
-            {isAnalyzing && (
+            {/* Прогресс бар - показываем только при выполнении анализа */}
+            {(latestAnalysis.status === 'pending' ||
+              latestAnalysis.status === 'cloning' ||
+              latestAnalysis.status === 'extracting' ||
+              latestAnalysis.status === 'analyzing' ||
+              latestAnalysis.status === 'generating') && (
               <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
                 <div
                   className="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out"
@@ -198,7 +201,6 @@ const AnalysisOverview = ({ project, analyses, onRefresh, onAnalyze }) => {
                     <span className="font-medium">Анализ #{analysis.id}</span>
                     <span className={`ml-2 px-2 py-1 text-xs rounded ${
                       analysis.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      analysis.status === 'running' ? 'bg-blue-100 text-blue-800' :
                       analysis.status === 'failed' ? 'bg-red-100 text-red-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>

@@ -2,7 +2,39 @@ from sqlalchemy import String, Integer, DateTime, Text, ForeignKey, JSON, Boolea
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from app.db.session import Base
+from pydantic import BaseModel
+from typing import Optional, Dict, Any, List
+from datetime import datetime
 
+# Базовые конфиги для генерации тестов
+class TestGenerationConfig(BaseModel):
+    framework: str = "auto"
+    coverage_target: int = 80
+    generate_unit_tests: bool = True
+    generate_integration_tests: bool = True
+    generate_e2e_tests: bool = False
+    include_comments: bool = True
+    generate_documentation: bool = False
+    documentation_format: str = "txt"
+    test_pattern: str = "standard"
+    test_directory: str = ""
+    custom_test_path: bool = False
+
+    class Config:
+        from_attributes = True
+
+# Если нужно расширить для тест-кейсов
+class TestGenerationWithCasesConfig(TestGenerationConfig):
+    generate_test_cases: bool = False
+    test_case_format: str = "excel"
+    test_case_level: str = "detailed"
+    include_test_steps: bool = True
+    include_expected_results: bool = True
+    include_ui_interactions: bool = True
+    test_case_template: str = "standard"
+
+    class Config:
+        from_attributes = True
 
 class User(Base):
     __tablename__ = "users"
@@ -148,3 +180,72 @@ class GeneratedTest(Base):
     project = relationship("Project", back_populates="generated_tests")
     user = relationship("User", back_populates="generated_tests")
     test_batch = relationship("TestBatch", back_populates="generated_tests")
+
+
+# Добавляем в существующие модели
+class TestCase(Base):
+    __tablename__ = "test_cases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    test_batch_id = Column(Integer, ForeignKey("test_batches.id"), nullable=True)
+
+    # Основная информация
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    test_case_id = Column(String, nullable=False)  # TC001, TC002, etc
+
+    # Детали тест-кейса
+    priority = Column(String, nullable=False)  # high, medium, low
+    test_type = Column(String, nullable=False)  # functional, e2e, api, integration
+    status = Column(String, nullable=False, default="draft")  # draft, approved, deprecated
+
+    # Шаги и результаты
+    steps = Column(JSON, nullable=True)  # [{step: 1, action: "...", expected: "..."}]
+    preconditions = Column(Text, nullable=True)
+    postconditions = Column(Text, nullable=True)
+
+    # Метаданные
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Связи
+    project = relationship("Project", back_populates="test_cases")
+    test_batch = relationship("TestBatch", back_populates="test_cases")
+    creator = relationship("User")
+
+
+class TestCaseFile(Base):
+    __tablename__ = "test_case_files"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+
+    # Информация о файле
+    filename = Column(String, nullable=False)
+    original_filename = Column(String, nullable=False)
+    file_format = Column(String, nullable=False)  # excel, word, txt
+    file_size = Column(Integer, nullable=False)
+
+    # Содержимое и парсинг
+    content = Column(Text, nullable=True)  # Для TXT файлов
+    parsed_data = Column(JSON, nullable=True)  # Парсированные данные
+
+    # Статус обработки
+    status = Column(String, nullable=False, default="uploaded")  # uploaded, parsing, parsed, error
+    error_message = Column(Text, nullable=True)
+
+    # Метаданные
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+    # Связи
+    project = relationship("Project")
+    uploader = relationship("User")
+
+
+# Добавляем отношения в существующие модели
+Project.test_cases = relationship("TestCase", back_populates="project", cascade="all, delete-orphan")
+Project.test_case_files = relationship("TestCaseFile", back_populates="project", cascade="all, delete-orphan")
+TestBatch.test_cases = relationship("TestCase", back_populates="test_batch")

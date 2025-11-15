@@ -1,9 +1,10 @@
 // src/components/layout/Sidebar.jsx
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ projects = [], onCreateProject }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path);
@@ -26,6 +27,17 @@ const Sidebar = ({ projects = [], onCreateProject }) => {
       ...prev,
       [projectId]: !prev[projectId]
     }));
+  };
+
+  // Универсальный обработчик создания проекта
+  const handleCreateProject = () => {
+    if (onCreateProject) {
+      // Если функция передана - используем её
+      onCreateProject();
+    } else {
+      // Если функция не передана - переходим на главную с флагом создания
+      navigate('/dashboard?create=true');
+    }
   };
 
   return (
@@ -79,7 +91,7 @@ const Sidebar = ({ projects = [], onCreateProject }) => {
                       <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                       <span className="truncate">{project.name}</span>
                     </div>
-                    <span className={`transform transition-transform ${
+                    <span className={`transform transition-transform text-xs ${
                       openProjects[project.id] ? 'rotate-90' : ''
                     }`}>
                       ▶
@@ -128,7 +140,7 @@ const Sidebar = ({ projects = [], onCreateProject }) => {
 
       <div className="p-4 border-t border-gray-200">
         <button
-          onClick={onCreateProject}
+          onClick={handleCreateProject}
           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
         >
           <span className="mr-2">+</span>

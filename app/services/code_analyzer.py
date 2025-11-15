@@ -681,42 +681,76 @@ class CodeAnalyzer:
         if any(dep in path_str for dep in ['node_modules', 'vendor', 'bower_components']):
             return False, None
 
-        # Паттерны для тестовых файлов и директорий
+        # БОЛЕЕ ШИРОКИЕ паттерны для тестовых файлов и директорий
         test_patterns = [
             # Имена файлов
-            re.search(r'^test_|_test\.|\.test\.|_spec\.|\.spec\.', name),
+            re.search(r'^test_|_test\.|\.test\.|_spec\.|\.spec\.|test\.', name),
             # Директории
             any(pattern in path_str for pattern in [
                 '/test/', '/tests/', '/__tests__/', '/spec/', '/specs/',
-                '/test_cases/', '/unit_test/', '/integration_test/'
+                '/test_cases/', '/unit_test/', '/integration_test/', '/e2e/',
+                '/features/', '/step_definitions/', '/support/'
             ]) and 'node_modules' not in path_str,
             # Особые случаи (только в корневых тестовых директориях)
-            parent_dir in ['test', 'tests', '__tests__', 'spec', 'specs'] and
+            parent_dir in ['test', 'tests', '__tests__', 'spec', 'specs', 'e2e', 'features'] and
             'node_modules' not in path_str
         ]
 
         has_test_pattern = any(test_patterns)
 
-        # Если нет паттернов тестов - точно не тестовый файл
-        if not has_test_pattern:
-            return False, None
+        # Если есть явные паттерны тестов - считаем тестовым файлом
+        if has_test_pattern:
+            # 🔥 УПРОЩЕННАЯ ПРОВЕРКА: анализируем содержимое файла
+            is_real_test, test_framework = self._analyze_test_content(file_path)
 
-        # 🔥 УМНАЯ ПРОВЕРКА: анализируем содержимое файла
-        is_real_test, test_framework = self._analyze_test_content(file_path)
+            # Если файл в тестовой директории И имеет тестовое имя - считаем тестовым даже при минимальном содержании
+            if not is_real_test and self._is_in_test_directory(file_path):
+                # Проверяем хотя бы базовые индикаторы
+                has_basic_test_content = self._has_basic_test_indicators(file_path)
+                if has_basic_test_content:
+                    return True, 'unknown'  # Возвращаем как тестовый с неизвестным фреймворком
 
-        return is_real_test, test_framework
+            return is_real_test, test_framework
+
+        return False, None
+
+    def _is_in_test_directory(self, file_path: Path) -> bool:
+        """Проверяет, находится ли файл в тестовой директории"""
+        path_str = str(file_path).lower()
+        test_directory_indicators = [
+            '/test/', '/tests/', '/__tests__/', '/spec/', '/specs/',
+            '/test_cases/', '/unit_test/', '/integration_test/', '/e2e/',
+            '/features/', '/step_definitions/', '/support/'
+        ]
+        return any(indicator in path_str for indicator in test_directory_indicators)
+
+    def _has_basic_test_indicators(self, file_path: Path) -> bool:
+        """Проверяет базовые индикаторы тестового файла"""
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read().lower()
+
+            # Базовые индикаторы тестов
+            basic_indicators = [
+                'test', 'assert', 'expect', 'should', 'describe', 'it(',
+                'def test_', 'class test', 'verify', 'check'
+            ]
+
+            return any(indicator in content for indicator in basic_indicators)
+        except:
+            return False
 
     def _analyze_test_content(self, file_path: Path) -> tuple:
-        """Анализирует содержимое файла на наличие реальных тестов"""
+        """Анализирует содержимое файла на наличие реальных тестов - УПРОЩЕННАЯ ВЕРСИЯ"""
         suffix = file_path.suffix.lower()
 
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
-            # Минимальный размер для реального теста (исключает пустые/заглушки)
-            if len(content.strip()) < 50:  # меньше 50 символов - вероятно заглушка
-                return False, None
+            # 🔥 УБИРАЕМ проверку минимального размера - даже маленькие тесты валидны
+            # if len(content.strip()) < 50:
+            #     return False, None
 
             # Проверяем наличие реальных тестовых конструкций
             test_indicators_count = 0
@@ -731,8 +765,8 @@ class CodeAnalyzer:
                 # Для других языков используем общие паттерны
                 test_indicators_count = self._analyze_generic_test_content(content)
 
-            # Считаем файл тестовым если найдено достаточно индикаторов
-            is_real_test = test_indicators_count >= 2
+            # 🔥 УМЕНЬШАЕМ порог до 1 индикатора
+            is_real_test = test_indicators_count >= 1
 
             # Определяем фреймворк
             test_framework = self._detect_test_framework_by_content(content, suffix) if is_real_test else None
@@ -1183,6 +1217,46 @@ class CodeAnalyzer:
 
         return routes
 
+    def _extract_route_component(self, content: str, route_path: str) -> str:
+        """Извлекает компонент/функцию связанную с маршрутом"""
+        try:
+            lines = content.split('\n')
+
+            # Паттерны для поиска функции после декоратора route
+            patterns = [
+                # FastAPI/Flask: после @app.route или @router.get
+                r'def\s+(\w+)\s*\([^)]*\)\s*:',
+                # Класс с методами
+                r'class\s+(\w+).*:',
+                # Async функции
+                r'async\s+def\s+(\w+)\s*\([^)]*\)\s*:'
+            ]
+
+            # Ищем определение функции/класса после строки с route_path
+            for i, line in enumerate(lines):
+                if route_path in line:
+                    # Ищем в следующих 10 строках
+                    for j in range(i + 1, min(i + 10, len(lines))):
+                        for pattern in patterns:
+                            match = re.search(pattern, lines[j])
+                            if match:
+                                component_name = match.group(1)
+
+                                # Определяем тип компонента
+                                if 'class' in lines[j]:
+                                    component_type = 'class'
+                                elif 'async' in lines[j]:
+                                    component_type = 'async_function'
+                                else:
+                                    component_type = 'function'
+
+                                return f"{component_type}: {component_name}"
+
+            return "unknown_component"
+
+        except Exception as e:
+            logger.debug(f"Error extracting route component: {e}")
+            return "unknown_component"
     def _create_navigation_scenarios(self, routes: List[Dict]) -> List[Dict]:
         """Создает сценарии навигации на основе маршрутов"""
         scenarios = []

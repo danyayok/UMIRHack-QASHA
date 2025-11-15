@@ -5,34 +5,60 @@ import ProjectCard from '../components/features/projects/ProjectCard';
 import ProjectForm from '../components/features/projects/ProjectForm';
 import { useProjects } from '../hooks/useProjects';
 import { Button } from '../components/ui';
+import { projectsAPI } from '../services/api';
 
 export default function Dashboard() {
   const { projects, loading, error, createProject, deleteProject, refetch } = useProjects();
   const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newProject, setNewProject] = useState(null);
-  const [pollingCount, setPollingCount] = useState(0);
+  const [projectsWithAnalysis, setProjectsWithAnalysis] = useState([]);
 
-  // Автоматическое обновление каждые 5 секунд если есть проекты в анализе
+  // Загружаем анализы для каждого проекта
   useEffect(() => {
-    const hasPendingAnalysis = projects.some(project =>
-      !project.coverage || project.coverage === 0
-    );
+    const loadAnalyses = async () => {
+      if (projects.length === 0) {
+        setProjectsWithAnalysis([]);
+        return;
+      }
 
-    if (hasPendingAnalysis) {
-      const interval = setInterval(() => {
-        refetch();
-        setPollingCount(prev => prev + 1);
-      }, 5000);
+      try {
+        const projectsWithAnalyses = await Promise.all(
+          projects.map(async (project) => {
+            try {
+              const latestAnalysis = await projectsAPI.getLatestAnalysis(project.id);
+              return {
+                ...project,
+                latest_analysis: latestAnalysis,
+                // coverage берем из проекта, так как он уже приходит с бэкенда
+                coverage: project.coverage || 0
+              };
+            } catch (error) {
+              console.error(`Error loading analysis for project ${project.id}:`, error);
+              return {
+                ...project,
+                latest_analysis: null,
+                coverage: project.coverage || 0
+              };
+            }
+          })
+        );
+        setProjectsWithAnalysis(projectsWithAnalyses);
+      } catch (error) {
+        console.error('Error loading analyses:', error);
+        setProjectsWithAnalysis(projects); // fallback - используем проекты без анализов
+      }
+    };
 
-      return () => clearInterval(interval);
-    }
-  }, [projects, refetch]);
+    loadAnalyses();
+  }, [projects]);
 
   const handleProjectCreated = (project) => {
     setNewProject(project);
-    // Начинаем опрос для нового проекта
-    setTimeout(refetch, 2000);
+    // Обновляем список проектов через некоторое время
+    setTimeout(() => {
+      refetch();
+    }, 2000);
   };
 
   const openProject = (project) => {
@@ -42,21 +68,14 @@ export default function Dashboard() {
   const headerProps = {
     title: "Мои проекты",
     actions: (
-      <div className="flex items-center space-x-4">
-        {pollingCount > 0 && (
-          <div className="text-sm text-gray-500">
-            Автообновление... ({pollingCount})
-          </div>
-        )}
-        <Button onClick={() => setShowCreateModal(true)}>
-          + Новый проект
-        </Button>
-      </div>
+      <Button onClick={() => setShowCreateModal(true)}>
+        + Новый проект
+      </Button>
     )
   };
 
   const sidebarProps = {
-    projects,
+    projects: projectsWithAnalysis,
     onCreateProject: () => setShowCreateModal(true)
   };
 
@@ -73,24 +92,33 @@ export default function Dashboard() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-blue-800 font-medium">🔄 Проект создан!</h3>
+                <h3 className="text-blue-800 font-medium">✅ Проект создан!</h3>
                 <p className="text-blue-700 text-sm">
-                  Проект "{newProject.name}" создан. Запущен анализ репозитория...
+                  Проект "{newProject.name}" успешно создан.
                 </p>
                 <p className="text-blue-600 text-xs mt-1">
-                  Данные появятся через 10-30 секунд
+                  Перейдите к проекту чтобы отслеживать прогресс анализа
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  openProject(newProject);
-                  setNewProject(null);
-                }}
-                variant="primary"
-                size="small"
-              >
-                Перейти к проекту
-              </Button>
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => setNewProject(null)}
+                  variant="secondary"
+                  size="small"
+                >
+                  Закрыть
+                </Button>
+                <Button
+                  onClick={() => {
+                    openProject(newProject);
+                    setNewProject(null);
+                  }}
+                  variant="primary"
+                  size="small"
+                >
+                  Перейти к проекту
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -101,7 +129,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map(project => (
+            {projectsWithAnalysis.map(project => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -112,7 +140,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {!loading && projects.length === 0 && (
+        {!loading && projectsWithAnalysis.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-500 text-lg mb-4">
               У вас пока нет проектов
