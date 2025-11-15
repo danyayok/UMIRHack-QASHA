@@ -194,15 +194,15 @@ CELERY_RESULT_BACKEND=redis://localhost:6379/2
 # ========================
 # AI ПРОВАЙДЕРЫ
 # ========================
-GIGACHAT_KEY="MDE5YTY4NmEtZDBjOS03OGY5LTkyNmQtNDJjMzAyN2JlZmVkOmUwOTc4YjYwLTZmZjItNGZhNS05ZDQwLTI3NmC4NjgwNTQ0Mw=="
-OLLAMA_API_KEY="04886c30b45b41a99b3012cd955f9d6f.tMGmDURT6ZICpygRUDz76k2N"
+GIGACHAT_KEY="enter yours"
+OLLAMA_API_KEY="enter yours"
 OLLAMA_HOST=https://ollama.com
 OLLAMA_MODEL=qwen3-coder:480b
 
 # ========================
 # GITHUB ИНТЕГРАЦИЯ
 # ========================
-GITHUB_TOKEN=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
+GITHUB_TOKEN="enter yours"
 GITHUB_USERNAME=danyayok
 
 # ========================
